@@ -8,10 +8,18 @@ TipoSistema sistema;
 // Declaracion del objeto teclado
 TipoTeclado teclado = {
 	.columnas = {
+			GPIO_KEYBOARD_COL_1,
+			GPIO_KEYBOARD_COL_2,
+			GPIO_KEYBOARD_COL_3,
+			GPIO_KEYBOARD_COL_4
 		// A completar por el alumno...
 		// ...
 	},
 	.filas = {
+			GPIO_KEYBOARD_ROW_1,
+			GPIO_KEYBOARD_ROW_2,
+			GPIO_KEYBOARD_ROW_3,
+			GPIO_KEYBOARD_ROW_4
 		// A completar por el alumno...
 		// ...
 	},
@@ -27,10 +35,20 @@ TipoTeclado teclado = {
 // Declaracion del objeto display
 TipoLedDisplay led_display = {
 	.pines_control_columnas = {
+			GPIO_LED_DISPLAY_COL_1,
+			GPIO_LED_DISPLAY_COL_2,
+			GPIO_LED_DISPLAY_COL_3
 		// A completar por el alumno...
 		// ...
 	},
 	.filas = {
+			GPIO_LED_DISPLAY_ROW_1,
+			GPIO_LED_DISPLAY_ROW_2,
+			GPIO_LED_DISPLAY_ROW_3,
+			GPIO_LED_DISPLAY_ROW_4,
+			GPIO_LED_DISPLAY_ROW_5,
+			GPIO_LED_DISPLAY_ROW_6,
+			GPIO_LED_DISPLAY_ROW_7
 		// A completar por el alumno...
 		// ...
 	},
@@ -85,6 +103,24 @@ PI_THREAD (thread_explora_teclado_PC) {
 			switch(teclaPulsada) {
 				// A completar por el alumno...
 				// ...
+				case 'a':
+					// A completar por el alumno...
+					// ...
+					printf("Tecla A pulsada!\n");
+					fflush(stdout);
+					break;
+				case 'c':
+					// A completar por el alumno...
+					// ...
+					printf("Tecla C pulsada!\n");
+					fflush(stdout);
+					break;
+				case 'd':
+					// A completar por el alumno...
+					// ...
+					printf("Tecla D pulsada!\n");
+					fflush(stdout);
+					break;
 				case 's':
 					// A completar por el alumno...
 					// ...

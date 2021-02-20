@@ -332,6 +332,9 @@ int CompruebaBotonPulsado (fsm_t* this) {
 int CompruebaMovimientoIzquierda(fsm_t* this) {
 	int result = 0;
 
+	piLock(SYSTEM_FLAGS_KEY);
+	result = (flags & FLAG_MOV_IZQUIERDA);
+	piUnlock(SYSTEM_FLAGS_KEY);
 	// A completar por el alumno
 	// ...
 
@@ -341,6 +344,9 @@ int CompruebaMovimientoIzquierda(fsm_t* this) {
 int CompruebaMovimientoDerecha(fsm_t* this) {
 	int result = 0;
 
+	piLock(SYSTEM_FLAGS_KEY);
+	result = (flags & FLAG_MOV_DERECHA);
+	piUnlock(SYSTEM_FLAGS_KEY);
 	// A completar por el alumno
 	// ...
 
@@ -395,6 +401,16 @@ void MuevePalaIzquierda (fsm_t* this) {
 	tipo_arkanoPi* p_arkanoPi;
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
+	piLock(SYSTEM_FLAGS_KEY);
+	flags &= ~FLAG_MOV_IZQUIERDA;
+	piUnlock(SYSTEM_FLAGS_KEY);
+	ActualizaPosicionPala(&p_arkanoPi->pala, IZQUIERDA);
+	piLock(MATRIX_KEY);
+	ActualizaPantalla(p_arkanoPi, 0);
+	piUnlock(MATRIX_KEY);
+	piLock(STD_IO_BUFFER_KEY);
+	PintaPantallaPorTerminal(p_arkanoPi->p_pantalla);
+	piUnlock(STD_IO_BUFFER_KEY);
 	// A completar por el alumno
 	// ...
 }
@@ -406,6 +422,16 @@ void MuevePalaDerecha (fsm_t* this) {
 	tipo_arkanoPi* p_arkanoPi;
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
+	piLock(SYSTEM_FLAGS_KEY);
+	flags &= ~FLAG_MOV_DERECHA;
+	piUnlock(SYSTEM_FLAGS_KEY);
+	ActualizaPosicionPala(&p_arkanoPi->pala, DERECHA);
+	piLock(MATRIX_KEY);
+	ActualizaPantalla(p_arkanoPi, 0);
+	piUnlock(MATRIX_KEY);
+	piLock(STD_IO_BUFFER_KEY);
+	PintaPantallaPorTerminal(p_arkanoPi->p_pantalla);
+	piUnlock(STD_IO_BUFFER_KEY);
 	// A completar por el alumno
 	// ...
 }
