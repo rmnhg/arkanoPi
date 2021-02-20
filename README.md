@@ -7,7 +7,7 @@ Idealmente se ejecutará en una Raspberry, pero este proyecto soporta su emulaci
 Para su desarrollo se está empleando Eclipse.
 
 ## Compilación del proyecto
-Para compilar el proyecto se debe emplear un sistema base de tipo Unix, y enlazar las librerias rt y pthread.
+Para compilar el proyecto se debe emplear un sistema base de tipo Unix y enlazar las librerias rt y pthread durante la compilación.
 
 Ejemplo de compilación y ejecución sin IDEs:
 ```
