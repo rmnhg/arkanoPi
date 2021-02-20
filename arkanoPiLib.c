@@ -26,24 +26,6 @@ void PintaMensajeInicialPantalla (tipo_pantalla *p_pantalla, tipo_pantalla *p_pa
 	return;
 }
 
-void PintaPantallaPorTerminal (tipo_pantalla *p_pantalla) {
-#ifdef __SIN_PSEUDOWIRINGPI__
-	int i=0, j=0;
-
-	printf("\n[PANTALLA]\n");
-	fflush(stdout);
-	for(i=0;i<NUM_FILAS_DISPLAY;i++) {
-		for(j=0;j<NUM_COLUMNAS_DISPLAY;j++) {
-			printf("%d", p_pantalla->matriz[i][j]);
-			fflush(stdout);
-		}
-		printf("\n");
-		fflush(stdout);
-	}
-	fflush(stdout);
-#endif
-}
-
 void ReseteaPantalla (tipo_pantalla *p_pantalla) {
 	int i=0, j=0;
 
@@ -162,7 +144,7 @@ void PintaPelota(tipo_pelota *p_pelota, tipo_pantalla *p_pantalla) {
 	}
 }
 
-void ActualizaPantalla(tipo_arkanoPi* p_arkanoPi) {
+void ActualizaPantalla(tipo_arkanoPi* p_arkanoPi, int debug) {
 
     // Borro toda la pantalla
 	ReseteaPantalla((tipo_pantalla*)(p_arkanoPi->p_pantalla));
@@ -181,11 +163,17 @@ void ActualizaPantalla(tipo_arkanoPi* p_arkanoPi) {
 	PintaPelota(
 		(tipo_pelota*)(&(p_arkanoPi->pelota)),
 		(tipo_pantalla*)(p_arkanoPi->p_pantalla));
+
+	if (debug) {
+		printf("\nDESPUES DE PintaPelota\n");
+		fflush(stdout);
+		PintaPantallaPorTerminal((tipo_pantalla*)(p_arkanoPi->p_pantalla));
+	}
 }
 
-void InicializaArkanoPi(tipo_arkanoPi *p_arkanoPi) {
+void InicializaArkanoPi(tipo_arkanoPi *p_arkanoPi, int debug) {
 	ResetArkanoPi(p_arkanoPi);
-	ActualizaPantalla(p_arkanoPi);
+	ActualizaPantalla(p_arkanoPi, debug);
 }
 
 void ResetArkanoPi(tipo_arkanoPi *p_arkanoPi) {

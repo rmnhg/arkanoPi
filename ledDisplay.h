@@ -53,6 +53,7 @@ void InicializaLedDisplay (TipoLedDisplay *led_display);
 void ApagaFilas (TipoLedDisplay *led_display);
 void ExcitaColumnas (int columna);
 void ActualizaLedDisplay (TipoLedDisplay *led_display);
+void PintaPantallaPorTerminal (tipo_pantalla *p_pantalla);
 
 //------------------------------------------------------
 // FUNCIONES DE ENTRADA O DE TRANSICION DE LA MAQUINA DE ESTADOS

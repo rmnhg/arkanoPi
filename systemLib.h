@@ -16,7 +16,6 @@
 #include "fsm.h"
 #include "tmr.h"
 
-#define __SIN_PSEUDOWIRINGPI__
 #define CLK_MS 					1
 
 // ATENCION: Valores a modificar por el alumno
