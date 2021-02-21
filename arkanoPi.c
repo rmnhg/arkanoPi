@@ -106,26 +106,40 @@ PI_THREAD (thread_explora_teclado_PC) {
 				case 'a':
 					// A completar por el alumno...
 					// ...
+					piLock(SYSTEM_FLAGS_KEY);
+					flags |= FLAG_MOV_IZQUIERDA;
+					piUnlock(SYSTEM_FLAGS_KEY);
 					printf("Tecla A pulsada!\n");
 					fflush(stdout);
 					break;
 				case 'c':
 					// A completar por el alumno...
 					// ...
+					piLock(SYSTEM_FLAGS_KEY);
+					flags |= FLAG_TIMER_JUEGO;
+					piUnlock(SYSTEM_FLAGS_KEY);
 					printf("Tecla C pulsada!\n");
 					fflush(stdout);
 					break;
 				case 'd':
 					// A completar por el alumno...
 					// ...
+					piLock(SYSTEM_FLAGS_KEY);
+					flags |= FLAG_MOV_DERECHA;
+					piUnlock(SYSTEM_FLAGS_KEY);
 					printf("Tecla D pulsada!\n");
 					fflush(stdout);
 					break;
 				case 's':
 					// A completar por el alumno...
 					// ...
+					piLock(SYSTEM_FLAGS_KEY);
+					flags |= FLAG_BOTON;
+					piUnlock(SYSTEM_FLAGS_KEY);
 					printf("Tecla S pulsada!\n");
 					fflush(stdout);
+					break;
+				case '\n':
 					break;
 
 				case 'q':
@@ -166,6 +180,7 @@ int main () {
 	};
 
 	// Configuracion e incializacion del sistema
+	sistema.arkanoPi.p_pantalla = &(led_display.pantalla);
 	ConfiguraInicializaSistema (&sistema);
 
 	fsm_t* arkanoPi_fsm = fsm_new (WAIT_START, arkanoPi, &sistema);

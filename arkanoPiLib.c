@@ -323,6 +323,9 @@ int CalculaLadrillosRestantes(tipo_pantalla *p_ladrillos) {
 int CompruebaBotonPulsado (fsm_t* this) {
 	int result = 0;
 
+	piLock(SYSTEM_FLAGS_KEY);
+	result = (flags & FLAG_BOTON);
+	piUnlock(SYSTEM_FLAGS_KEY);
 	// A completar por el alumno
 	// ...
 
@@ -356,6 +359,9 @@ int CompruebaMovimientoDerecha(fsm_t* this) {
 int CompruebaTimeoutActualizacionJuego (fsm_t* this) {
 	int result = 0;
 
+	piLock(SYSTEM_FLAGS_KEY);
+	result = (flags & FLAG_TIMER_JUEGO);
+	piUnlock(SYSTEM_FLAGS_KEY);
 	// A completar por el alumno
 	// ...
 
@@ -365,6 +371,9 @@ int CompruebaTimeoutActualizacionJuego (fsm_t* this) {
 int CompruebaFinalJuego(fsm_t* this) {
 	int result = 0;
 
+	piLock(SYSTEM_FLAGS_KEY);
+	result = (flags & FLAG_FIN_JUEGO);
+	piUnlock(SYSTEM_FLAGS_KEY);
 	// A completar por el alumno
 	// ...
 
@@ -383,10 +392,22 @@ void InicializaJuego(fsm_t* this) {
 	tipo_arkanoPi *p_arkanoPi;
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
-	// A completar por el alumno
-	// ...
+	piLock(SYSTEM_FLAGS_KEY);
+	flags &= ~FLAG_BOTON;
+	piUnlock(SYSTEM_FLAGS_KEY);
+	//InicializaLedDisplay(p_arkanoPi->p_pantalla);
+	//InicializaTeclado(p_arkanoPi->)
+	/*p_arkanoPi->pelota.x = 5;
+	p_arkanoPi->pelota.y = 2;
+	p_arkanoPi->pelota.trayectoria.xv = 0;
+	p_arkanoPi->pelota.trayectoria.yv = 1;*/
+	InicializaArkanoPi(p_arkanoPi);
+	pseudoWiringPiEnableDisplay(1);
 
-	//pseudoWiringPiEnableDisplay(1);
+
+	piLock(STD_IO_BUFFER_KEY);
+	PintaPantallaPorTerminal(p_arkanoPi->p_pantalla);
+	piUnlock(STD_IO_BUFFER_KEY);
 }
 
 // void MuevePalaIzquierda (void): funcion encargada de ejecutar
@@ -406,7 +427,7 @@ void MuevePalaIzquierda (fsm_t* this) {
 	piUnlock(SYSTEM_FLAGS_KEY);
 	ActualizaPosicionPala(&p_arkanoPi->pala, IZQUIERDA);
 	piLock(MATRIX_KEY);
-	ActualizaPantalla(p_arkanoPi, 0);
+	ActualizaPantalla(p_arkanoPi);
 	piUnlock(MATRIX_KEY);
 	piLock(STD_IO_BUFFER_KEY);
 	PintaPantallaPorTerminal(p_arkanoPi->p_pantalla);
@@ -427,7 +448,7 @@ void MuevePalaDerecha (fsm_t* this) {
 	piUnlock(SYSTEM_FLAGS_KEY);
 	ActualizaPosicionPala(&p_arkanoPi->pala, DERECHA);
 	piLock(MATRIX_KEY);
-	ActualizaPantalla(p_arkanoPi, 0);
+	ActualizaPantalla(p_arkanoPi);
 	piUnlock(MATRIX_KEY);
 	piLock(STD_IO_BUFFER_KEY);
 	PintaPantallaPorTerminal(p_arkanoPi->p_pantalla);
@@ -451,6 +472,56 @@ void ActualizarJuego (fsm_t* this) {
 	tipo_arkanoPi* p_arkanoPi;
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
+/*
+	piLock(SYSTEM_FLAGS_KEY);
+	flags &= (~FLAG_TIMER_JUEGO);
+	// Con esto apago el flag_boton y hago que si se da a la S no se reinicie.
+	flags &= (~FLAG_BOTON);
+	//flags &= (~FLAG_PAUSA_JUEGO);
+	piUnlock(SYSTEM_FLAGS_KEY);
+
+
+
+	piLock(MATRIX_KEY);
+	ActualizaSnakePi(p_snakePi);
+	piUnlock(MATRIX_KEY);
+
+
+	if (CompruebaColision(&(p_snakePi->serpiente), &(p_snakePi->manzana), 0)) {
+ */
+
+	piLock(SYSTEM_FLAGS_KEY);
+	flags &= (~FLAG_TIMER_JUEGO);
+	flags &= (~FLAG_BOTON);
+	piUnlock(SYSTEM_FLAGS_KEY);
+
+/*	p_pelota->x += p_pelota->trayectoria.xv;
+	p_pelota->y += p_pelota->trayectoria.yv; */
+
+
+	if (CompruebaFallo(*(p_arkanoPi))) {
+		piLock(SYSTEM_FLAGS_KEY);
+		flags |= FLAG_FIN_JUEGO;
+		piUnlock(SYSTEM_FLAGS_KEY);
+	} else if (CompruebaReboteParedesVerticales(*(p_arkanoPi))) {
+		p_arkanoPi->pelota.trayectoria.xv *= -1;
+	} else if (CompruebaRebotePala(*(p_arkanoPi))) {
+		// Falta por completar
+		p_arkanoPi->pelota.trayectoria.xv = 0;
+		p_arkanoPi->pelota.trayectoria.yv = 1;
+	} else if (CompruebaReboteTecho(*(p_arkanoPi)) || CompruebaReboteLadrillo(p_arkanoPi)) {
+		if (CompruebaReboteLadrillo(p_arkanoPi)) {
+			ladrillos_basico[p_arkanoPi->pelota.x][p_arkanoPi->pelota.y] = 0;
+		}
+		p_arkanoPi->pelota.trayectoria.yv *= -1;
+	}
+
+	ActualizaPosicionPelota(&(p_arkanoPi->pelota));
+
+	//cd eclipse-workspace/arkanoPi_1
+	//git branch
+	//git add *.c *.h && git commit -m "Cambios D-21-02-2021" && git push https://github.com/rmnhg/arkanoPi master_Moodle:master_Moodle
+
 	// A completar por el alumno
 	// ...
 }
@@ -462,10 +533,12 @@ void FinalJuego (fsm_t* this) {
 	tipo_arkanoPi *p_arkanoPi;
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
+	flags |= FLAG_FIN_JUEGO;
+	printf("Has destruido %d ladrillos. ¡Enhorabuena!\n", NUM_COLUMNAS_DISPLAY * 2 - CalculaLadrillosRestantes(&(p_arkanoPi->ladrillos)));
 	// A completar por el alumno
 	// ...
 
-	//pseudoWiringPiEnableDisplay(0);
+	pseudoWiringPiEnableDisplay(0);
 }
 
 //void ReseteaJuego (void): función encargada de llevar a cabo la
@@ -476,6 +549,15 @@ void ReseteaJuego (fsm_t* this) {
 	tipo_arkanoPi *p_arkanoPi;
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
+
+	piLock(SYSTEM_FLAGS_KEY);
+	flags &= ~FLAG_BOTON;
+	piUnlock(SYSTEM_FLAGS_KEY);
+	piLock(STD_IO_BUFFER_KEY);
+	PintaPantallaPorTerminal(p_arkanoPi->p_pantalla);
+	piUnlock(STD_IO_BUFFER_KEY);
+	ResetArkanoPi(p_arkanoPi);
+	pseudoWiringPiEnableDisplay(1);
 	// A completar por el alumno
 	// ...
 }

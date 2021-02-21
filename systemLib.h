@@ -65,7 +65,7 @@
 #define FLAG_MOV_DERECHA 	0x04 //00000100
 #define FLAG_MOV_IZQUIERDA 	0x08 //00001000
 #define FLAG_TIMER_JUEGO	0x10 //00010000
-#define FLAG_BOTON 		0x20 //00100000
+#define FLAG_BOTON 			0x20 //00100000
 #define FLAG_FIN_JUEGO		0x40 //01000000
 
 //result = (flags & FLAG_MOV_ARRIBA); //Comprueba este bit
