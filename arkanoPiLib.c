@@ -503,20 +503,48 @@ void ActualizarJuego (fsm_t* this) {
 		piLock(SYSTEM_FLAGS_KEY);
 		flags |= FLAG_FIN_JUEGO;
 		piUnlock(SYSTEM_FLAGS_KEY);
-	} else if (CompruebaReboteParedesVerticales(*(p_arkanoPi))) {
-		p_arkanoPi->pelota.trayectoria.xv *= -1;
-	} else if (CompruebaRebotePala(*(p_arkanoPi))) {
-		// Falta por completar
-		p_arkanoPi->pelota.trayectoria.xv = 0;
-		p_arkanoPi->pelota.trayectoria.yv = 1;
-	} else if (CompruebaReboteTecho(*(p_arkanoPi)) || CompruebaReboteLadrillo(p_arkanoPi)) {
-		if (CompruebaReboteLadrillo(p_arkanoPi)) {
-			ladrillos_basico[p_arkanoPi->pelota.x][p_arkanoPi->pelota.y] = 0;
+	} else {
+		if (CompruebaReboteParedesVerticales(*(p_arkanoPi))) {
+			p_arkanoPi->pelota.trayectoria.xv *= -1;
 		}
-		p_arkanoPi->pelota.trayectoria.yv *= -1;
+		if (CompruebaRebotePala(*(p_arkanoPi))) {
+			//Completado :)
+			p_arkanoPi->pelota.trayectoria.yv = -1;
+			// De estos ifs se pueden quitar realmente los que su xv se quede igual
+			if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x - 1) && p_arkanoPi->pelota.trayectoria.xv == 1) {
+				p_arkanoPi->pelota.trayectoria.xv = -1; // Caso fila 1 columna 1
+			} else if (p_arkanoPi->pelota.x == p_arkanoPi->pala.x && p_arkanoPi->pelota.trayectoria.xv == 1) {
+				p_arkanoPi->pelota.trayectoria.xv = 0; // Caso fila 1 columna 1
+			} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1) && p_arkanoPi->pelota.trayectoria.xv == 1) {
+				p_arkanoPi->pelota.trayectoria.xv = 1; // Caso fila 1 columna 1
+			} else if (p_arkanoPi->pelota.x == p_arkanoPi->pala.x && p_arkanoPi->pelota.trayectoria.xv == 0) {
+				p_arkanoPi->pelota.trayectoria.xv = -1; // Caso fila 1 columna 1
+			} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1) && p_arkanoPi->pelota.trayectoria.xv == 0) {
+				p_arkanoPi->pelota.trayectoria.xv = 0; // Caso fila 1 columna 1
+			} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 2) && p_arkanoPi->pelota.trayectoria.xv == 0) {
+				p_arkanoPi->pelota.trayectoria.xv = 1; // Caso fila 1 columna 1
+			} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1) && p_arkanoPi->pelota.trayectoria.xv == -1) {
+				p_arkanoPi->pelota.trayectoria.xv = -1; // Caso fila 1 columna 1
+			} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 2) && p_arkanoPi->pelota.trayectoria.xv == -1) {
+				p_arkanoPi->pelota.trayectoria.xv = 0; // Caso fila 1 columna 1
+			} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 3) && p_arkanoPi->pelota.trayectoria.xv == -1) {
+				p_arkanoPi->pelota.trayectoria.xv = +1; // Caso fila 1 columna 1
+			}
+		}
+		if (CompruebaReboteTecho(*(p_arkanoPi)) || CompruebaReboteLadrillo(p_arkanoPi)) {
+			// Se elimina el ladrillo que toque la pelota
+			p_arkanoPi->ladrillos.matriz[p_arkanoPi->pelota.x][p_arkanoPi->pelota.y] = 0;
+			p_arkanoPi->pelota.trayectoria.yv *= -1;
+		}
 	}
 
 	ActualizaPosicionPelota(&(p_arkanoPi->pelota));
+	piLock(MATRIX_KEY);
+	ActualizaPantalla(p_arkanoPi);
+	piUnlock(MATRIX_KEY);
+	piLock(STD_IO_BUFFER_KEY);
+	PintaPantallaPorTerminal(p_arkanoPi->p_pantalla);
+	piUnlock(STD_IO_BUFFER_KEY);
 
 	//cd eclipse-workspace/arkanoPi_1
 	//git branch
@@ -533,8 +561,16 @@ void FinalJuego (fsm_t* this) {
 	tipo_arkanoPi *p_arkanoPi;
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
-	flags |= FLAG_FIN_JUEGO;
+	piLock(SYSTEM_FLAGS_KEY);
+	flags &= ~FLAG_FIN_JUEGO;
+	flags &= ~FLAG_BOTON;
+	piUnlock(SYSTEM_FLAGS_KEY);
+	piLock(STD_IO_BUFFER_KEY);
 	printf("Has destruido %d ladrillos. ¡Enhorabuena!\n", NUM_COLUMNAS_DISPLAY * 2 - CalculaLadrillosRestantes(&(p_arkanoPi->ladrillos)));
+	printf("Pulsa la tecla S para jugar de nuevo.\n");
+	printf("Si quieres salir pulsa la tecla Q.\n");
+	fflush(stdout);
+	piUnlock(STD_IO_BUFFER_KEY);
 	// A completar por el alumno
 	// ...
 
@@ -550,14 +586,25 @@ void ReseteaJuego (fsm_t* this) {
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
 
+	InicializaJuego(this);
 	piLock(SYSTEM_FLAGS_KEY);
-	flags &= ~FLAG_BOTON;
+	flags &= (~FLAG_TIMER_JUEGO);
+	flags &= (~FLAG_BOTON);
 	piUnlock(SYSTEM_FLAGS_KEY);
-	piLock(STD_IO_BUFFER_KEY);
-	PintaPantallaPorTerminal(p_arkanoPi->p_pantalla);
-	piUnlock(STD_IO_BUFFER_KEY);
 	ResetArkanoPi(p_arkanoPi);
+	//InicializaArkanoPi(p_arkanoPi);
 	pseudoWiringPiEnableDisplay(1);
+
+	piLock(STD_IO_BUFFER_KEY);
+	printf("¡Bienvenido a arkanoPi!\n");
+	printf("Instrucciones de uso:\n");
+	printf("\tLa tecla S inicia el juego.\n");
+	printf("\tLas teclas A y D mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n");
+	printf("\tLa tecla C actualiza la posición de la pelota en la pantalla.\n");
+	printf("\tLa tecla Q cierra el juego.\n");
+	fflush(stdout);
+	piUnlock(STD_IO_BUFFER_KEY);
+
 	// A completar por el alumno
 	// ...
 }

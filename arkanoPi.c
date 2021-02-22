@@ -143,6 +143,7 @@ PI_THREAD (thread_explora_teclado_PC) {
 					break;
 
 				case 'q':
+					printf("Gracias por jugar a arkanoPi.\n");
 					exit(0);
 					break;
 
@@ -187,6 +188,16 @@ int main () {
 
 	// A completar por el alumno...
 	// ...
+
+	piLock(STD_IO_BUFFER_KEY);
+	printf("¡Bienvenido a arkanoPi!\n");
+	printf("Instrucciones de uso:\n");
+	printf("\tLa tecla S inicia el juego.\n");
+	printf("\tLas teclas A y D mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n");
+	printf("\tLa tecla C actualiza la posición de la pelota en la pantalla.\n");
+	printf("\tLa tecla Q cierra el juego.\n");
+	fflush(stdout);
+	piUnlock(STD_IO_BUFFER_KEY);
 
 	next = millis();
 	while (1) {
