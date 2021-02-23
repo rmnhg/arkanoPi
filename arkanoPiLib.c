@@ -472,32 +472,10 @@ void ActualizarJuego (fsm_t* this) {
 	tipo_arkanoPi* p_arkanoPi;
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
-/*
-	piLock(SYSTEM_FLAGS_KEY);
-	flags &= (~FLAG_TIMER_JUEGO);
-	// Con esto apago el flag_boton y hago que si se da a la S no se reinicie.
-	flags &= (~FLAG_BOTON);
-	//flags &= (~FLAG_PAUSA_JUEGO);
-	piUnlock(SYSTEM_FLAGS_KEY);
-
-
-
-	piLock(MATRIX_KEY);
-	ActualizaSnakePi(p_snakePi);
-	piUnlock(MATRIX_KEY);
-
-
-	if (CompruebaColision(&(p_snakePi->serpiente), &(p_snakePi->manzana), 0)) {
- */
-
 	piLock(SYSTEM_FLAGS_KEY);
 	flags &= (~FLAG_TIMER_JUEGO);
 	flags &= (~FLAG_BOTON);
 	piUnlock(SYSTEM_FLAGS_KEY);
-
-/*	p_pelota->x += p_pelota->trayectoria.xv;
-	p_pelota->y += p_pelota->trayectoria.yv; */
-
 
 	if (CompruebaFallo(*(p_arkanoPi))) {
 		piLock(SYSTEM_FLAGS_KEY);
@@ -506,36 +484,37 @@ void ActualizarJuego (fsm_t* this) {
 	} else {
 		if (CompruebaReboteParedesVerticales(*(p_arkanoPi))) {
 			p_arkanoPi->pelota.trayectoria.xv *= -1;
-		}
-		if (CompruebaRebotePala(*(p_arkanoPi))) {
-			//Completado :)
-			p_arkanoPi->pelota.trayectoria.yv = -1;
-			// De estos ifs se pueden quitar realmente los que su xv se quede igual
-			if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x - 1) && p_arkanoPi->pelota.trayectoria.xv == 1) {
-				p_arkanoPi->pelota.trayectoria.xv = -1; // Caso fila 1 columna 1
-			} else if (p_arkanoPi->pelota.x == p_arkanoPi->pala.x && p_arkanoPi->pelota.trayectoria.xv == 1) {
-				p_arkanoPi->pelota.trayectoria.xv = 0; // Caso fila 1 columna 1
-			} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1) && p_arkanoPi->pelota.trayectoria.xv == 1) {
-				p_arkanoPi->pelota.trayectoria.xv = 1; // Caso fila 1 columna 1
-			} else if (p_arkanoPi->pelota.x == p_arkanoPi->pala.x && p_arkanoPi->pelota.trayectoria.xv == 0) {
-				p_arkanoPi->pelota.trayectoria.xv = -1; // Caso fila 1 columna 1
-			} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1) && p_arkanoPi->pelota.trayectoria.xv == 0) {
-				p_arkanoPi->pelota.trayectoria.xv = 0; // Caso fila 1 columna 1
-			} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 2) && p_arkanoPi->pelota.trayectoria.xv == 0) {
-				p_arkanoPi->pelota.trayectoria.xv = 1; // Caso fila 1 columna 1
-			} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1) && p_arkanoPi->pelota.trayectoria.xv == -1) {
-				p_arkanoPi->pelota.trayectoria.xv = -1; // Caso fila 1 columna 1
-			} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 2) && p_arkanoPi->pelota.trayectoria.xv == -1) {
-				p_arkanoPi->pelota.trayectoria.xv = 0; // Caso fila 1 columna 1
-			} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 3) && p_arkanoPi->pelota.trayectoria.xv == -1) {
-				p_arkanoPi->pelota.trayectoria.xv = +1; // Caso fila 1 columna 1
+		} else if (CompruebaReboteTecho(*(p_arkanoPi))) {
+			p_arkanoPi->pelota.trayectoria.yv *= -1;
+		} else if (CompruebaReboteLadrillo(p_arkanoPi)) {
+				// Se elimina el ladrillo que toque la pelota
+				p_arkanoPi->ladrillos.matriz[p_arkanoPi->pelota.x][p_arkanoPi->pelota.y] = 0;
+				p_arkanoPi->pelota.trayectoria.yv *= -1;
 			}
 		}
-		if (CompruebaReboteTecho(*(p_arkanoPi)) || CompruebaReboteLadrillo(p_arkanoPi)) {
-			// Se elimina el ladrillo que toque la pelota
-			p_arkanoPi->ladrillos.matriz[p_arkanoPi->pelota.x][p_arkanoPi->pelota.y] = 0;
-			p_arkanoPi->pelota.trayectoria.yv *= -1;
-		}
+		if (CompruebaRebotePala(*(p_arkanoPi))) {
+				//Completado :)
+				p_arkanoPi->pelota.trayectoria.yv = -1;
+				// De estos ifs se pueden quitar realmente los que su xv se quede igual
+				if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x - 1) && p_arkanoPi->pelota.trayectoria.xv == 1) {
+					p_arkanoPi->pelota.trayectoria.xv = -1; // Caso fila 1 columna 1
+				} else if (p_arkanoPi->pelota.x == p_arkanoPi->pala.x && p_arkanoPi->pelota.trayectoria.xv == 1) {
+					p_arkanoPi->pelota.trayectoria.xv = 0; // Caso fila 1 columna 2
+				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1) && p_arkanoPi->pelota.trayectoria.xv == 1) {
+					p_arkanoPi->pelota.trayectoria.xv = 1; // Caso fila 1 columna 3
+				} else if (p_arkanoPi->pelota.x == p_arkanoPi->pala.x && p_arkanoPi->pelota.trayectoria.xv == 0) {
+					p_arkanoPi->pelota.trayectoria.xv = -1; // Caso fila 2 columna 1
+				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1) && p_arkanoPi->pelota.trayectoria.xv == 0) {
+					p_arkanoPi->pelota.trayectoria.xv = 0; // Caso fila 2 columna 2
+				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 2) && p_arkanoPi->pelota.trayectoria.xv == 0) {
+					p_arkanoPi->pelota.trayectoria.xv = 1; // Caso fila 2 columna 3
+				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1) && p_arkanoPi->pelota.trayectoria.xv == -1) {
+					p_arkanoPi->pelota.trayectoria.xv = -1; // Caso fila 3 columna 1
+				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 2) && p_arkanoPi->pelota.trayectoria.xv == -1) {
+					p_arkanoPi->pelota.trayectoria.xv = 0; // Caso fila 3 columna 2
+				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 3) && p_arkanoPi->pelota.trayectoria.xv == -1) {
+					p_arkanoPi->pelota.trayectoria.xv = +1; // Caso fila 3 columna 3
+				}
 	}
 
 	ActualizaPosicionPelota(&(p_arkanoPi->pelota));
@@ -545,10 +524,6 @@ void ActualizarJuego (fsm_t* this) {
 	piLock(STD_IO_BUFFER_KEY);
 	PintaPantallaPorTerminal(p_arkanoPi->p_pantalla);
 	piUnlock(STD_IO_BUFFER_KEY);
-
-	//cd eclipse-workspace/arkanoPi_1
-	//git branch
-	//git add *.c *.h && git commit -m "Cambios D-21-02-2021" && git push https://github.com/rmnhg/arkanoPi master_Moodle:master_Moodle
 
 	// A completar por el alumno
 	// ...
