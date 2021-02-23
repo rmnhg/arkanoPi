@@ -482,15 +482,12 @@ void ActualizarJuego (fsm_t* this) {
 		flags |= FLAG_FIN_JUEGO;
 		piUnlock(SYSTEM_FLAGS_KEY);
 	} else {
-		if (CompruebaReboteParedesVerticales(*(p_arkanoPi))) {
-			p_arkanoPi->pelota.trayectoria.xv *= -1;
-		} else if (CompruebaReboteTecho(*(p_arkanoPi))) {
+		if (CompruebaReboteTecho(*(p_arkanoPi))) {
 			p_arkanoPi->pelota.trayectoria.yv *= -1;
-		} else if (CompruebaReboteLadrillo(p_arkanoPi)) {
+		} else if (!CompruebaReboteParedesVerticales(*(p_arkanoPi)) && CompruebaReboteLadrillo(p_arkanoPi)) {
 				// Se elimina el ladrillo que toque la pelota
 				p_arkanoPi->ladrillos.matriz[p_arkanoPi->pelota.x][p_arkanoPi->pelota.y] = 0;
 				p_arkanoPi->pelota.trayectoria.yv *= -1;
-			}
 		}
 		if (CompruebaRebotePala(*(p_arkanoPi))) {
 				//Completado :)
@@ -515,15 +512,19 @@ void ActualizarJuego (fsm_t* this) {
 				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 3) && p_arkanoPi->pelota.trayectoria.xv == -1) {
 					p_arkanoPi->pelota.trayectoria.xv = +1; // Caso fila 3 columna 3
 				}
-	}
+		}
+		if (CompruebaReboteParedesVerticales(*(p_arkanoPi))) {
+			p_arkanoPi->pelota.trayectoria.xv *= -1;
+		}
 
-	ActualizaPosicionPelota(&(p_arkanoPi->pelota));
-	piLock(MATRIX_KEY);
-	ActualizaPantalla(p_arkanoPi);
-	piUnlock(MATRIX_KEY);
-	piLock(STD_IO_BUFFER_KEY);
-	PintaPantallaPorTerminal(p_arkanoPi->p_pantalla);
-	piUnlock(STD_IO_BUFFER_KEY);
+		ActualizaPosicionPelota(&(p_arkanoPi->pelota));
+		piLock(MATRIX_KEY);
+		ActualizaPantalla(p_arkanoPi);
+		piUnlock(MATRIX_KEY);
+		piLock(STD_IO_BUFFER_KEY);
+		PintaPantallaPorTerminal(p_arkanoPi->p_pantalla);
+		piUnlock(STD_IO_BUFFER_KEY);
+	}
 
 	// A completar por el alumno
 	// ...
