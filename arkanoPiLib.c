@@ -488,6 +488,37 @@ void ActualizarJuego (fsm_t* this) {
 				// Se elimina el ladrillo que toque la pelota
 				p_arkanoPi->ladrillos.matriz[p_arkanoPi->pelota.x][p_arkanoPi->pelota.y] = 0;
 				p_arkanoPi->pelota.trayectoria.yv *= -1;
+		} else if (CompruebaReboteParedesVerticales(*(p_arkanoPi))) {
+			if (CompruebaReboteParedesVerticales(*(p_arkanoPi))) {
+				p_arkanoPi->pelota.trayectoria.xv *= -1;
+			}
+			if (CompruebaRebotePala(*(p_arkanoPi))) {
+				//Completado :)
+				p_arkanoPi->pelota.trayectoria.yv = -1;
+				// De estos ifs se pueden quitar realmente los que su xv se quede igual
+				if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x - 1) && p_arkanoPi->pelota.trayectoria.xv == 1) {
+					p_arkanoPi->pelota.trayectoria.xv = -1; // Caso fila 1 columna 1
+				} else if (p_arkanoPi->pelota.x == p_arkanoPi->pala.x && p_arkanoPi->pelota.trayectoria.xv == 1) {
+					p_arkanoPi->pelota.trayectoria.xv = 0; // Caso fila 1 columna 2
+				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1) && p_arkanoPi->pelota.trayectoria.xv == 1) {
+					p_arkanoPi->pelota.trayectoria.xv = 1; // Caso fila 1 columna 3
+				} else if (p_arkanoPi->pelota.x == p_arkanoPi->pala.x && p_arkanoPi->pelota.trayectoria.xv == 0) {
+					p_arkanoPi->pelota.trayectoria.xv = -1; // Caso fila 2 columna 1
+				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1) && p_arkanoPi->pelota.trayectoria.xv == 0) {
+					p_arkanoPi->pelota.trayectoria.xv = 0; // Caso fila 2 columna 2
+				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 2) && p_arkanoPi->pelota.trayectoria.xv == 0) {
+					p_arkanoPi->pelota.trayectoria.xv = 1; // Caso fila 2 columna 3
+				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1) && p_arkanoPi->pelota.trayectoria.xv == -1) {
+					p_arkanoPi->pelota.trayectoria.xv = -1; // Caso fila 3 columna 1
+				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 2) && p_arkanoPi->pelota.trayectoria.xv == -1) {
+					p_arkanoPi->pelota.trayectoria.xv = 0; // Caso fila 3 columna 2
+				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 3) && p_arkanoPi->pelota.trayectoria.xv == -1) {
+					p_arkanoPi->pelota.trayectoria.xv = +1; // Caso fila 3 columna 3
+				}
+			}
+			if (CompruebaReboteParedesVerticales(*(p_arkanoPi))) {
+					p_arkanoPi->pelota.trayectoria.xv *= -1;
+			}
 		}
 		if (CompruebaRebotePala(*(p_arkanoPi))) {
 				//Completado :)
