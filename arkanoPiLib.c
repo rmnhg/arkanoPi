@@ -323,11 +323,12 @@ int CalculaLadrillosRestantes(tipo_pantalla *p_ladrillos) {
 int CompruebaBotonPulsado (fsm_t* this) {
 	int result = 0;
 
+	// Comprobamos si el flag del botón ha sido activado
 	piLock(SYSTEM_FLAGS_KEY);
 	result = (flags & FLAG_BOTON);
 	piUnlock(SYSTEM_FLAGS_KEY);
 	// A completar por el alumno
-	// ...
+	// Hecho
 
 	return result;
 }
@@ -335,11 +336,12 @@ int CompruebaBotonPulsado (fsm_t* this) {
 int CompruebaMovimientoIzquierda(fsm_t* this) {
 	int result = 0;
 
+	// Comprobamos si el flag del movimiento a la izquierda ha sido activado
 	piLock(SYSTEM_FLAGS_KEY);
 	result = (flags & FLAG_MOV_IZQUIERDA);
 	piUnlock(SYSTEM_FLAGS_KEY);
 	// A completar por el alumno
-	// ...
+	// Hecho
 
 	return result;
 }
@@ -347,11 +349,12 @@ int CompruebaMovimientoIzquierda(fsm_t* this) {
 int CompruebaMovimientoDerecha(fsm_t* this) {
 	int result = 0;
 
+	// Comprobamos si el flag del movimiento a la derecha ha sido activado
 	piLock(SYSTEM_FLAGS_KEY);
 	result = (flags & FLAG_MOV_DERECHA);
 	piUnlock(SYSTEM_FLAGS_KEY);
 	// A completar por el alumno
-	// ...
+	// Hecho
 
 	return result;
 }
@@ -359,11 +362,12 @@ int CompruebaMovimientoDerecha(fsm_t* this) {
 int CompruebaTimeoutActualizacionJuego (fsm_t* this) {
 	int result = 0;
 
+	// Comprobamos si el flag del timer del juego ha sido activado
 	piLock(SYSTEM_FLAGS_KEY);
 	result = (flags & FLAG_TIMER_JUEGO);
 	piUnlock(SYSTEM_FLAGS_KEY);
 	// A completar por el alumno
-	// ...
+	// Hecho
 
 	return result;
 }
@@ -371,11 +375,12 @@ int CompruebaTimeoutActualizacionJuego (fsm_t* this) {
 int CompruebaFinalJuego(fsm_t* this) {
 	int result = 0;
 
+	// Comprobamos si el flag del fin del juego ha sido activado
 	piLock(SYSTEM_FLAGS_KEY);
 	result = (flags & FLAG_FIN_JUEGO);
 	piUnlock(SYSTEM_FLAGS_KEY);
 	// A completar por el alumno
-	// ...
+	// Hecho
 
 	return result;
 }
@@ -392,19 +397,19 @@ void InicializaJuego(fsm_t* this) {
 	tipo_arkanoPi *p_arkanoPi;
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
+	// Cancelamos los posibles flags generados por las teclas de control además del flag del botón
 	piLock(SYSTEM_FLAGS_KEY);
 	flags &= ~FLAG_BOTON;
+	flags &= ~FLAG_MOV_DERECHA;
+	flags &= ~FLAG_MOV_IZQUIERDA;
+	flags &= ~FLAG_TIMER_JUEGO;
 	piUnlock(SYSTEM_FLAGS_KEY);
-	//InicializaLedDisplay(p_arkanoPi->p_pantalla);
-	//InicializaTeclado(p_arkanoPi->)
-	/*p_arkanoPi->pelota.x = 5;
-	p_arkanoPi->pelota.y = 2;
-	p_arkanoPi->pelota.trayectoria.xv = 0;
-	p_arkanoPi->pelota.trayectoria.yv = 1;*/
+
+	// Inicializamos las variables del juego y habilitamos la pantalla
 	InicializaArkanoPi(p_arkanoPi);
 	pseudoWiringPiEnableDisplay(1);
 
-
+	// Finalmente pintamos la pantalla por terminal
 	piLock(STD_IO_BUFFER_KEY);
 	PintaPantallaPorTerminal(p_arkanoPi->p_pantalla);
 	piUnlock(STD_IO_BUFFER_KEY);
@@ -433,7 +438,7 @@ void MuevePalaIzquierda (fsm_t* this) {
 	PintaPantallaPorTerminal(p_arkanoPi->p_pantalla);
 	piUnlock(STD_IO_BUFFER_KEY);
 	// A completar por el alumno
-	// ...
+	// Hecho
 }
 
 // void MuevePalaDerecha (void): función similar a la anterior
@@ -454,7 +459,7 @@ void MuevePalaDerecha (fsm_t* this) {
 	PintaPantallaPorTerminal(p_arkanoPi->p_pantalla);
 	piUnlock(STD_IO_BUFFER_KEY);
 	// A completar por el alumno
-	// ...
+	// Hech
 }
 
 // void ActualizarJuego (void): función encargada de actualizar la
@@ -472,82 +477,90 @@ void ActualizarJuego (fsm_t* this) {
 	tipo_arkanoPi* p_arkanoPi;
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
+	// Eliminamos los flags que ya hemos cubierto
 	piLock(SYSTEM_FLAGS_KEY);
 	flags &= (~FLAG_TIMER_JUEGO);
 	flags &= (~FLAG_BOTON);
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	if (CompruebaFallo(*(p_arkanoPi))) {
+		// Si la pelota se ha escapado del área de juego, se finaliza el juego
 		piLock(SYSTEM_FLAGS_KEY);
 		flags |= FLAG_FIN_JUEGO;
 		piUnlock(SYSTEM_FLAGS_KEY);
 	} else {
+		// Si no se ha escapado, se comprueban los rebotes con los elementos de la pantalla
 		if (CompruebaReboteTecho(*(p_arkanoPi))) {
+			// Si chocamos con el techo cambiamos invertimos la  componente y de la trayectoria
 			p_arkanoPi->pelota.trayectoria.yv *= -1;
 		} else if (!CompruebaReboteParedesVerticales(*(p_arkanoPi)) && CompruebaReboteLadrillo(p_arkanoPi)) {
-				// Se elimina el ladrillo que toque la pelota
-				p_arkanoPi->ladrillos.matriz[p_arkanoPi->pelota.x][p_arkanoPi->pelota.y] = 0;
-				p_arkanoPi->pelota.trayectoria.yv *= -1;
+			// Si se choca con una pared vertical, se invierte la componente x de la trayectoria
+			// Se elimina el ladrillo que toque la pelota
+			p_arkanoPi->ladrillos.matriz[p_arkanoPi->pelota.x][p_arkanoPi->pelota.y] = 0;
+			p_arkanoPi->pelota.trayectoria.yv *= -1;
 		} else if (CompruebaReboteParedesVerticales(*(p_arkanoPi))) {
-			if (CompruebaReboteParedesVerticales(*(p_arkanoPi))) {
-				p_arkanoPi->pelota.trayectoria.xv *= -1;
-			}
+			// Si se choca con una pared vertical, se invierte la componente x de la trayectoria
+			p_arkanoPi->pelota.trayectoria.xv *= -1;
+
 			if (CompruebaRebotePala(*(p_arkanoPi))) {
-				//Completado :)
-				p_arkanoPi->pelota.trayectoria.yv = -1;
-				// De estos ifs se pueden quitar realmente los que su xv se quede igual
-				if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x - 1) && p_arkanoPi->pelota.trayectoria.xv == 1) {
+				// Comprobamos la posición relativa de la pelota con respecto a la pala para variar su trayectoria
+				p_arkanoPi->pelota.trayectoria.yv = -1; // Al chocar con la pala la pelota vuelve hacia arriba
+				if ((p_arkanoPi->pelota.x == (p_arkanoPi->pala.x - 1)) && (p_arkanoPi->pelota.trayectoria.xv == 1)) {
 					p_arkanoPi->pelota.trayectoria.xv = -1; // Caso fila 1 columna 1
-				} else if (p_arkanoPi->pelota.x == p_arkanoPi->pala.x && p_arkanoPi->pelota.trayectoria.xv == 1) {
+				} else if ((p_arkanoPi->pelota.x == p_arkanoPi->pala.x) && (p_arkanoPi->pelota.trayectoria.xv == 1)) {
 					p_arkanoPi->pelota.trayectoria.xv = 0; // Caso fila 1 columna 2
-				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1) && p_arkanoPi->pelota.trayectoria.xv == 1) {
+				} else if ((p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1)) && (p_arkanoPi->pelota.trayectoria.xv == 1)) {
 					p_arkanoPi->pelota.trayectoria.xv = 1; // Caso fila 1 columna 3
-				} else if (p_arkanoPi->pelota.x == p_arkanoPi->pala.x && p_arkanoPi->pelota.trayectoria.xv == 0) {
+				} else if ((p_arkanoPi->pelota.x == p_arkanoPi->pala.x) && (p_arkanoPi->pelota.trayectoria.xv == 0)) {
 					p_arkanoPi->pelota.trayectoria.xv = -1; // Caso fila 2 columna 1
-				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1) && p_arkanoPi->pelota.trayectoria.xv == 0) {
+				} else if ((p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1)) && (p_arkanoPi->pelota.trayectoria.xv == 0)) {
 					p_arkanoPi->pelota.trayectoria.xv = 0; // Caso fila 2 columna 2
-				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 2) && p_arkanoPi->pelota.trayectoria.xv == 0) {
+				} else if ((p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 2)) && (p_arkanoPi->pelota.trayectoria.xv == 0)) {
 					p_arkanoPi->pelota.trayectoria.xv = 1; // Caso fila 2 columna 3
-				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1) && p_arkanoPi->pelota.trayectoria.xv == -1) {
+				} else if ((p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1)) && (p_arkanoPi->pelota.trayectoria.xv == -1)) {
 					p_arkanoPi->pelota.trayectoria.xv = -1; // Caso fila 3 columna 1
-				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 2) && p_arkanoPi->pelota.trayectoria.xv == -1) {
+				} else if ((p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 2)) && (p_arkanoPi->pelota.trayectoria.xv == -1)) {
 					p_arkanoPi->pelota.trayectoria.xv = 0; // Caso fila 3 columna 2
-				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 3) && p_arkanoPi->pelota.trayectoria.xv == -1) {
+				} else if ((p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 3)) && (p_arkanoPi->pelota.trayectoria.xv == -1)) {
 					p_arkanoPi->pelota.trayectoria.xv = +1; // Caso fila 3 columna 3
 				}
 			}
+			// Puede pasar que después de rebotar con la pala la pelota se dirija a una pared vertical
 			if (CompruebaReboteParedesVerticales(*(p_arkanoPi))) {
-					p_arkanoPi->pelota.trayectoria.xv *= -1;
+				// Si se choca con una pared vertical, se invierte la componente x de la trayectoria
+				p_arkanoPi->pelota.trayectoria.xv *= -1;
 			}
 		}
 		if (CompruebaRebotePala(*(p_arkanoPi))) {
-				//Completado :)
-				p_arkanoPi->pelota.trayectoria.yv = -1;
-				// De estos ifs se pueden quitar realmente los que su xv se quede igual
-				if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x - 1) && p_arkanoPi->pelota.trayectoria.xv == 1) {
+				// Comprobamos la posición relativa de la pelota con respecto a la pala para variar su trayectoria
+				p_arkanoPi->pelota.trayectoria.yv = -1; // Al chocar con la pala la pelota vuelve hacia arriba
+				if ((p_arkanoPi->pelota.x == (p_arkanoPi->pala.x - 1)) && (p_arkanoPi->pelota.trayectoria.xv == 1)) {
 					p_arkanoPi->pelota.trayectoria.xv = -1; // Caso fila 1 columna 1
-				} else if (p_arkanoPi->pelota.x == p_arkanoPi->pala.x && p_arkanoPi->pelota.trayectoria.xv == 1) {
+				} else if ((p_arkanoPi->pelota.x == p_arkanoPi->pala.x) && (p_arkanoPi->pelota.trayectoria.xv == 1)) {
 					p_arkanoPi->pelota.trayectoria.xv = 0; // Caso fila 1 columna 2
-				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1) && p_arkanoPi->pelota.trayectoria.xv == 1) {
+				} else if ((p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1)) && (p_arkanoPi->pelota.trayectoria.xv == 1)) {
 					p_arkanoPi->pelota.trayectoria.xv = 1; // Caso fila 1 columna 3
-				} else if (p_arkanoPi->pelota.x == p_arkanoPi->pala.x && p_arkanoPi->pelota.trayectoria.xv == 0) {
+				} else if ((p_arkanoPi->pelota.x == p_arkanoPi->pala.x) && (p_arkanoPi->pelota.trayectoria.xv == 0)) {
 					p_arkanoPi->pelota.trayectoria.xv = -1; // Caso fila 2 columna 1
-				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1) && p_arkanoPi->pelota.trayectoria.xv == 0) {
+				} else if ((p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1)) && (p_arkanoPi->pelota.trayectoria.xv == 0)) {
 					p_arkanoPi->pelota.trayectoria.xv = 0; // Caso fila 2 columna 2
-				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 2) && p_arkanoPi->pelota.trayectoria.xv == 0) {
+				} else if ((p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 2)) && (p_arkanoPi->pelota.trayectoria.xv == 0)) {
 					p_arkanoPi->pelota.trayectoria.xv = 1; // Caso fila 2 columna 3
-				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1) && p_arkanoPi->pelota.trayectoria.xv == -1) {
+				} else if ((p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 1)) && (p_arkanoPi->pelota.trayectoria.xv == -1)) {
 					p_arkanoPi->pelota.trayectoria.xv = -1; // Caso fila 3 columna 1
-				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 2) && p_arkanoPi->pelota.trayectoria.xv == -1) {
+				} else if ((p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 2)) && (p_arkanoPi->pelota.trayectoria.xv == -1)) {
 					p_arkanoPi->pelota.trayectoria.xv = 0; // Caso fila 3 columna 2
-				} else if (p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 3) && p_arkanoPi->pelota.trayectoria.xv == -1) {
+				} else if ((p_arkanoPi->pelota.x == (p_arkanoPi->pala.x + 3)) && (p_arkanoPi->pelota.trayectoria.xv == -1)) {
 					p_arkanoPi->pelota.trayectoria.xv = +1; // Caso fila 3 columna 3
 				}
 		}
+		// Puede pasar que después de rebotar con la pala la pelota se dirija a una pared vertical
 		if (CompruebaReboteParedesVerticales(*(p_arkanoPi))) {
+			// Si se choca con una pared vertical, se invierte la componente x de la trayectoria
 			p_arkanoPi->pelota.trayectoria.xv *= -1;
 		}
 
+		// Actualizamos finalmente la posición de la pelota y pintamos la nueva pantalla
 		ActualizaPosicionPelota(&(p_arkanoPi->pelota));
 		piLock(MATRIX_KEY);
 		ActualizaPantalla(p_arkanoPi);
@@ -558,7 +571,7 @@ void ActualizarJuego (fsm_t* this) {
 	}
 
 	// A completar por el alumno
-	// ...
+	// Hecho
 }
 
 // void FinalJuego (void): función encargada de mostrar en la ventana de
@@ -568,19 +581,22 @@ void FinalJuego (fsm_t* this) {
 	tipo_arkanoPi *p_arkanoPi;
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
+	// Eliminamos los flags que estamos atendiendo
 	piLock(SYSTEM_FLAGS_KEY);
 	flags &= ~FLAG_FIN_JUEGO;
 	flags &= ~FLAG_BOTON;
 	piUnlock(SYSTEM_FLAGS_KEY);
+	// Imprimimos por consola los resultados de la partida
 	piLock(STD_IO_BUFFER_KEY);
 	printf("Has destruido %d ladrillos. ¡Enhorabuena!\n", NUM_COLUMNAS_DISPLAY * 2 - CalculaLadrillosRestantes(&(p_arkanoPi->ladrillos)));
-	printf("Pulsa la tecla S para jugar de nuevo.\n");
+	printf("Pulsa cualquier tecla para jugar de nuevo.\n");
 	printf("Si quieres salir pulsa la tecla Q.\n");
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
 	// A completar por el alumno
-	// ...
+	// Hecho
 
+	// Deshabilitamos la pantalla
 	pseudoWiringPiEnableDisplay(0);
 }
 
@@ -593,19 +609,22 @@ void ReseteaJuego (fsm_t* this) {
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
 
+	// Inicializamos el juego
 	InicializaJuego(this);
+	// Desactivamos los flags que atendemos
 	piLock(SYSTEM_FLAGS_KEY);
 	flags &= (~FLAG_TIMER_JUEGO);
 	flags &= (~FLAG_BOTON);
 	piUnlock(SYSTEM_FLAGS_KEY);
-	ResetArkanoPi(p_arkanoPi);
-	//InicializaArkanoPi(p_arkanoPi);
+
+	// Volvemos a habilitar la pantalla
 	pseudoWiringPiEnableDisplay(1);
 
+	// Imprimimos el saludo y las instrucciones del juego
 	piLock(STD_IO_BUFFER_KEY);
 	printf("¡Bienvenido a arkanoPi!\n");
 	printf("Instrucciones de uso:\n");
-	printf("\tLa tecla S inicia el juego.\n");
+	printf("\tCualquier tecla inicia el juego.\n");
 	printf("\tLas teclas A y D mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n");
 	printf("\tLa tecla C actualiza la posición de la pelota en la pantalla.\n");
 	printf("\tLa tecla Q cierra el juego.\n");
@@ -613,7 +632,7 @@ void ReseteaJuego (fsm_t* this) {
 	piUnlock(STD_IO_BUFFER_KEY);
 
 	// A completar por el alumno
-	// ...
+	// Hecho
 }
 
 //------------------------------------------------------

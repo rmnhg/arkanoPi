@@ -105,39 +105,38 @@ PI_THREAD (thread_explora_teclado_PC) {
 				// ...
 				case 'a':
 					// A completar por el alumno...
-					// ...
+					// Hecho
+					// Activamos los flags de movimiento y de boton pulsado
 					piLock(SYSTEM_FLAGS_KEY);
 					flags |= FLAG_MOV_IZQUIERDA;
+					flags |= FLAG_BOTON;
 					piUnlock(SYSTEM_FLAGS_KEY);
-					printf("Tecla A pulsada!\n");
-					fflush(stdout);
 					break;
 				case 'c':
 					// A completar por el alumno...
-					// ...
+					// Hecho
+					// Activamos los flags de timer y de boton pulsado
 					piLock(SYSTEM_FLAGS_KEY);
 					flags |= FLAG_TIMER_JUEGO;
+					flags |= FLAG_BOTON;
 					piUnlock(SYSTEM_FLAGS_KEY);
-					printf("Tecla C pulsada!\n");
-					fflush(stdout);
 					break;
 				case 'd':
 					// A completar por el alumno...
-					// ...
+					// Hecho
+					// Activamos los flags de movimiento y de boton pulsado
 					piLock(SYSTEM_FLAGS_KEY);
 					flags |= FLAG_MOV_DERECHA;
+					flags |= FLAG_BOTON;
 					piUnlock(SYSTEM_FLAGS_KEY);
-					printf("Tecla D pulsada!\n");
-					fflush(stdout);
 					break;
 				case 's':
 					// A completar por el alumno...
-					// ...
+					// Hecho
+					// Activamos los flags de movimiento y de boton pulsado
 					piLock(SYSTEM_FLAGS_KEY);
 					flags |= FLAG_BOTON;
 					piUnlock(SYSTEM_FLAGS_KEY);
-					printf("Tecla S pulsada!\n");
-					fflush(stdout);
 					break;
 				case '\n':
 					break;
@@ -148,7 +147,10 @@ PI_THREAD (thread_explora_teclado_PC) {
 					break;
 
 				default:
-					printf("INVALID KEY!!!\n");
+					// Activams el flag de boton pulsado
+					piLock(SYSTEM_FLAGS_KEY);
+					flags |= FLAG_BOTON;
+					piUnlock(SYSTEM_FLAGS_KEY);
 					break;
 			}
 		}
@@ -181,6 +183,8 @@ int main () {
 	};
 
 	// Configuracion e incializacion del sistema
+	// Hecho
+	// Inicializamos el puntero a la pantalla
 	sistema.arkanoPi.p_pantalla = &(led_display.pantalla);
 	ConfiguraInicializaSistema (&sistema);
 
@@ -192,7 +196,7 @@ int main () {
 	piLock(STD_IO_BUFFER_KEY);
 	printf("¡Bienvenido a arkanoPi!\n");
 	printf("Instrucciones de uso:\n");
-	printf("\tLa tecla S inicia el juego.\n");
+	printf("\tCualquier tecla inicia el juego.\n");
 	printf("\tLas teclas A y D mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n");
 	printf("\tLa tecla C actualiza la posición de la pelota en la pantalla.\n");
 	printf("\tLa tecla Q cierra el juego.\n");
