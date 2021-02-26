@@ -142,7 +142,7 @@ PI_THREAD (thread_explora_teclado_PC) {
 					break;
 
 				case 'q':
-					printf("Gracias por jugar a arkanoPi.\n");
+					printf("\nGracias por jugar a arkanoPi.\n");
 					exit(0);
 					break;
 
