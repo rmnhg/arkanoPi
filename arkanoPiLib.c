@@ -413,6 +413,9 @@ void InicializaJuego(fsm_t* this) {
 	piLock(STD_IO_BUFFER_KEY);
 	PintaPantallaPorTerminal(p_arkanoPi->p_pantalla);
 	piUnlock(STD_IO_BUFFER_KEY);
+
+	// Inicializamos el primer timer
+	tmr_startms((tmr_t*)p_arkanoPi->tmr_actualizacion_juego, TIMEOUT_ACTUALIZA_JUEGO);
 }
 
 // void MuevePalaIzquierda (void): funcion encargada de ejecutar
@@ -498,28 +501,22 @@ void ActualizarJuego (fsm_t* this) {
 		switch (p_arkanoPi->pelota.x + p_arkanoPi->pelota.trayectoria.xv - p_arkanoPi->pala.x){
 			case 0:
 				CambiarDireccionPelota(&(p_arkanoPi->pelota),ARRIBA_IZQUIERDA);
-				if (CompruebaReboteParedesVerticales(*(p_arkanoPi))){
-					p_arkanoPi->pelota.trayectoria.xv *=-1;
-				}
 				break;
 			case 1:
 				CambiarDireccionPelota(&(p_arkanoPi->pelota),ARRIBA);
-				if (CompruebaReboteParedesVerticales(*(p_arkanoPi))){
-					p_arkanoPi->pelota.trayectoria.xv *=-1;
-				}
 				break;
 			case 2:
 				CambiarDireccionPelota(&(p_arkanoPi->pelota),ARRIBA_DERECHA);
-				if (CompruebaReboteParedesVerticales(*(p_arkanoPi))){
-					p_arkanoPi->pelota.trayectoria.xv *=-1;
-				}
 				break;
+		}
+		if (CompruebaReboteParedesVerticales(*(p_arkanoPi))){
+			p_arkanoPi->pelota.trayectoria.xv *=-1;
 		}
 	}
 	if (CompruebaReboteLadrillo(p_arkanoPi)){
 		p_arkanoPi->pelota.trayectoria.yv *= -1;
 
-		if (CalculaLadrillosRestantes(&(p_arkanoPi->ladrillos))<=0){
+		if (CalculaLadrillosRestantes(&(p_arkanoPi->ladrillos)) <= 0){
 			piLock(SYSTEM_FLAGS_KEY);
 			flags |= FLAG_FIN_JUEGO;
 			piUnlock(SYSTEM_FLAGS_KEY);
@@ -534,6 +531,9 @@ void ActualizarJuego (fsm_t* this) {
 	piLock(STD_IO_BUFFER_KEY);
 	PintaPantallaPorTerminal(p_arkanoPi->p_pantalla);
 	piUnlock(STD_IO_BUFFER_KEY);
+
+	// Inicializamos el primer timer
+	tmr_startms((tmr_t*)p_arkanoPi->tmr_actualizacion_juego, TIMEOUT_ACTUALIZA_JUEGO);
 	// A completar por el alumno
 	// Hecho
 }
@@ -608,6 +608,9 @@ void ReseteaJuego (fsm_t* this) {
 void tmr_actualizacion_juego_isr(union sigval value) {
 	// A completar por el alumno
 	// ...
+	piLock(SYSTEM_FLAGS_KEY);
+	flags |= FLAG_TIMER_JUEGO;
+	piUnlock(SYSTEM_FLAGS_KEY);
 }
 
 

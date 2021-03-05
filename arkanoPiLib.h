@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include "ledDisplay.h"
+#include "tmr.h"
 
 enum t_direccion {
 	ARRIBA_IZQUIERDA,
@@ -49,6 +50,7 @@ typedef struct {
 	tipo_pantalla ladrillos;
 	tipo_pala pala;
 	tipo_pelota pelota;
+	tmr_t* tmr_actualizacion_juego;
 } tipo_arkanoPi;
 
 //------------------------------------------------------------------------

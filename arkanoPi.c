@@ -138,11 +138,10 @@ PI_THREAD (thread_explora_teclado_PC) {
 					flags |= FLAG_BOTON;
 					piUnlock(SYSTEM_FLAGS_KEY);
 					break;
-				case '\n':
-					break;
 
 				case 'q':
 					printf("\nGracias por jugar a arkanoPi.\n");
+					tmr_destroy ((tmr_t*)(sistema.arkanoPi.tmr_actualizacion_juego));
 					exit(0);
 					break;
 
@@ -182,6 +181,9 @@ int main () {
 		{-1, NULL, -1, NULL },
 	};
 
+	sistema.arkanoPi.tmr_actualizacion_juego = tmr_new (tmr_actualizacion_juego_isr);
+
+
 	// Configuracion e incializacion del sistema
 	// Hecho
 	// Inicializamos el puntero a la pantalla
@@ -206,7 +208,6 @@ int main () {
 	next = millis();
 	while (1) {
 		fsm_fire (arkanoPi_fsm);
-
 		// A completar por el alumno...
 		// ...
 
@@ -214,5 +215,6 @@ int main () {
 		delay_until (next);
 	}
 
+	tmr_destroy ((tmr_t*)(sistema.arkanoPi.tmr_actualizacion_juego));
 	fsm_destroy (arkanoPi_fsm);
 }
