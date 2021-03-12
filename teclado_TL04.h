@@ -2,6 +2,7 @@
 #define _TECLADO_TL04_H_
 
 #include "systemLib.h"
+#include "arkanoPi.h"
 
 // REFRESCO TECLADO
 #define TIMEOUT_COLUMNA_TECLADO	25
@@ -11,8 +12,8 @@
 
 // FLAGS FSM CONTROL DE EXCITACION TECLADO Y FSM GESTION TECLAS PULSADAS
 // ATENCION: Valores a modificar por el alumno
-#define FLAG_TIMEOUT_COLUMNA_TECLADO  	0x00
-#define FLAG_TECLA_PULSADA 				0x00
+#define FLAG_TIMEOUT_COLUMNA_TECLADO  	0x01 //00000001
+#define FLAG_TECLA_PULSADA 				0x02 //00000010
 
 enum columns_values {
 	COLUMNA_1,

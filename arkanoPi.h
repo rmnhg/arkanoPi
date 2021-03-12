@@ -50,5 +50,6 @@ void tmr_actualizacion_juego_isr(union sigval value);
 // FUNCIONES LIGADAS A THREADS ADICIONALES
 //------------------------------------------------------
 PI_THREAD(thread_explora_teclado_PC);
+void explora_teclado(int teclaPulsada);
 
 #endif /* ARKANOPI_H_ */
