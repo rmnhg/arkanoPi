@@ -64,10 +64,14 @@ static int columnaTecladoActiva = -1;
 static int columnaDisplayActiva = -1;
 
 static char pseudoTecladoTL04[4][4] = {
-	{'1', '2', '3', 'c'},
+	/*{'1', '2', '3', 'c'},
 	{'4', '5', '6', 'd'},
 	{'7', '8', '9', 'e'},
-	{'a', '0', 'b', 'f'}
+	{'a', '0', 'b', 'f'}*/
+	{'1', '2', '3', '4'},
+	{'q', 'w', 'e', 'r'},
+	{'a', 's', 'd', 'f'},
+	{'z', 'x', 'c', 'v'}
 };
 
 // Matriz interna de pseudoWiringPi para modelar el estado del display emulado

@@ -13,7 +13,7 @@ TipoTeclado teclado = {
 			GPIO_KEYBOARD_COL_3,
 			GPIO_KEYBOARD_COL_4
 		// A completar por el alumno...
-		// ...
+		// Hecho
 	},
 	.filas = {
 			GPIO_KEYBOARD_ROW_1,
@@ -21,15 +21,23 @@ TipoTeclado teclado = {
 			GPIO_KEYBOARD_ROW_3,
 			GPIO_KEYBOARD_ROW_4
 		// A completar por el alumno...
-		// ...
+		// Hecho
 	},
 	.rutinas_ISR = {
+		teclado_fila_1_isr,
+		teclado_fila_2_isr,
+		teclado_fila_3_isr,
+		teclado_fila_4_isr
 		// A completar por el alumno...
-		// ...
+		// Hecho
 	},
+	.debounceTime = {0, 0, 0, 0},
+	.columna_actual = COLUMNA_1,
+	.teclaPulsada = {-1, -1},
+	.flags = 0
 
 	// A completar por el alumno...
-	// ...
+	// Hecho
 };
 
 // Declaracion del objeto display
@@ -39,7 +47,7 @@ TipoLedDisplay led_display = {
 			GPIO_LED_DISPLAY_COL_2,
 			GPIO_LED_DISPLAY_COL_3
 		// A completar por el alumno...
-		// ...
+		// Hecho
 	},
 	.filas = {
 			GPIO_LED_DISPLAY_ROW_1,
@@ -50,7 +58,7 @@ TipoLedDisplay led_display = {
 			GPIO_LED_DISPLAY_ROW_6,
 			GPIO_LED_DISPLAY_ROW_7
 		// A completar por el alumno...
-		// ...
+		// Hecho
 	},
 	// A completar por el alumno...
 	// ...
@@ -72,15 +80,21 @@ TipoLedDisplay led_display = {
 int ConfiguraInicializaSistema (TipoSistema *p_sistema) {
 	int result = 0;
 	// A completar por el alumno...
-	// ...
+	// Hecho
 
 	// Lanzamos thread para exploracion del teclado convencional del PC
-	result = piThreadCreate (thread_explora_teclado_PC);
+	/*result = piThreadCreate (thread_explora_teclado_PC);
 
 	if (result != 0) {
 		printf ("Thread didn't start!!!\n");
 		return -1;
-	}
+	}*/
+
+	// Inicializamos la librería wiringPi
+	if (wiringPiSetupGpio() < 0)
+		printf("Unable to setup wiringPi\n");
+
+	InicializaTeclado(&teclado);
 
 	return result;
 }
@@ -95,66 +109,72 @@ PI_THREAD (thread_explora_teclado_PC) {
 	while(1) {
 		delay(10); // Wiring Pi function: pauses program execution for at least 10 ms
 
-		piLock (STD_IO_BUFFER_KEY);
+		piLock(STD_IO_BUFFER_KEY);
 
 		if(kbhit()) {
 			teclaPulsada = kbread();
 
-			switch(teclaPulsada) {
-				// A completar por el alumno...
-				// ...
-				case 'a':
-					// A completar por el alumno...
-					// Hecho
-					// Activamos los flags de movimiento y de boton pulsado
-					piLock(SYSTEM_FLAGS_KEY);
-					flags |= FLAG_MOV_IZQUIERDA;
-					flags |= FLAG_BOTON;
-					piUnlock(SYSTEM_FLAGS_KEY);
-					break;
-				case 'c':
-					// A completar por el alumno...
-					// Hecho
-					// Activamos los flags de timer y de boton pulsado
-					piLock(SYSTEM_FLAGS_KEY);
-					flags |= FLAG_TIMER_JUEGO;
-					flags |= FLAG_BOTON;
-					piUnlock(SYSTEM_FLAGS_KEY);
-					break;
-				case 'd':
-					// A completar por el alumno...
-					// Hecho
-					// Activamos los flags de movimiento y de boton pulsado
-					piLock(SYSTEM_FLAGS_KEY);
-					flags |= FLAG_MOV_DERECHA;
-					flags |= FLAG_BOTON;
-					piUnlock(SYSTEM_FLAGS_KEY);
-					break;
-				case 's':
-					// A completar por el alumno...
-					// Hecho
-					// Activamos los flags de movimiento y de boton pulsado
-					piLock(SYSTEM_FLAGS_KEY);
-					flags |= FLAG_BOTON;
-					piUnlock(SYSTEM_FLAGS_KEY);
-					break;
-
-				case 'q':
-					printf("\nGracias por jugar a arkanoPi.\n");
-					tmr_destroy ((tmr_t*)(sistema.arkanoPi.tmr_actualizacion_juego));
-					exit(0);
-					break;
-
-				default:
-					// Activams el flag de boton pulsado
-					piLock(SYSTEM_FLAGS_KEY);
-					flags |= FLAG_BOTON;
-					piUnlock(SYSTEM_FLAGS_KEY);
-					break;
-			}
+			explora_teclado(teclaPulsada);
 		}
 
-		piUnlock (STD_IO_BUFFER_KEY);
+		piUnlock(STD_IO_BUFFER_KEY);
+	}
+}
+
+void explora_teclado(int teclaPulsada) {
+	switch(teclaPulsada) {
+		// A completar por el alumno...
+		// Hecho
+		case 'a':
+			// A completar por el alumno...
+			// Hecho
+			// Activamos los flags de movimiento y de boton pulsado
+			piLock(SYSTEM_FLAGS_KEY);
+			flags |= FLAG_MOV_IZQUIERDA;
+			flags |= FLAG_BOTON;
+			piUnlock(SYSTEM_FLAGS_KEY);
+			break;
+		case 'c':
+			// A completar por el alumno...
+			// Hecho
+			// Activamos los flags de timer y de boton pulsado
+			piLock(SYSTEM_FLAGS_KEY);
+			flags |= FLAG_TIMER_JUEGO;
+			flags |= FLAG_BOTON;
+			piUnlock(SYSTEM_FLAGS_KEY);
+			break;
+		case 'd':
+			// A completar por el alumno...
+			// Hecho
+			// Activamos los flags de movimiento y de boton pulsado
+			piLock(SYSTEM_FLAGS_KEY);
+			flags |= FLAG_MOV_DERECHA;
+			flags |= FLAG_BOTON;
+			piUnlock(SYSTEM_FLAGS_KEY);
+			break;
+		case 's':
+			// A completar por el alumno...
+			// Hecho
+			// Activamos los flags de movimiento y de boton pulsado
+			piLock(SYSTEM_FLAGS_KEY);
+			flags |= FLAG_BOTON;
+			piUnlock(SYSTEM_FLAGS_KEY);
+			break;
+
+		case 'q':
+			printf("\nGracias por jugar a arkanoPi.\n");
+			// Destruimos los timers anteriormente creados para liberar la memoria
+			tmr_destroy((tmr_t*) (sistema.arkanoPi.tmr_actualizacion_juego));
+			tmr_destroy((tmr_t*) (teclado.tmr_duracion_columna));
+			exit(0);
+			break;
+
+		default:
+			// Activams el flag de boton pulsado
+			piLock(SYSTEM_FLAGS_KEY);
+			flags |= FLAG_BOTON;
+			piUnlock(SYSTEM_FLAGS_KEY);
+			break;
 	}
 }
 
@@ -178,22 +198,29 @@ int main () {
 		{ WAIT_PUSH, CompruebaMovimientoDerecha, WAIT_PUSH, MuevePalaDerecha },
 		{ WAIT_PUSH, CompruebaFinalJuego, WAIT_END, FinalJuego },
 		{ WAIT_END,  CompruebaBotonPulsado, WAIT_START, ReseteaJuego },
-		{-1, NULL, -1, NULL },
+		{-1, NULL, -1, NULL }
 	};
 
-	sistema.arkanoPi.tmr_actualizacion_juego = tmr_new (tmr_actualizacion_juego_isr);
+	// Inicializamos el temporizador de actualización de la pantalla LED
+	sistema.arkanoPi.tmr_actualizacion_juego = tmr_new(tmr_actualizacion_juego_isr);
 
+	// Creamos e iniciamos el temporizador relativo a la exploración del teclado
+	teclado.tmr_duracion_columna = tmr_new(timer_duracion_columna_isr);
+	tmr_startms((tmr_t*) (teclado.tmr_duracion_columna), TIMEOUT_COLUMNA_TECLADO);
 
 	// Configuracion e incializacion del sistema
 	// Hecho
 	// Inicializamos el puntero a la pantalla
 	sistema.arkanoPi.p_pantalla = &(led_display.pantalla);
-	ConfiguraInicializaSistema (&sistema);
+	ConfiguraInicializaSistema(&sistema);
 
-	fsm_t* arkanoPi_fsm = fsm_new (WAIT_START, arkanoPi, &sistema);
+	fsm_t* arkanoPi_fsm = fsm_new(WAIT_START, arkanoPi, &sistema);
+	// Creamos nuevas máquinas de estados para la exploración del teclado
+	fsm_t* teclado_fsm = fsm_new(TECLADO_ESPERA_COLUMNA, fsm_trans_excitacion_columnas, &teclado);
+	fsm_t* tecla_fsm = fsm_new(TECLADO_ESPERA_TECLA, fsm_trans_deteccion_pulsaciones, &teclado);
 
 	// A completar por el alumno...
-	// ...
+	// Hecho
 
 	piLock(STD_IO_BUFFER_KEY);
 	printf("¡Bienvenido a arkanoPi!\n");
@@ -207,14 +234,20 @@ int main () {
 
 	next = millis();
 	while (1) {
-		fsm_fire (arkanoPi_fsm);
+		fsm_fire(arkanoPi_fsm);
+		// Ejecutamos las comprobaciones de las máquinas de estado del teclado
+		fsm_fire(teclado_fsm);
+		fsm_fire(tecla_fsm);
+
 		// A completar por el alumno...
-		// ...
+		// Hecho
 
 		next += CLK_MS;
-		delay_until (next);
+		delay_until(next);
 	}
 
-	tmr_destroy ((tmr_t*)(sistema.arkanoPi.tmr_actualizacion_juego));
-	fsm_destroy (arkanoPi_fsm);
+	// Destruimos los timers anteriormente creados para liberar la memoria
+	tmr_destroy((tmr_t*) (sistema.arkanoPi.tmr_actualizacion_juego));
+	tmr_destroy((tmr_t*) (teclado.tmr_duracion_columna));
+	fsm_destroy(arkanoPi_fsm);
 }

@@ -1,10 +1,16 @@
 #include "teclado_TL04.h"
 
 char tecladoTL04[4][4] = {
+	/*
 	{'1', '2', '3', 'C'},
 	{'4', '5', '6', 'D'},
 	{'7', '8', '9', 'E'},
 	{'A', '0', 'B', 'F'}
+	*/
+	{'1', '2', '3', '4'},
+	{'q', 'w', 'e', 'r'},
+	{'a', 's', 'd', 'f'},
+	{'z', 'x', 'c', 'v'}
 };
 
 // Maquina de estados: lista de transiciones
@@ -25,7 +31,21 @@ fsm_trans_t fsm_trans_deteccion_pulsaciones[] = {
 
 void InicializaTeclado(TipoTeclado *p_teclado) {
 	// A completar por el alumno...
-	// ...
+	// Hecho
+
+	// Ponemos los pines GPIO de las filas como entradas y les asignamos sus rutinas de interrupción
+	for (int i = 0; i < NUM_FILAS_TECLADO; i++) {
+		pinMode(p_teclado->filas[i], INPUT);
+		pullUpDnControl(p_teclado->filas[i], PUD_DOWN);
+		wiringPiISR(p_teclado->filas[i], INT_EDGE_RISING, p_teclado->rutinas_ISR[i]);
+	}
+
+	// Ponemos los pines GPIO de las columnas como salidas
+	for (int i = 0; i < NUM_COLUMNAS_TECLADO; i++)
+		pinMode(p_teclado->columnas[i], OUTPUT);
+
+	// Excitamos por primera vez la columna actual
+	ActualizaExcitacionTecladoGPIO(p_teclado->columna_actual);
 }
 
 //------------------------------------------------------
@@ -34,9 +54,13 @@ void InicializaTeclado(TipoTeclado *p_teclado) {
 
 void ActualizaExcitacionTecladoGPIO (int columna) {
 	// A completar por el alumno
-	// ...
-	switch(columna){
-		// ...
+	// Hecho
+	for (int i = 0; i < NUM_COLUMNAS_TECLADO; i++) {
+		// Ponemos la columna pasado como parámetro a HIGH y el resto a LOW
+		if (i == columna)
+			digitalWrite(teclado.columnas[i], HIGH);
+		else
+			digitalWrite(teclado.columnas[i], LOW);
 	}
 }
 
@@ -50,7 +74,11 @@ int CompruebaTimeoutColumna (fsm_t* this) {
 	p_teclado = (TipoTeclado*)(this->user_data);
 
 	// A completar por el alumno...
-	// ...
+	// Hecho
+
+	piLock(SYSTEM_FLAGS_KEY);
+	result = (p_teclado->flags & FLAG_TIMEOUT_COLUMNA_TECLADO);
+	piUnlock(SYSTEM_FLAGS_KEY);
 
 	return result;
 }
@@ -61,7 +89,11 @@ int CompruebaTeclaPulsada (fsm_t* this) {
 	p_teclado = (TipoTeclado*)(this->user_data);
 
 	// A completar por el alumno
-	// ...
+	// Hecho
+
+	piLock(SYSTEM_FLAGS_KEY);
+	result = (p_teclado->flags & FLAG_TECLA_PULSADA);
+	piUnlock(SYSTEM_FLAGS_KEY);
 
 	return result;
 }
@@ -75,9 +107,27 @@ void TecladoExcitaColumna (fsm_t* this) {
 	p_teclado = (TipoTeclado*)(this->user_data);
 
 	// A completar por el alumno
-	// ...
+	// Hecho
+
+	// Se elimina el flag de timout columna atendido
+	piLock(SYSTEM_FLAGS_KEY);
+	p_teclado->flags &= ~FLAG_TIMEOUT_COLUMNA_TECLADO;
+	piUnlock(SYSTEM_FLAGS_KEY);
+
+	// Se cambia a la columna siguiente
+	piLock(KEYBOARD_KEY);
+	if (p_teclado->columna_actual == COLUMNA_4) {
+		teclado.columna_actual = COLUMNA_1;
+	} else {
+		teclado.columna_actual++;
+	}
 
 	// Llamada a ActualizaExcitacionTecladoGPIO con columna a activar como argumento
+	ActualizaExcitacionTecladoGPIO(p_teclado->columna_actual);
+	piUnlock(KEYBOARD_KEY);
+
+	// Se reinicia la cuenta del temporizador de excitación de columnas
+	tmr_startms((tmr_t*) (p_teclado->tmr_duracion_columna), TIMEOUT_COLUMNA_TECLADO);
 }
 
 void ProcesaTeclaPulsada (fsm_t* this) {
@@ -86,6 +136,13 @@ void ProcesaTeclaPulsada (fsm_t* this) {
 
 	// A completar por el alumno
 	// ...
+
+	piLock(SYSTEM_FLAGS_KEY);
+	p_teclado->flags &= (~FLAG_TECLA_PULSADA);
+	piUnlock(SYSTEM_FLAGS_KEY);
+	explora_teclado(tecladoTL04[p_teclado->teclaPulsada.row][p_teclado->teclaPulsada.col]);
+	p_teclado->teclaPulsada.row = -1;
+	p_teclado->teclaPulsada.col = -1;
 }
 
 
@@ -95,25 +152,84 @@ void ProcesaTeclaPulsada (fsm_t* this) {
 
 void teclado_fila_1_isr (void) {
 	// A completar por el alumno
-	// ...
+	// Hecho
+
+	// Pin event (key / button event) debouncing procedure
+	if (millis() < teclado.debounceTime[FILA_1]) {
+		teclado.debounceTime[FILA_1] = millis() + DEBOUNCE_TIME;
+		return;
+	}
+
+	piLock(SYSTEM_FLAGS_KEY);
+	teclado.teclaPulsada.row = FILA_1;
+	teclado.teclaPulsada.col = teclado.columna_actual;
+	teclado.flags |= FLAG_TECLA_PULSADA;
+	piUnlock(SYSTEM_FLAGS_KEY);
+
+	teclado.debounceTime[FILA_1] = millis() + DEBOUNCE_TIME;
 }
 
 void teclado_fila_2_isr (void) {
 	// A completar por el alumno
-	// ...
+	// Hecho
+
+	// Pin event (key / button event) debouncing procedure
+	if (millis() < teclado.debounceTime[FILA_2]) {
+		teclado.debounceTime[FILA_2] = millis() + DEBOUNCE_TIME;
+		return;
+	}
+
+	piLock(SYSTEM_FLAGS_KEY);
+	teclado.teclaPulsada.row = FILA_2;
+	teclado.teclaPulsada.col = teclado.columna_actual;
+	teclado.flags |= FLAG_TECLA_PULSADA;
+	piUnlock(SYSTEM_FLAGS_KEY);
+
+	teclado.debounceTime[FILA_2] = millis() + DEBOUNCE_TIME;
 }
 
 void teclado_fila_3_isr (void) {
 	// A completar por el alumno
-	// ...
+	// Hecho
+
+	// Pin event (key / button event) debouncing procedure
+	if (millis() < teclado.debounceTime[FILA_3]) {
+		teclado.debounceTime[FILA_3] = millis() + DEBOUNCE_TIME;
+		return;
+	}
+
+	piLock(SYSTEM_FLAGS_KEY);
+	teclado.teclaPulsada.row = FILA_3;
+	teclado.teclaPulsada.col = teclado.columna_actual;
+	teclado.flags |= FLAG_TECLA_PULSADA;
+	piUnlock(SYSTEM_FLAGS_KEY);
+
+	teclado.debounceTime[FILA_3] = millis() + DEBOUNCE_TIME;
 }
 
 void teclado_fila_4_isr (void) {
 	// A completar por el alumno
-	// ...
+	// Hecho
+
+	// Pin event (key / button event) debouncing procedure
+	if (millis() < teclado.debounceTime[FILA_4]) {
+		teclado.debounceTime[FILA_4] = millis() + DEBOUNCE_TIME;
+		return;
+	}
+
+	piLock(SYSTEM_FLAGS_KEY);
+	teclado.teclaPulsada.row = FILA_4;
+	teclado.teclaPulsada.col = teclado.columna_actual;
+	teclado.flags |= FLAG_TECLA_PULSADA;
+	piUnlock(SYSTEM_FLAGS_KEY);
+
+	teclado.debounceTime[FILA_4] = millis() + DEBOUNCE_TIME;
 }
 
 void timer_duracion_columna_isr (union sigval value) {
 	// A completar por el alumno
-	// ...
+	// Hecho
+	piLock(SYSTEM_FLAGS_KEY);
+	teclado.flags |= FLAG_TIMEOUT_COLUMNA_TECLADO;
+	piUnlock(SYSTEM_FLAGS_KEY);
 }
