@@ -45,7 +45,8 @@ TipoLedDisplay led_display = {
 	.pines_control_columnas = {
 			GPIO_LED_DISPLAY_COL_1,
 			GPIO_LED_DISPLAY_COL_2,
-			GPIO_LED_DISPLAY_COL_3
+			GPIO_LED_DISPLAY_COL_3,
+			GPIO_LED_DISPLAY_COL_4,
 		// A completar por el alumno...
 		// Hecho
 	},
@@ -60,6 +61,8 @@ TipoLedDisplay led_display = {
 		// A completar por el alumno...
 		// Hecho
 	},
+	.p_columna = 0,
+	.flags = 0
 	// A completar por el alumno...
 	// ...
 };
@@ -95,6 +98,13 @@ int ConfiguraInicializaSistema (TipoSistema *p_sistema) {
 		printf("Unable to setup wiringPi\n");
 
 	InicializaTeclado(&teclado);
+	InicializaLedDisplay(&led_display);
+
+	// Pintamos la pantalla inicial en la matriz de LEDs
+	PintaMensajeInicialPantalla(&(led_display.pantalla), &pantalla_inicial);
+
+	// Nos falta escribir las instrucciones del juego, deshabilitamos la pantalla
+	pseudoWiringPiEnableDisplay(0);
 
 	return result;
 }
@@ -172,6 +182,7 @@ void explora_teclado(int teclaPulsada) {
 			// Destruimos los timers anteriormente creados para liberar la memoria
 			tmr_destroy((tmr_t*) (sistema.arkanoPi.tmr_actualizacion_juego));
 			tmr_destroy((tmr_t*) (teclado.tmr_duracion_columna));
+			tmr_destroy((tmr_t*) (led_display.tmr_refresco_display));
 			exit(0);
 			break;
 		default:
@@ -213,6 +224,10 @@ int main () {
 	teclado.tmr_duracion_columna = tmr_new(timer_duracion_columna_isr);
 	tmr_startms((tmr_t*) (teclado.tmr_duracion_columna), TIMEOUT_COLUMNA_TECLADO);
 
+	// Creamos e iniciamos el temporizador relativo a la actualización de la matriz de LEDs
+	led_display.tmr_refresco_display = tmr_new(timer_refresco_display_isr);
+	tmr_startms((tmr_t*) (led_display.tmr_refresco_display), TIMEOUT_COLUMNA_DISPLAY);
+
 	// Configuracion e incializacion del sistema
 	// Hecho
 	// Inicializamos el puntero a la pantalla
@@ -223,6 +238,8 @@ int main () {
 	// Creamos nuevas máquinas de estados para la exploración del teclado
 	fsm_t* teclado_fsm = fsm_new(TECLADO_ESPERA_COLUMNA, fsm_trans_excitacion_columnas, &teclado);
 	fsm_t* tecla_fsm = fsm_new(TECLADO_ESPERA_TECLA, fsm_trans_deteccion_pulsaciones, &teclado);
+	// Creamos nuevas máquinas de estados para la actualización de columnas en el display
+	fsm_t* display_fsm = fsm_new(DISPLAY_ESPERA_COLUMNA, fsm_trans_excitacion_display, &led_display);
 
 	// A completar por el alumno...
 	// Hecho
@@ -242,6 +259,7 @@ int main () {
 		// Ejecutamos las comprobaciones de las máquinas de estado del teclado
 		fsm_fire(teclado_fsm);
 		fsm_fire(tecla_fsm);
+		fsm_fire(display_fsm);
 		fsm_fire(arkanoPi_fsm);
 
 		// A completar por el alumno...
@@ -254,5 +272,6 @@ int main () {
 	// Destruimos los timers anteriormente creados para liberar la memoria
 	tmr_destroy((tmr_t*) (sistema.arkanoPi.tmr_actualizacion_juego));
 	tmr_destroy((tmr_t*) (teclado.tmr_duracion_columna));
+	tmr_destroy((tmr_t*) (led_display.tmr_refresco_display));
 	fsm_destroy(arkanoPi_fsm);
 }

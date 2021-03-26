@@ -550,6 +550,10 @@ void FinalJuego (fsm_t* this) {
 	flags &= ~FLAG_FIN_JUEGO;
 	flags &= ~FLAG_BOTON;
 	piUnlock(SYSTEM_FLAGS_KEY);
+
+	// Deshabilitamos la pantalla para escribir mensajes por la terminal
+	pseudoWiringPiEnableDisplay(0);
+
 	// Imprimimos por consola los resultados de la partida
 	piLock(STD_IO_BUFFER_KEY);
 	printf("\nHas destruido %d ladrillos. ¡Enhorabuena!\n", NUM_COLUMNAS_DISPLAY * 2 - CalculaLadrillosRestantes(&(p_arkanoPi->ladrillos)));
@@ -557,11 +561,13 @@ void FinalJuego (fsm_t* this) {
 	printf("Si quieres salir pulsa la tecla F.\n");
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
-	// A completar por el alumno
-	// Hecho
 
-	// Deshabilitamos la pantalla
-	pseudoWiringPiEnableDisplay(0);
+	// Pintamos la pantalla final
+	piLock(MATRIX_KEY);
+	PintaMensajeInicialPantalla(&(led_display.pantalla), &pantalla_final);
+	piUnlock(MATRIX_KEY);
+	// A completar por el alumno
+	// Hech
 }
 
 //void ReseteaJuego (void): función encargada de llevar a cabo la
@@ -580,9 +586,6 @@ void ReseteaJuego (fsm_t* this) {
 	flags &= ~FLAG_TIMER_JUEGO;
 	piUnlock(SYSTEM_FLAGS_KEY);
 
-	// Volvemos a habilitar la pantalla
-	pseudoWiringPiEnableDisplay(1);
-
 	// Inicializamos el juego
 	ResetArkanoPi(p_arkanoPi);
 
@@ -596,6 +599,14 @@ void ReseteaJuego (fsm_t* this) {
 	printf("\tLa tecla F cierra el juego.\n");
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
+
+	// Volvemos a habilitar la pantalla
+	pseudoWiringPiEnableDisplay(1);
+
+	// Pintamos la pantalla inicial
+	piLock(MATRIX_KEY);
+	PintaMensajeInicialPantalla(&(led_display.pantalla), &pantalla_inicial);
+	piUnlock(MATRIX_KEY);
 
 	// A completar por el alumno
 	// Hecho
