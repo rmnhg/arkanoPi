@@ -92,6 +92,13 @@ int ConfiguraInicializaSistema (TipoSistema *p_sistema) {
 		return -1;
 	}*/
 
+	// Lanzamos un thread para gestionar las conexiones TCP de los periféricos externos
+	result = piThreadCreate(thread_conexion);
+	if (result != 0) {
+		printf ("No se pudo crear el thread thread_conexion.\n");
+		return -1;
+	}
+
 	// Inicializamos la librería wiringPi
 	if (wiringPiSetupGpio() < 0)
 		printf("Unable to setup wiringPi\n");
@@ -186,6 +193,10 @@ void explora_teclado(int teclaPulsada) {
 			tmr_destroy((tmr_t*) (sistema.arkanoPi.tmr_actualizacion_juego));
 			tmr_destroy((tmr_t*) (teclado.tmr_duracion_columna));
 			tmr_destroy((tmr_t*) (led_display.tmr_refresco_display));
+			// Se cierran las conexiones
+			close(servidor.socket_fd);
+			close(servidor.periferico[0].conexion_fd);
+			close(servidor.periferico[1].conexion_fd);
 			exit(0);
 			break;
 		default:
@@ -254,6 +265,10 @@ int main () {
 	printf("\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n");
 	printf("\tLa tecla C actualiza la posición de la pelota en la pantalla.\n");
 	printf("\tLa tecla F cierra el juego.\n");
+	if (!(servidor.flags & FLAG_TCP_ERROR))
+		printf("\nEscuchando conexiones de periféricos en el puerto %d.\n", servidor.puerto);
+	else
+		printf("Error en TCP: %s", servidor.mensaje_error);
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
 
