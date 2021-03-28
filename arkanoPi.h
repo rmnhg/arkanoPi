@@ -8,6 +8,7 @@
 #include "teclado_TL04.h"
 #include "arkanoPiLib.h"
 #include "ledDisplay.h"
+#include "tcpServer.h" // para conectar hardware extrerno simulado en móviles Android
 
 typedef struct {
 	tipo_arkanoPi arkanoPi;
