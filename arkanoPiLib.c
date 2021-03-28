@@ -405,9 +405,8 @@ void InicializaJuego(fsm_t* this) {
 	flags &= ~FLAG_TIMER_JUEGO;
 	piUnlock(SYSTEM_FLAGS_KEY);
 
-	// Inicializamos las variables del juego y habilitamos la pantalla
+	// Inicializamos las variables del juego
 	InicializaArkanoPi(p_arkanoPi);
-	pseudoWiringPiEnableDisplay(1);
 
 	// Finalmente pintamos la pantalla por terminal
 	piLock(STD_IO_BUFFER_KEY);
@@ -562,12 +561,14 @@ void FinalJuego (fsm_t* this) {
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
 
-	// Pintamos la pantalla final
+	// Pintamos la pantalla final y habilitamos la pantalla para que se muestre
 	piLock(MATRIX_KEY);
 	PintaMensajeInicialPantalla(&(led_display.pantalla), &pantalla_final);
 	piUnlock(MATRIX_KEY);
+	pseudoWiringPiEnableDisplay(1);
+
 	// A completar por el alumno
-	// Hech
+	// Hecho
 }
 
 //void ReseteaJuego (void): función encargada de llevar a cabo la
@@ -589,6 +590,9 @@ void ReseteaJuego (fsm_t* this) {
 	// Inicializamos el juego
 	ResetArkanoPi(p_arkanoPi);
 
+	// Deshabilitamos la pantalla para escribir por consola
+	pseudoWiringPiEnableDisplay(0);
+
 	// Imprimimos el saludo y las instrucciones del juego
 	piLock(STD_IO_BUFFER_KEY);
 	printf("\n¡Bienvenido a arkanoPi!\n");
@@ -600,13 +604,13 @@ void ReseteaJuego (fsm_t* this) {
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
 
-	// Volvemos a habilitar la pantalla
-	pseudoWiringPiEnableDisplay(1);
-
 	// Pintamos la pantalla inicial
 	piLock(MATRIX_KEY);
 	PintaMensajeInicialPantalla(&(led_display.pantalla), &pantalla_inicial);
 	piUnlock(MATRIX_KEY);
+
+	// Volvemos a habilitar la pantalla
+	pseudoWiringPiEnableDisplay(1);
 
 	// A completar por el alumno
 	// Hecho

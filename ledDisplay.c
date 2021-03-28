@@ -39,14 +39,13 @@ fsm_trans_t fsm_trans_excitacion_display[] = {
 void InicializaLedDisplay (TipoLedDisplay *led_display) {
 	// A completar por el alumno...
 	// ...
-	printf("Se mete a InicializaLedDisplay");
 
 	piLock(MATRIX_KEY);
 	// Ponemos los pines GPIO de las filas como entradas
 	for (int i = 0; i < NUM_FILAS_DISPLAY; i++) {
 		pinMode(led_display->filas[i], OUTPUT);
 	}
-	// Ponemos los pines GPIO de las columnas como entradas
+	// Ponemos los pines GPIO del descodificador de las columnas como entradas
 	for (int i = 0; i < NUM_PINES_CONTROL_COLUMNAS_DISPLAY; i++) {
 		pinMode(led_display->pines_control_columnas[i], OUTPUT);
 	}
@@ -60,45 +59,54 @@ void InicializaLedDisplay (TipoLedDisplay *led_display) {
 void ApagaFilas (TipoLedDisplay *led_display){
 	// A completar por el alumno...
 	// ...
-	printf("Se mete a ApagaFilas");
 
-	piLock(MATRIX_KEY);
-	// Ponemos los pines GPIO de las filas como entradas y les asignamos sus rutinas de interrupción
+	// Ponemos los pines GPIO de las filas en HIGH (apagamos las filas a nivel alto)
 	for (int i = 0; i < NUM_FILAS_DISPLAY; i++) {
-		pinMode(led_display->filas[i], OUTPUT);
+		digitalWrite(led_display->filas[i], HIGH);
 	}
-	piUnlock(MATRIX_KEY);
 }
 
 void ExcitaColumnas(int columna) {
-	printf("Se mete a ExcitaColumnas");
+	// Matriz que extrae la configuración de los pines del descodificador en función de la columna activa
+	int columnaBinaria[NUM_COLUMNAS_DISPLAY][NUM_PINES_CONTROL_COLUMNAS_DISPLAY] = {
+		{0, 0, 0},
+		{1, 0, 0},
+		{0, 1, 0},
+		{1, 1, 0},
+		{0, 0, 1},
+		{1, 0, 1},
+		{0, 1, 1},
+		{1, 1, 1},
+	};
 
 	/*switch(columna) {
 		// A completar por el alumno...
 		// ...
 	}*/
-	piLock(MATRIX_KEY);
 	for (int i = 0; i < NUM_PINES_CONTROL_COLUMNAS_DISPLAY; i++) {
-		// Ponemos la columna pasado como parámetro a HIGH y el resto a LOW
-		if (i == columna)
+		// Ponemos los pines del descodificador de la columna a HIGH o a LOW en función de la columna que seleccionamos
+		if (columnaBinaria[columna][i] == 1)
 			digitalWrite(led_display.pines_control_columnas[i], HIGH);
 		else
 			digitalWrite(led_display.pines_control_columnas[i], LOW);
 	}
-	piUnlock(MATRIX_KEY);
 }
 
 void ActualizaLedDisplay (TipoLedDisplay *led_display) {
-	printf("Se mete a ActualizaLedDisplay");
 	// A completar por el alumno...
 	// ...
+
+	piLock(MATRIX_KEY);
 	ExcitaColumnas(led_display->p_columna);
+	//ApagaFilas(led_display); // No usamos ApagaFilas() porque tenemos un display emulado y nos pondría todas las filas a 0 siempre
 	for (int i = 0; i < NUM_FILAS_DISPLAY; i++) {
-		if ((led_display->pantalla.matriz[i][led_display->p_columna] == 1 ||
-				led_display->pantalla.matriz[i][led_display->p_columna] == 8)) {
+		if ((led_display->pantalla.matriz[i][led_display->p_columna] != 0)) {
+			digitalWrite(led_display->filas[i], LOW);
+		} else {
 			digitalWrite(led_display->filas[i], HIGH);
 		}
 	}
+	piUnlock(MATRIX_KEY);
 }
 
 //------------------------------------------------------
@@ -106,16 +114,15 @@ void ActualizaLedDisplay (TipoLedDisplay *led_display) {
 //------------------------------------------------------
 
 int CompruebaTimeoutColumnaDisplay (fsm_t* this) {
-	printf("Se mete a CompruebaTimeoutColumnaDisplay");
 	int result = 0;
 	TipoLedDisplay *p_ledDisplay;
 	p_ledDisplay = (TipoLedDisplay*)(this->user_data);
 
 	// A completar por el alumno...
 	// ...
-	piLock(MATRIX_KEY);
+	piLock(SYSTEM_FLAGS_KEY);
 	result = p_ledDisplay->flags & FLAG_TIMEOUT_COLUMNA_DISPLAY;
-	piUnlock(MATRIX_KEY);
+	piUnlock(SYSTEM_FLAGS_KEY);
 
 	return result;
 }
@@ -125,21 +132,28 @@ int CompruebaTimeoutColumnaDisplay (fsm_t* this) {
 //------------------------------------------------------
 
 void ActualizaExcitacionDisplay (fsm_t* this) {
-	printf("Se mete a ActualizaExcitacionDisplay");
 	TipoLedDisplay *p_ledDisplay;
 	p_ledDisplay = (TipoLedDisplay*)(this->user_data);
 
 	// A completar por el alumno...
 	// ...
 
-	if (p_ledDisplay->p_columna == NUM_COLUMNAS_DISPLAY - 1) {
-		p_ledDisplay->p_columna = 0;
-	} else {
-		p_ledDisplay->p_columna++;
-	}
+	// Desactivamos el flag que atendemos
+	piLock(SYSTEM_FLAGS_KEY);
+	p_ledDisplay->flags &= ~FLAG_TIMEOUT_COLUMNA_DISPLAY;
+	piUnlock(SYSTEM_FLAGS_KEY);
 
 	// Actualizamos el display en función de la matriz
 	ActualizaLedDisplay(p_ledDisplay);
+
+	// Cambiamos a la columna siguiente
+	piLock(MATRIX_KEY);
+	if (p_ledDisplay->p_columna < NUM_COLUMNAS_DISPLAY - 1) {
+		p_ledDisplay->p_columna++;
+	} else {
+		p_ledDisplay->p_columna = 0;
+	}
+	piUnlock(MATRIX_KEY);
 
 	// Reseteamos el temporizador
 	tmr_startms((tmr_t*) (led_display.tmr_refresco_display), TIMEOUT_COLUMNA_DISPLAY);
@@ -151,10 +165,9 @@ void ActualizaExcitacionDisplay (fsm_t* this) {
 //------------------------------------------------------
 
 void timer_refresco_display_isr (union sigval value) {
-	printf("Se mete a timer_refresco_display_isr");
 	// A completar por el alumno...
 	// ...
-	piLock(MATRIX_KEY);
+	piLock(SYSTEM_FLAGS_KEY);
 	led_display.flags |= FLAG_TIMEOUT_COLUMNA_DISPLAY;
-	piUnlock(MATRIX_KEY);
+	piUnlock(SYSTEM_FLAGS_KEY);
 }
