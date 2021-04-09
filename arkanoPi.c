@@ -45,8 +45,7 @@ TipoLedDisplay led_display = {
 	.pines_control_columnas = {
 			GPIO_LED_DISPLAY_COL_1,
 			GPIO_LED_DISPLAY_COL_2,
-			GPIO_LED_DISPLAY_COL_3,
-			GPIO_LED_DISPLAY_COL_4,
+			GPIO_LED_DISPLAY_COL_3
 		// A completar por el alumno...
 		// Hecho
 	},
@@ -98,10 +97,10 @@ int ConfiguraInicializaSistema (TipoSistema *p_sistema) {
 		printf("Unable to setup wiringPi\n");
 
 	InicializaTeclado(&teclado);
-	InicializaLedDisplay(&led_display);
 
 	// Pintamos la pantalla inicial en la matriz de LEDs
 	PintaMensajeInicialPantalla(&(led_display.pantalla), &pantalla_inicial);
+	InicializaLedDisplay(&led_display);
 
 	// Nos falta escribir las instrucciones del juego, deshabilitamos la pantalla
 	pseudoWiringPiEnableDisplay(0);
@@ -178,7 +177,11 @@ void explora_teclado(int teclaPulsada) {
 			break;
 		case 'F':
 		case 'f':
+			// Se deshabilita la pantalla para mostrar el mensaje final
+			pseudoWiringPiEnableDisplay(0);
+			piLock(STD_IO_BUFFER_KEY);
 			printf("\nGracias por jugar a arkanoPi.\n");
+			piUnlock(STD_IO_BUFFER_KEY);
 			// Destruimos los timers anteriormente creados para liberar la memoria
 			tmr_destroy((tmr_t*) (sistema.arkanoPi.tmr_actualizacion_juego));
 			tmr_destroy((tmr_t*) (teclado.tmr_duracion_columna));
@@ -254,6 +257,9 @@ int main () {
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
 
+	// Habilitamos el display para mostrar la pantalla inicial
+	pseudoWiringPiEnableDisplay(1);
+
 	next = millis();
 	while (1) {
 		// Ejecutamos las comprobaciones de las máquinas de estado del teclado
@@ -274,4 +280,6 @@ int main () {
 	tmr_destroy((tmr_t*) (teclado.tmr_duracion_columna));
 	tmr_destroy((tmr_t*) (led_display.tmr_refresco_display));
 	fsm_destroy(arkanoPi_fsm);
+	fsm_destroy(teclado_fsm);
+	fsm_destroy(display_fsm);
 }
