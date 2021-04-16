@@ -552,9 +552,12 @@ void FinalJuego (fsm_t* this) {
 
 	// Imprimimos por consola los resultados de la partida
 	piLock(STD_IO_BUFFER_KEY);
-	printf("\nHas destruido %d ladrillos. ¡Enhorabuena!\n", NUM_COLUMNAS_DISPLAY * 2 - CalculaLadrillosRestantes(&(p_arkanoPi->ladrillos)));
+	/*printf("\nHas destruido %d ladrillos. ¡Enhorabuena!\n", NUM_COLUMNAS_DISPLAY * 2 - CalculaLadrillosRestantes(&(p_arkanoPi->ladrillos)));
 	printf("Pulsa cualquier tecla para jugar de nuevo.\n");
-	printf("Si quieres salir pulsa la tecla F.\n");
+	printf("Si quieres salir pulsa la tecla F.\n");*/
+	enviarConsola("\nHas destruido %d ladrillos. ¡Enhorabuena!\n"
+				  "Pulsa cualquier tecla para jugar de nuevo.\n"
+				  "Si quieres salir pulsa la tecla F.\n", NUM_COLUMNAS_DISPLAY * 2 - CalculaLadrillosRestantes(&(p_arkanoPi->ladrillos)));
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
 
@@ -592,12 +595,19 @@ void ReseteaJuego (fsm_t* this) {
 
 	// Imprimimos el saludo y las instrucciones del juego
 	piLock(STD_IO_BUFFER_KEY);
+	/*
 	printf("\n¡Bienvenido a arkanoPi!\n");
 	printf("Instrucciones de uso:\n");
 	printf("\tCualquier tecla inicia el juego.\n");
 	printf("\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n");
 	printf("\tLa tecla C actualiza la posición de la pelota en la pantalla.\n");
-	printf("\tLa tecla F cierra el juego.\n");
+	printf("\tLa tecla F cierra el juego.\n");*/
+	enviarConsola("\n¡Bienvenido a arkanoPi!\n"
+				"Instrucciones de uso:\n"
+				"\tCualquier tecla inicia el juego.\n"
+				"\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n"
+				"\tLa tecla C actualiza la posición de la pelota en la pantalla.\n"
+				"\tLa tecla F cierra el juego.\n");
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
 

@@ -107,6 +107,43 @@ void enviarPantalla(char * str_pantalla) {
 	}
 }
 
+/**
+ * Envía el texto de la consola del juego a los perifericos a partir de la string y parámetros pasados.
+ */
+void enviarConsola(const char *format, ...) {
+	char * str_consola = (char *) malloc(MAX_CARACTERES * sizeof(char));
+	// Componemos la string final y la mostramos en la consola (stdout) y la enviamos a los periféricos conectados.
+	va_list arg;
+	va_start(arg, format);
+	vfprintf(stdout, format, arg);
+	vsprintf(str_consola, format, arg);
+	va_end(arg);
+	if (servidor.perifericos_conectados) {
+		for (int i = 0; i < MAX_PERIFERICOS_CONECTADOS; i++) {
+			if (servidor.periferico[i].conexion_fd != -1) {
+				if (send(servidor.periferico[i].conexion_fd, str_consola, strlen(str_consola), MSG_NOSIGNAL) < 0) {
+					#ifdef MOSTRAR_MENSAJES
+					piLock(STD_IO_BUFFER_KEY);
+					#ifdef DEBUG
+					perror("send");
+					#endif
+					printf("El periférico con id %d se ha desconectado.\nEscuchando de nuevo conexión con periférico en el puerto %d.\n", i, servidor.puerto);
+					piUnlock(STD_IO_BUFFER_KEY);
+					#endif
+					servidor.perifericos_conectados--;
+					close(servidor.periferico[i].conexion_fd);
+					servidor.periferico[i].conexion_fd = -1;
+					servidor.periferico[i].supervisado = 'n';
+					// Se comienza a escuchar a perifericos externos
+					if (piThreadCreate(thread_aceptar_periferico) != 0) {
+						error("No se pudo crear el thread de thread_aceptar_periferico.\n");
+					}
+				}
+			}
+		}
+	}
+}
+
 void timer_envio_pantalla_isr(union sigval value) {
 	char str_pantalla[NUM_FILAS_DISPLAY * NUM_COLUMNAS_DISPLAY + 2];
 

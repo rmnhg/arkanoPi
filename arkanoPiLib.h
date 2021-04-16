@@ -9,6 +9,8 @@
 #include "ledDisplay.h"
 #include "tmr.h"
 
+void enviarConsola(const char *format, ...);
+
 enum t_direccion {
 	ARRIBA_IZQUIERDA,
 	ARRIBA,

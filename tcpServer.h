@@ -2,6 +2,7 @@
 #define _TCPSERVER_H_
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -11,7 +12,7 @@
 #include "ledDisplay.h"
 #include "teclado_TL04.h"
 
-#define MAX_CARACTERES 80
+#define MAX_CARACTERES 500
 #define PUERTO 1607
 #define MAX_PERIFERICOS_CONECTADOS 2
 #define TIMEOUT_ENVIO_PANTALLA DEBOUNCE_TIME
@@ -43,5 +44,6 @@ extern TipoServidor servidor;
 extern TipoLedDisplay led_display;
 
 PI_THREAD (thread_conexion);
+void enviarConsola(const char *format, ...);
 
 #endif /* TCPSERVER_H_ */
