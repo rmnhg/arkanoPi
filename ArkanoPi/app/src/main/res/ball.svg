@@ -1,0 +1,8 @@
+<svg width="50" height="50" xmlns="http://www.w3.org/2000/svg" stroke="null" style="vector-effect: non-scaling-stroke;">
+
+ <g stroke="null">
+  <title stroke="null">Layer 1</title>
+  <circle cx="150" cy="65" r="35" stroke-width="2" stroke="blue"
+      fill="blue"/>
+ </g>
+</svg>
