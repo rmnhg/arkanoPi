@@ -177,10 +177,12 @@ void ActualizaPantalla(tipo_arkanoPi* p_arkanoPi) {
 		(tipo_pala*)(&(p_arkanoPi->pala)),
 		(tipo_pantalla*)(p_arkanoPi->p_pantalla));
 
-	// Pinta la pelota
-	PintaPelota(
-		(tipo_pelota*)(&(p_arkanoPi->pelota)),
-		(tipo_pantalla*)(p_arkanoPi->p_pantalla));
+	// Pinta las pelotas
+	for (int i = 0; i < MAX_PELOTAS; i++) {
+		PintaPelota(
+			(tipo_pelota*)(&(p_arkanoPi->pelota[i])),
+			(tipo_pantalla*)(p_arkanoPi->p_pantalla));
+	}
 }
 
 void InicializaArkanoPi(tipo_arkanoPi *p_arkanoPi) {
@@ -191,7 +193,10 @@ void InicializaArkanoPi(tipo_arkanoPi *p_arkanoPi) {
 void ResetArkanoPi(tipo_arkanoPi *p_arkanoPi) {
 	ReseteaPantalla((tipo_pantalla*)(p_arkanoPi->p_pantalla));
 	InicializaLadrillos((tipo_pantalla*)(&(p_arkanoPi->ladrillos)));
-	InicializaPelota((tipo_pelota*)(&(p_arkanoPi->pelota)));
+	// Inicializamos las pelotas
+	for (int i = 0; i < MAX_PELOTAS; i++) {
+		InicializaPelota((tipo_pelota*)(&(p_arkanoPi->pelota[i])));
+	}
 	InicializaPala((tipo_pala*)(&(p_arkanoPi->pala)));
 }
 
@@ -229,11 +234,11 @@ void ActualizaPosicionPelota (tipo_pelota *p_pelota) {
 	p_pelota->y += p_pelota->trayectoria.yv;
 }
 
-int CompruebaReboteLadrillo (tipo_arkanoPi *p_arkanoPi) {
+int CompruebaReboteLadrillo (tipo_arkanoPi *p_arkanoPi, int pelota) {
 	int p_posible_ladrillo_x = 0;
 	int p_posible_ladrillo_y = 0;
 
-	p_posible_ladrillo_x = p_arkanoPi->pelota.x + p_arkanoPi->pelota.trayectoria.xv;
+	p_posible_ladrillo_x = p_arkanoPi->pelota[pelota].x + p_arkanoPi->pelota[pelota].trayectoria.xv;
 
 	if ( ( p_posible_ladrillo_x < 0) || ( p_posible_ladrillo_x >= NUM_COLUMNAS_DISPLAY ) ) {
 		printf("\n\nERROR GRAVE!!! p_posible_ladrillo_x = %d!!!\n\n", p_posible_ladrillo_x);
@@ -241,7 +246,7 @@ int CompruebaReboteLadrillo (tipo_arkanoPi *p_arkanoPi) {
 		exit(-1);
 	}
 
-	p_posible_ladrillo_y = p_arkanoPi->pelota.y + p_arkanoPi->pelota.trayectoria.yv;
+	p_posible_ladrillo_y = p_arkanoPi->pelota[pelota].y + p_arkanoPi->pelota[pelota].trayectoria.yv;
 
 	if ( ( p_posible_ladrillo_y < 0) || ( p_posible_ladrillo_y >= NUM_FILAS_DISPLAY ) ) {
 		printf("\n\nERROR GRAVE!!! p_posible_ladrillo_y = %d!!!\n\n", p_posible_ladrillo_y);
@@ -258,31 +263,31 @@ int CompruebaReboteLadrillo (tipo_arkanoPi *p_arkanoPi) {
 	return 0;
 }
 
-int CompruebaReboteParedesVerticales (tipo_arkanoPi arkanoPi) {
+int CompruebaReboteParedesVerticales (tipo_arkanoPi arkanoPi, int pelota) {
 	// Comprobamos si la nueva posicion de la pelota excede los limites de la pantalla
-	if((arkanoPi.pelota.x + arkanoPi.pelota.trayectoria.xv >= NUM_COLUMNAS_DISPLAY) ||
-		(arkanoPi.pelota.x + arkanoPi.pelota.trayectoria.xv < 0) ) {
+	if((arkanoPi.pelota[pelota].x + arkanoPi.pelota[pelota].trayectoria.xv >= NUM_COLUMNAS_DISPLAY) ||
+		(arkanoPi.pelota[pelota].x + arkanoPi.pelota[pelota].trayectoria.xv < 0) ) {
 		// La pelota rebota contra la pared derecha o izquierda
 		return 1;
 	}
 	return 0;
 }
 
-int CompruebaReboteTecho (tipo_arkanoPi arkanoPi) {
+int CompruebaReboteTecho (tipo_arkanoPi arkanoPi, int pelota) {
 	// Comprobamos si la nueva posicion de la pelota excede los limites de la pantalla
-	if(arkanoPi.pelota.y + arkanoPi.pelota.trayectoria.yv < 0) {
+	if(arkanoPi.pelota[pelota].y + arkanoPi.pelota[pelota].trayectoria.yv < 0) {
 		// La pelota rebota contra la pared derecha o izquierda
 		return 1;
 	}
 	return 0;
 }
 
-int CompruebaRebotePala (tipo_arkanoPi arkanoPi) {
-	if(arkanoPi.pelota.trayectoria.yv > 0) { // Esta condicion solo tiene sentido si la pelota va hacia abajo en la pantalla
-		if ((arkanoPi.pelota.x + arkanoPi.pelota.trayectoria.xv >= arkanoPi.pala.x ) &&
-			(arkanoPi.pelota.x + arkanoPi.pelota.trayectoria.xv < arkanoPi.pala.x + NUM_COLUMNAS_PALA)) {
-				if ((arkanoPi.pelota.y + arkanoPi.pelota.trayectoria.yv >= arkanoPi.pala.y) &&
-					(arkanoPi.pelota.y + arkanoPi.pelota.trayectoria.yv < arkanoPi.pala.y + NUM_FILAS_PALA)) {
+int CompruebaRebotePala (tipo_arkanoPi arkanoPi, int pelota) {
+	if(arkanoPi.pelota[pelota].trayectoria.yv > 0) { // Esta condicion solo tiene sentido si la pelota va hacia abajo en la pantalla
+		if ((arkanoPi.pelota[pelota].x + arkanoPi.pelota[pelota].trayectoria.xv >= arkanoPi.pala.x ) &&
+			(arkanoPi.pelota[pelota].x + arkanoPi.pelota[pelota].trayectoria.xv < arkanoPi.pala.x + NUM_COLUMNAS_PALA)) {
+				if ((arkanoPi.pelota[pelota].y + arkanoPi.pelota[pelota].trayectoria.yv >= arkanoPi.pala.y) &&
+					(arkanoPi.pelota[pelota].y + arkanoPi.pelota[pelota].trayectoria.yv < arkanoPi.pala.y + NUM_FILAS_PALA)) {
 					return 1;
 				}
 		}
@@ -290,9 +295,9 @@ int CompruebaRebotePala (tipo_arkanoPi arkanoPi) {
 	return 0;
 }
 
-int CompruebaFallo (tipo_arkanoPi arkanoPi) {
+int CompruebaFallo (tipo_arkanoPi arkanoPi, int pelota) {
 	// Comprobamos si no hemos conseguido devolver la pelota
-	if(arkanoPi.pelota.y + arkanoPi.pelota.trayectoria.yv >= NUM_FILAS_DISPLAY) {
+	if(arkanoPi.pelota[pelota].y + arkanoPi.pelota[pelota].trayectoria.yv >= NUM_FILAS_DISPLAY) {
 		// Hemos fallado
 		return 1;
 	}
@@ -329,6 +334,17 @@ int CompruebaBotonPulsado (fsm_t* this) {
 	piUnlock(SYSTEM_FLAGS_KEY);
 	// A completar por el alumno
 	// Hecho
+
+	return result;
+}
+
+int CompruebaPausaPulsada (fsm_t* this) {
+	int result = 0;
+
+	// Comprobamos si el flag del botón de pausa ha sido activado
+	piLock(SYSTEM_FLAGS_KEY);
+	result = (flags & FLAG_PAUSA);
+	piUnlock(SYSTEM_FLAGS_KEY);
 
 	return result;
 }
@@ -477,7 +493,15 @@ void MuevePalaDerecha (fsm_t* this) {
 
 void ActualizarJuego (fsm_t* this) {
 	tipo_arkanoPi* p_arkanoPi;
+	int pelotasEnJuego = MAX_PELOTAS;
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
+
+	/*
+	  Bola 0 caida, ¿bola 1 caida? -> Si (fin juego)
+	  -> No, se sigue juego
+	  Bola 1 caida, ¿bola 0 caida? -> Si (fin juego)
+	  -> No, se sigue jugando
+	 */
 
 	// Eliminamos los flags que ya hemos cubierto
 	piLock(SYSTEM_FLAGS_KEY);
@@ -485,44 +509,62 @@ void ActualizarJuego (fsm_t* this) {
 	flags &= (~FLAG_BOTON);
 	piUnlock(SYSTEM_FLAGS_KEY);
 
-	if (CompruebaReboteParedesVerticales(*(p_arkanoPi))){
-		p_arkanoPi->pelota.trayectoria.xv *=-1;
-	}
-	if (CompruebaReboteTecho(*(p_arkanoPi))){
-		p_arkanoPi->pelota.trayectoria.yv *=-1;
-	}
-	if (CompruebaFallo(*(p_arkanoPi))){
-		piLock(SYSTEM_FLAGS_KEY);
-		flags |= FLAG_FIN_JUEGO;
-		piUnlock(SYSTEM_FLAGS_KEY);
-		return;
-	} else if (CompruebaRebotePala(*(p_arkanoPi))){
-		switch (p_arkanoPi->pelota.x + p_arkanoPi->pelota.trayectoria.xv - p_arkanoPi->pala.x){
-			case 0:
-				CambiarDireccionPelota(&(p_arkanoPi->pelota),ARRIBA_IZQUIERDA);
-				break;
-			case 1:
-				CambiarDireccionPelota(&(p_arkanoPi->pelota),ARRIBA);
-				break;
-			case 2:
-				CambiarDireccionPelota(&(p_arkanoPi->pelota),ARRIBA_DERECHA);
-				break;
-		}
-		if (CompruebaReboteParedesVerticales(*(p_arkanoPi))){
-			p_arkanoPi->pelota.trayectoria.xv *=-1;
-		}
-	}
-	if (CompruebaReboteLadrillo(p_arkanoPi)){
-		p_arkanoPi->pelota.trayectoria.yv *= -1;
+	for (int i = 0; i < MAX_PELOTAS; i++) {
+		if (p_arkanoPi->pelota[i].y < NUM_FILAS_DISPLAY) {
+			if (CompruebaReboteParedesVerticales(*(p_arkanoPi), i)){
+				p_arkanoPi->pelota[i].trayectoria.xv *=-1;
+			}
+			if (CompruebaReboteTecho(*(p_arkanoPi), i)){
+				p_arkanoPi->pelota[i].trayectoria.yv *=-1;
+			}
+			if (CompruebaFallo(*(p_arkanoPi), i)){
+				// Sacamos la pelota actual fuera de la pantalla
+				p_arkanoPi->pelota[i].y++;
+				pelotasEnJuego--;
+				// Comprobamos si la otra pelota también ha fallado
+				for (int j = 0; j < MAX_PELOTAS; j++) {
+					if ((j != i) && (p_arkanoPi->pelota[j].y >= NUM_FILAS_DISPLAY)) {
+						pelotasEnJuego--;
+					}
+				}
+				// Si no quedan pelotas en juego se termina la partida
+				if (pelotasEnJuego == 0) {
+					piLock(SYSTEM_FLAGS_KEY);
+					flags |= FLAG_FIN_JUEGO;
+					piUnlock(SYSTEM_FLAGS_KEY);
+					return;
+				}
+				// Si quedan pelotas en juego pero se ha caido esta, se comprueban las demás
+				continue;
+			} else if (CompruebaRebotePala(*(p_arkanoPi), i)){
+				switch (p_arkanoPi->pelota[i].x + p_arkanoPi->pelota[i].trayectoria.xv - p_arkanoPi->pala.x){
+					case 0:
+						CambiarDireccionPelota(&(p_arkanoPi->pelota[i]),ARRIBA_IZQUIERDA);
+						break;
+					case 1:
+						CambiarDireccionPelota(&(p_arkanoPi->pelota[i]),ARRIBA);
+						break;
+					case 2:
+						CambiarDireccionPelota(&(p_arkanoPi->pelota[i]),ARRIBA_DERECHA);
+						break;
+				}
+				if (CompruebaReboteParedesVerticales(*(p_arkanoPi), i)){
+					p_arkanoPi->pelota[i].trayectoria.xv *=-1;
+				}
+			}
+			if (CompruebaReboteLadrillo(p_arkanoPi, i)){
+				p_arkanoPi->pelota[i].trayectoria.yv *= -1;
 
-		if (CalculaLadrillosRestantes(&(p_arkanoPi->ladrillos)) <= 0){
-			piLock(SYSTEM_FLAGS_KEY);
-			flags |= FLAG_FIN_JUEGO;
-			piUnlock(SYSTEM_FLAGS_KEY);
-			return;
+				if (CalculaLadrillosRestantes(&(p_arkanoPi->ladrillos)) <= 0){
+					piLock(SYSTEM_FLAGS_KEY);
+					flags |= FLAG_FIN_JUEGO;
+					piUnlock(SYSTEM_FLAGS_KEY);
+					return;
+				}
+			}
+			ActualizaPosicionPelota(&(p_arkanoPi->pelota[i]));
 		}
 	}
-	ActualizaPosicionPelota(&(p_arkanoPi->pelota));
 
 	piLock(MATRIX_KEY);
 	ActualizaPantalla(p_arkanoPi);
@@ -621,6 +663,19 @@ void ReseteaJuego (fsm_t* this) {
 
 	// A completar por el alumno
 	// Hecho
+}
+
+/**
+  * Función que pausa o reactiva la partida.
+  */
+void PausarJuego (fsm_t* this) {
+	tipo_arkanoPi *p_arkanoPi;
+	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
+
+	// Cancelamos los posibles flags generados por las teclas de control además del flag del botón
+	piLock(SYSTEM_FLAGS_KEY);
+	flags &= ~FLAG_PAUSA;
+	piUnlock(SYSTEM_FLAGS_KEY);
 }
 
 //------------------------------------------------------

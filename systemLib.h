@@ -67,6 +67,7 @@
 #define FLAG_TIMER_JUEGO	0x10 //00010000
 #define FLAG_BOTON 			0x20 //00100000
 #define FLAG_FIN_JUEGO		0x40 //01000000
+#define FLAG_PAUSA			0x80 //10000000
 
 //result = (flags & FLAG_MOV_ARRIBA); //Comprueba este bit
 //flags &= ~FLAG_MOV_ARRIBA; //Niega este bit
@@ -75,6 +76,7 @@
 enum fsm_state {
 	WAIT_START,
 	WAIT_PUSH,
+	WAIT_PAUSE,
 	WAIT_END};
 
 extern int flags;

@@ -173,12 +173,13 @@ void explora_teclado(int teclaPulsada) {
 			flags |= FLAG_BOTON;
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
-		case 'S':
-		case 's':
+		case 'B':
+		case 'b':
 			// A completar por el alumno...
 			// Hecho
 			// Activamos los flags de movimiento y de boton pulsado
 			piLock(SYSTEM_FLAGS_KEY);
+			flags |= FLAG_PAUSA;
 			flags |= FLAG_BOTON;
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
@@ -228,6 +229,8 @@ int main () {
 		{ WAIT_PUSH, CompruebaMovimientoIzquierda, WAIT_PUSH, MuevePalaIzquierda },
 		{ WAIT_PUSH, CompruebaMovimientoDerecha, WAIT_PUSH, MuevePalaDerecha },
 		{ WAIT_PUSH, CompruebaFinalJuego, WAIT_END, FinalJuego },
+		{ WAIT_PUSH, CompruebaPausaPulsada, WAIT_PAUSE, PausarJuego },
+		{ WAIT_PAUSE, CompruebaPausaPulsada, WAIT_PUSH, PausarJuego },
 		{ WAIT_END,  CompruebaBotonPulsado, WAIT_START, ReseteaJuego },
 		{-1, NULL, -1, NULL }
 	};
