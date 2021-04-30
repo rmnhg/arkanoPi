@@ -270,6 +270,11 @@ void ActualizaPosicionPala(tipo_pala *p_pala, enum t_direccion direccion) {
 
 void ActualizaPosicionPelota (tipo_pelota *p_pelota) {
 	p_pelota->x += p_pelota->trayectoria.xv;
+	if (p_pelota->x == NUM_COLUMNAS_DISPLAY) {
+		p_pelota->x = 0;
+	} else if (p_pelota->x == -1) {
+		p_pelota->x = NUM_COLUMNAS_DISPLAY - 1;
+	}
 	p_pelota->y += p_pelota->trayectoria.yv;
 }
 
@@ -278,6 +283,11 @@ int CompruebaReboteLadrillo (tipo_arkanoPi *p_arkanoPi, int pelota) {
 	int p_posible_ladrillo_y = 0;
 
 	p_posible_ladrillo_x = p_arkanoPi->pelota[pelota].x + p_arkanoPi->pelota[pelota].trayectoria.xv;
+	if (p_posible_ladrillo_x == NUM_COLUMNAS_DISPLAY) {
+		p_posible_ladrillo_x = 0;
+	} else if (p_posible_ladrillo_x == -1) {
+		p_posible_ladrillo_x = NUM_COLUMNAS_DISPLAY - 1;
+	}
 
 	if ( ( p_posible_ladrillo_x < 0) || ( p_posible_ladrillo_x >= NUM_COLUMNAS_DISPLAY ) ) {
 		printf("\n\nERROR GRAVE!!! p_posible_ladrillo_x = %d!!!\n\n", p_posible_ladrillo_x);
@@ -550,9 +560,9 @@ void ActualizarJuego (fsm_t* this) {
 
 	for (int i = 0; i < MAX_PELOTAS; i++) {
 		if (p_arkanoPi->pelota[i].y >= 0) {
-			if (CompruebaReboteParedesVerticales(*(p_arkanoPi), i)){
+			/*if (CompruebaReboteParedesVerticales(*(p_arkanoPi), i)){
 				p_arkanoPi->pelota[i].trayectoria.xv *=-1;
-			}
+			}*/
 			if (CompruebaReboteTecho(*(p_arkanoPi), i)){
 				p_arkanoPi->pelota[i].trayectoria.yv *=-1;
 			}
@@ -587,9 +597,9 @@ void ActualizarJuego (fsm_t* this) {
 						CambiarDireccionPelota(&(p_arkanoPi->pelota[i]),ARRIBA_DERECHA);
 						break;
 				}
-				if (CompruebaReboteParedesVerticales(*(p_arkanoPi), i)){
+				/*if (CompruebaReboteParedesVerticales(*(p_arkanoPi), i)){
 					p_arkanoPi->pelota[i].trayectoria.xv *=-1;
-				}
+				}*/
 			}
 			if (CompruebaReboteLadrillo(p_arkanoPi, i)){
 				p_arkanoPi->pelota[i].trayectoria.yv *= -1;
