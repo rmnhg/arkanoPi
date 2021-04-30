@@ -72,7 +72,7 @@ void InicializaLadrillos(tipo_pantalla *p_ladrillos) {
 void InicializaPelota(tipo_pelota *p_pelota) {
 	// Aleatorizamos la posicion inicial de la pelota
 	p_pelota->x = rand() % NUM_COLUMNAS_DISPLAY;
-	p_pelota->y = 2 + rand() % (NUM_FILAS_DISPLAY-2); // 2 evita que aparezca encima de ladrillos y para que no empiece demasiado pegada al suelo de la pantalla
+	p_pelota->y = 2 + rand() % (NUM_FILAS_DISPLAY-3); // 2 evita que aparezca encima de ladrillos y para que no empiece demasiado pegada al suelo de la pantalla
 
 	// Pelota inicialmente en el centro de la pantalla
 	//p_pelota->x = NUM_COLUMNAS_DISPLAY/2 - 1;
@@ -179,9 +179,11 @@ void ActualizaPantalla(tipo_arkanoPi* p_arkanoPi) {
 
 	// Pinta las pelotas
 	for (int i = 0; i < MAX_PELOTAS; i++) {
-		PintaPelota(
-			(tipo_pelota*)(&(p_arkanoPi->pelota[i])),
-			(tipo_pantalla*)(p_arkanoPi->p_pantalla));
+		if (p_arkanoPi->pelota[i].y >= 0) {
+			PintaPelota(
+				(tipo_pelota*)(&(p_arkanoPi->pelota[i])),
+				(tipo_pantalla*)(p_arkanoPi->p_pantalla));
+		}
 	}
 }
 
@@ -191,12 +193,49 @@ void InicializaArkanoPi(tipo_arkanoPi *p_arkanoPi) {
 }
 
 void ResetArkanoPi(tipo_arkanoPi *p_arkanoPi) {
+	int posiciones_pelotas[MAX_PELOTAS][3]; // En la segunda dimensión, se guarda la x, la y y la paridad de la x
+	int pelotas_unicas = FALSE;
+	int paridad_igual = TRUE; // Significa que todas las pelotas tienen paridad en la x igual
 	ReseteaPantalla((tipo_pantalla*)(p_arkanoPi->p_pantalla));
 	InicializaLadrillos((tipo_pantalla*)(&(p_arkanoPi->ladrillos)));
 	// Inicializamos las pelotas
 	for (int i = 0; i < MAX_PELOTAS; i++) {
 		InicializaPelota((tipo_pelota*)(&(p_arkanoPi->pelota[i])));
+		posiciones_pelotas[i][0] = p_arkanoPi->pelota[i].x;
+		posiciones_pelotas[i][1] = p_arkanoPi->pelota[i].y;
+		posiciones_pelotas[i][2] = p_arkanoPi->pelota[i].x % 2;
 	}
+
+	// Comprobamos que ninguna pelota está en el mismo sitio que las demás
+	while (!pelotas_unicas || paridad_igual) {	// Si las pelotas no son unicas o la paridad es igual
+		pelotas_unicas = TRUE; // Caso ideal
+		paridad_igual = TRUE; // Caso peor
+		for (int i = 0; i < MAX_PELOTAS; i++) {
+			for (int j = 0; j < MAX_PELOTAS - 1; j++) {
+				// Si una pelota tiene distinta paridad a otra, se guarda y no se vuelve a comprobar
+				if ((i != j) && paridad_igual && (posiciones_pelotas[i][2] != posiciones_pelotas[j][2])) {
+					paridad_igual = FALSE;
+				}
+				// Si llegamos a la última pelota y todas tienen la misma paridad, se cambia
+				if ((i == MAX_PELOTAS-1) && (j == MAX_PELOTAS-2) && paridad_igual) {
+					paridad_igual = FALSE;
+					if (posiciones_pelotas[j][0] < NUM_COLUMNAS_DISPLAY - 1) {
+						posiciones_pelotas[j][0]++;
+					} else {
+						posiciones_pelotas[j][0]--;
+					}
+				}
+				// Si una pelota tiene la misma posición que otra, se cambia su posición
+				if ((i != j) && (posiciones_pelotas[i][0] == posiciones_pelotas[j][0]) && (posiciones_pelotas[i][1] == posiciones_pelotas[j][1])) {
+					InicializaPelota((tipo_pelota*)(&(p_arkanoPi->pelota[i])));
+					// Como hemos cambiado la posición de la pelota, habrá que comprobar e nuevo las condiciones que queremos
+					pelotas_unicas = FALSE;
+					paridad_igual = TRUE;
+				}
+			}
+		}
+	}
+
 	InicializaPala((tipo_pala*)(&(p_arkanoPi->pala)));
 }
 
@@ -510,7 +549,7 @@ void ActualizarJuego (fsm_t* this) {
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	for (int i = 0; i < MAX_PELOTAS; i++) {
-		if (p_arkanoPi->pelota[i].y < NUM_FILAS_DISPLAY) {
+		if (p_arkanoPi->pelota[i].y >= 0) {
 			if (CompruebaReboteParedesVerticales(*(p_arkanoPi), i)){
 				p_arkanoPi->pelota[i].trayectoria.xv *=-1;
 			}
@@ -519,11 +558,11 @@ void ActualizarJuego (fsm_t* this) {
 			}
 			if (CompruebaFallo(*(p_arkanoPi), i)){
 				// Sacamos la pelota actual fuera de la pantalla
-				p_arkanoPi->pelota[i].y++;
+				p_arkanoPi->pelota[i].y = -1;
 				pelotasEnJuego--;
 				// Comprobamos si la otra pelota también ha fallado
 				for (int j = 0; j < MAX_PELOTAS; j++) {
-					if ((j != i) && (p_arkanoPi->pelota[j].y >= NUM_FILAS_DISPLAY)) {
+					if ((j != i) && (p_arkanoPi->pelota[j].y < 0)) {
 						pelotasEnJuego--;
 					}
 				}
@@ -594,9 +633,6 @@ void FinalJuego (fsm_t* this) {
 
 	// Imprimimos por consola los resultados de la partida
 	piLock(STD_IO_BUFFER_KEY);
-	/*printf("\nHas destruido %d ladrillos. ¡Enhorabuena!\n", NUM_COLUMNAS_DISPLAY * 2 - CalculaLadrillosRestantes(&(p_arkanoPi->ladrillos)));
-	printf("Pulsa cualquier tecla para jugar de nuevo.\n");
-	printf("Si quieres salir pulsa la tecla F.\n");*/
 	enviarConsola("\nHas destruido %d ladrillos. ¡Enhorabuena!\n"
 				  "Pulsa cualquier tecla para jugar de nuevo.\n"
 				  "Si quieres salir pulsa la tecla F.\n", NUM_COLUMNAS_DISPLAY * 2 - CalculaLadrillosRestantes(&(p_arkanoPi->ladrillos)));
@@ -637,18 +673,12 @@ void ReseteaJuego (fsm_t* this) {
 
 	// Imprimimos el saludo y las instrucciones del juego
 	piLock(STD_IO_BUFFER_KEY);
-	/*
-	printf("\n¡Bienvenido a arkanoPi!\n");
-	printf("Instrucciones de uso:\n");
-	printf("\tCualquier tecla inicia el juego.\n");
-	printf("\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n");
-	printf("\tLa tecla C actualiza la posición de la pelota en la pantalla.\n");
-	printf("\tLa tecla F cierra el juego.\n");*/
 	enviarConsola("\n¡Bienvenido a arkanoPi!\n"
 				"Instrucciones de uso:\n"
 				"\tCualquier tecla inicia el juego.\n"
 				"\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n"
 				"\tLa tecla C actualiza la posición de la pelota en la pantalla.\n"
+				"\tLa tecla B pausa el juego.\n"
 				"\tLa tecla F cierra el juego.\n");
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);

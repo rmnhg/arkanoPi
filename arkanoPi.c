@@ -188,7 +188,6 @@ void explora_teclado(int teclaPulsada) {
 			// Se deshabilita la pantalla para mostrar el mensaje final
 			pseudoWiringPiEnableDisplay(0);
 			piLock(STD_IO_BUFFER_KEY);
-			//printf("\nGracias por jugar a arkanoPi.\n");
 			enviarConsola("\nGracias por jugar a arkanoPi.\n");
 			piUnlock(STD_IO_BUFFER_KEY);
 			// Destruimos los timers anteriormente creados para liberar la memoria
@@ -263,18 +262,12 @@ int main () {
 	// Hecho
 
 	piLock(STD_IO_BUFFER_KEY);
-	/*
-	printf("¡Bienvenido a arkanoPi!\n");
-	printf("Instrucciones de uso:\n");
-	printf("\tCualquier tecla inicia el juego.\n");
-	printf("\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n");
-	printf("\tLa tecla C actualiza la posición de la pelota en la pantalla.\n");
-	printf("\tLa tecla F cierra el juego.\n");*/
 	enviarConsola("¡Bienvenido a arkanoPi!\n"
 				  "Instrucciones de uso:\n"
 				  "\tCualquier tecla inicia el juego.\n"
 				  "\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n"
 				  "\tLa tecla C actualiza la posición de la pelota en la pantalla.\n"
+				  "\tLa tecla B pausa el juego.\n"
 				  "\tLa tecla F cierra el juego.\n");
 	if (!(servidor.flags & FLAG_TCP_ERROR))
 		printf("\nEscuchando conexiones de periféricos en el puerto %d.\n", servidor.puerto);
