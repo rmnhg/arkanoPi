@@ -450,6 +450,63 @@ int CompruebaFinalJuego(fsm_t* this) {
 	return result;
 }
 
+int CompruebaNumeroPelotas(fsm_t* this) {
+	int result = 0;
+
+	// Comprobamos si el flag del submenu de número de pelotas está activo
+	piLock(SYSTEM_FLAGS_KEY);
+	result = (flags & FLAG_MENU_PELOTAS);
+	piUnlock(SYSTEM_FLAGS_KEY);
+
+	return result;
+}
+
+int CompruebaParedes(fsm_t* this) {
+	int result = 0;
+
+	// Comprobamos si el flag del submenu de paredes está activo
+	piLock(SYSTEM_FLAGS_KEY);
+	result = (flags & FLAG_MENU_PAREDES);
+	piUnlock(SYSTEM_FLAGS_KEY);
+
+	return result;
+}
+
+int CompruebaTCP(fsm_t* this) {
+	int result = 0;
+
+	// Comprobamos si el flag del submenu de TCP está activo
+	piLock(SYSTEM_FLAGS_KEY);
+	result = (flags & FLAG_MENU_TCP);
+	piUnlock(SYSTEM_FLAGS_KEY);
+
+	return result;
+}
+
+int CompruebaAyuda(fsm_t* this) {
+	int result = 0;
+
+	// Comprobamos si el flag del submenu de ayuda está activo
+	piLock(SYSTEM_FLAGS_KEY);
+	result = (flags & FLAG_MENU_AYUDA);
+	piUnlock(SYSTEM_FLAGS_KEY);
+
+	return result;
+}
+
+int CompruebaNumerosPulsados(fsm_t* this) {
+	int result = 0;
+
+	// Comprobamos si los flags de alguno de los números está activo
+	piLock(SYSTEM_FLAGS_KEY);
+	result = (flags & FLAG_NUM_1) || (flags & FLAG_NUM_2) || (flags & FLAG_NUM_3)
+	      || (flags & FLAG_NUM_4) || (flags & FLAG_NUM_5) || (flags & FLAG_NUM_6)
+		  || (flags & FLAG_NUM_7) || (flags & FLAG_NUM_8) || (flags & FLAG_NUM_9);
+	piUnlock(SYSTEM_FLAGS_KEY);
+
+	return result;
+}
+
 //------------------------------------------------------
 // FUNCIONES DE ACCION DE LA MAQUINA DE ESTADOS
 //------------------------------------------------------
@@ -683,14 +740,7 @@ void ReseteaJuego (fsm_t* this) {
 
 	// Imprimimos el saludo y las instrucciones del juego
 	piLock(STD_IO_BUFFER_KEY);
-	enviarConsola("\n¡Bienvenido a arkanoPi!\n"
-				"Instrucciones de uso:\n"
-				"\tCualquier tecla inicia el juego.\n"
-				"\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n"
-				"\tLa tecla C actualiza la posición de la pelota en la pantalla.\n"
-				"\tLa tecla B pausa el juego.\n"
-				"\tLa tecla F cierra el juego.\n");
-	fflush(stdout);
+	mostrarInstruccionesJuego();
 	piUnlock(STD_IO_BUFFER_KEY);
 
 	// Pintamos la pantalla inicial
@@ -712,10 +762,85 @@ void PausarJuego (fsm_t* this) {
 	tipo_arkanoPi *p_arkanoPi;
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
-	// Cancelamos los posibles flags generados por las teclas de control además del flag del botón
+	// Cancelamos el flag de pausa
 	piLock(SYSTEM_FLAGS_KEY);
 	flags &= ~FLAG_PAUSA;
 	piUnlock(SYSTEM_FLAGS_KEY);
+}
+
+void MostrarMenu() {
+	pseudoWiringPiEnableDisplay(0);
+	enviarConsola("\n¡Bienvenido a arkanoPi!\n"
+			"\tPulsa 1 para cambiar el números de pelotas en juego (1 - 9).\n"
+			"\tPulsa 2 para alternar las paredes del juego.\n"
+			"\tPulsa 3 para alternar el soporte de periféricos externos.\n"
+			"\tPulsa 4 para ver la ayuda.\n"
+			"\tPulsa A o D para comenzar la partida.\n");
+	fflush(stdout);
+}
+
+void MostrarSubmenuPelotas (fsm_t* this) {
+	tipo_arkanoPi *p_arkanoPi;
+	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
+
+	// Cancelamos el flag del submenu del número de pelotas
+	piLock(SYSTEM_FLAGS_KEY);
+	flags &= ~FLAG_MENU_PELOTAS;
+	piUnlock(SYSTEM_FLAGS_KEY);
+
+	pseudoWiringPiEnableDisplay(0);
+	piLock(STD_IO_BUFFER_KEY);
+	enviarConsola("\nPulse un número del 1 al 9 para definir el número de pelotas.\n");
+	fflush(stdout);
+	piUnlock(STD_IO_BUFFER_KEY);
+}
+
+void MostrarSubmenuParedes (fsm_t* this) {
+	tipo_arkanoPi *p_arkanoPi;
+	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
+
+	// Cancelamos el flag del submenu de paredes
+	piLock(SYSTEM_FLAGS_KEY);
+	flags &= ~FLAG_MENU_PAREDES;
+	piUnlock(SYSTEM_FLAGS_KEY);
+
+	pseudoWiringPiEnableDisplay(0);
+	piLock(STD_IO_BUFFER_KEY);
+	enviarConsola("\nPulse el número 1 para activar las paredes del juego o el 0 para desactivar la paredes del juego.\n");
+	fflush(stdout);
+	piUnlock(STD_IO_BUFFER_KEY);
+}
+
+void MostrarSubmenuTCP (fsm_t* this) {
+	tipo_arkanoPi *p_arkanoPi;
+	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
+
+	// Cancelamos el flag del submenu de TCP
+	piLock(SYSTEM_FLAGS_KEY);
+	flags &= ~FLAG_MENU_PAREDES;
+	piUnlock(SYSTEM_FLAGS_KEY);
+
+	pseudoWiringPiEnableDisplay(0);
+	piLock(STD_IO_BUFFER_KEY);
+	enviarConsola("\nPulse el número 1 para activar la conexión inalámbrica de periféricos externos o el 0 para desactivarla.\n");
+	fflush(stdout);
+	piUnlock(STD_IO_BUFFER_KEY);
+}
+
+void MostrarSubmenuAyuda (fsm_t* this) {
+	tipo_arkanoPi *p_arkanoPi;
+	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
+
+	// Cancelamos el flag del submenu de paredes
+	piLock(SYSTEM_FLAGS_KEY);
+	flags &= ~FLAG_MENU_PAREDES;
+	piUnlock(SYSTEM_FLAGS_KEY);
+
+	pseudoWiringPiEnableDisplay(0);
+	piLock(STD_IO_BUFFER_KEY);
+	mostrarInstruccionesJuego();
+	fflush(stdout);
+	piUnlock(STD_IO_BUFFER_KEY);
 }
 
 //------------------------------------------------------
@@ -724,7 +849,7 @@ void PausarJuego (fsm_t* this) {
 
 void tmr_actualizacion_juego_isr(union sigval value) {
 	// A completar por el alumno
-	// ...
+	// Hecho
 	piLock(SYSTEM_FLAGS_KEY);
 	flags |= FLAG_TIMER_JUEGO;
 	piUnlock(SYSTEM_FLAGS_KEY);

@@ -5,6 +5,8 @@ int flags = 0;
 
 TipoSistema sistema;
 
+fsm_t* arkanoPi_fsm;
+
 // Declaracion del objeto teclado
 TipoTeclado teclado = {
 	.columnas = {
@@ -141,7 +143,56 @@ void explora_teclado(int teclaPulsada) {
 	switch(teclaPulsada) {
 		// A completar por el alumno...
 		// Hecho
+		case '1':
+			// Activamos el flag del 1
+			piLock(SYSTEM_FLAGS_KEY);
+			flags |= FLAG_NUM_1;
+			piUnlock(SYSTEM_FLAGS_KEY);
+			break;
+		case '2':
+			// Activamos el flag del 2
+			piLock(SYSTEM_FLAGS_KEY);
+			flags |= FLAG_NUM_2;
+			piUnlock(SYSTEM_FLAGS_KEY);
+			break;
+		case '3':
+			// Activamos el flag del 3
+			piLock(SYSTEM_FLAGS_KEY);
+			flags |= FLAG_NUM_3;
+			piUnlock(SYSTEM_FLAGS_KEY);
+			break;
+		case '5':
+			// Activamos el flag del 5
+			piLock(SYSTEM_FLAGS_KEY);
+			flags |= FLAG_NUM_5;
+			piUnlock(SYSTEM_FLAGS_KEY);
+			break;
+		case '7':
+			// Activamos el flag del 7
+			piLock(SYSTEM_FLAGS_KEY);
+			flags |= FLAG_NUM_7;
+			piUnlock(SYSTEM_FLAGS_KEY);
+			break;
+		case '8':
+			// Activamos el flag del 8
+			piLock(SYSTEM_FLAGS_KEY);
+			flags |= FLAG_NUM_8;
+			piUnlock(SYSTEM_FLAGS_KEY);
+			break;
+		case '9':
+			// Activamos el flag del 9
+			piLock(SYSTEM_FLAGS_KEY);
+			flags |= FLAG_NUM_9;
+			piUnlock(SYSTEM_FLAGS_KEY);
+			break;
 		case '4':
+			// Activamos el flag del 4
+			piLock(SYSTEM_FLAGS_KEY);
+			flags |= FLAG_NUM_4;
+			piUnlock(SYSTEM_FLAGS_KEY);
+			if (arkanoPi_fsm->current_state != WAIT_MENU) {
+				break;
+			}
 		case 'A':
 		case 'a':
 			// A completar por el alumno...
@@ -163,6 +214,13 @@ void explora_teclado(int teclaPulsada) {
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case '6':
+			// Activamos el flag del 6
+			piLock(SYSTEM_FLAGS_KEY);
+			flags |= FLAG_NUM_6;
+			piUnlock(SYSTEM_FLAGS_KEY);
+			if (arkanoPi_fsm->current_state != WAIT_MENU) {
+				break;
+			}
 		case 'D':
 		case 'd':
 			// A completar por el alumno...
@@ -223,6 +281,14 @@ int main () {
 	// Maquina de estados: lista de transiciones
 	// {EstadoOrigen, CondicionDeDisparo, EstadoFinal, AccionesSiTransicion }
 	fsm_trans_t arkanoPi[] = {
+		// Transiciones menú
+		{ WAIT_MENU, CompruebaNumeroPelotas, WAIT_PELOTAS, MostrarSubmenuPelotas},
+		{ WAIT_MENU, CompruebaParedes, WAIT_PAREDES, MostrarSubmenuParedes},
+		{ WAIT_MENU, CompruebaTCP, WAIT_TCP, MostrarSubmenuTCP},
+		{ WAIT_MENU, CompruebaAyuda, WAIT_AYUDA, MostrarSubmenuAyuda},
+		// Submenu Pelotas
+		{ WAIT_PELOTAS, CompruebaNumerosPulsados, WAIT_MENU, MostrarMenu},
+		// Transiciones juego
 		{ WAIT_START, CompruebaBotonPulsado, WAIT_PUSH, InicializaJuego },
 		{ WAIT_PUSH, CompruebaTimeoutActualizacionJuego, WAIT_PUSH, ActualizarJuego },
 		{ WAIT_PUSH, CompruebaMovimientoIzquierda, WAIT_PUSH, MuevePalaIzquierda },
@@ -251,7 +317,7 @@ int main () {
 	sistema.arkanoPi.p_pantalla = &(led_display.pantalla);
 	ConfiguraInicializaSistema(&sistema);
 
-	fsm_t* arkanoPi_fsm = fsm_new(WAIT_START, arkanoPi, &sistema);
+	arkanoPi_fsm = fsm_new(WAIT_MENU, arkanoPi, &sistema);
 	// Creamos nuevas máquinas de estados para la exploración del teclado
 	fsm_t* teclado_fsm = fsm_new(TECLADO_ESPERA_COLUMNA, fsm_trans_excitacion_columnas, &teclado);
 	fsm_t* tecla_fsm = fsm_new(TECLADO_ESPERA_TECLA, fsm_trans_deteccion_pulsaciones, &teclado);
@@ -262,13 +328,8 @@ int main () {
 	// Hecho
 
 	piLock(STD_IO_BUFFER_KEY);
-	enviarConsola("¡Bienvenido a arkanoPi!\n"
-				  "Instrucciones de uso:\n"
-				  "\tCualquier tecla inicia el juego.\n"
-				  "\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n"
-				  "\tLa tecla C actualiza la posición de la pelota en la pantalla.\n"
-				  "\tLa tecla B pausa el juego.\n"
-				  "\tLa tecla F cierra el juego.\n");
+	// Mostramos el menú de selección del juego
+	MostrarMenu();
 	if (!(servidor.flags & FLAG_TCP_ERROR))
 		printf("\nEscuchando conexiones de periféricos en el puerto %d.\n", servidor.puerto);
 	else

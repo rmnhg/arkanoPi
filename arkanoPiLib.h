@@ -26,7 +26,7 @@ enum t_direccion {
 #define NUM_COLUMNAS_PALA 	3
 #define NUM_FILAS_PALA 		1
 #define MAX_NUM_TRAYECTORIAS 8
-#define MAX_PELOTAS			2
+#define MAX_PELOTAS			9
 
 typedef struct {
   int ancho;
@@ -68,6 +68,16 @@ void InicializaArkanoPi(tipo_arkanoPi *p_arkanoPi);
 void ResetArkanoPi(tipo_arkanoPi *p_arkanoPi);
 void ReseteaMatriz(tipo_pantalla *p_pantalla);
 
+inline static void mostrarInstruccionesJuego() {
+	enviarConsola("Instrucciones de uso:\n"
+				  "\tCualquier tecla inicia el juego.\n"
+				  "\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n"
+				  "\tLa tecla C actualiza la posición de la pelota en la pantalla.\n"
+				  "\tLa tecla B pausa el juego.\n"
+				  "\tLa tecla F cierra el juego.\n");
+	fflush(stdout);
+}
+
 //------------------------------------------------------
 // PROCEDIMIENTOS PARA LA GESTION DEL JUEGO
 //------------------------------------------------------
@@ -102,6 +112,11 @@ int CompruebaMovimientoIzquierda (fsm_t* this);
 int CompruebaMovimientoDerecha (fsm_t* this);
 int CompruebaTimeoutActualizacionJuego (fsm_t* this);
 int CompruebaFinalJuego (fsm_t* this);
+int CompruebaNumeroPelotas(fsm_t* this);
+int CompruebaParedes(fsm_t* this);
+int CompruebaTCP(fsm_t* this);
+int CompruebaAyuda(fsm_t* this);
+int CompruebaNumerosPulsados(fsm_t* this);
 
 //------------------------------------------------------
 // FUNCIONES DE ACCION DE LA MAQUINA DE ESTADOS
@@ -113,6 +128,11 @@ void ActualizarJuego (fsm_t* this);
 void FinalJuego (fsm_t* this);
 void ReseteaJuego (fsm_t* this);
 void PausarJuego (fsm_t* this);
+void MostrarMenu();
+void MostrarSubmenuPelotas (fsm_t* this);
+void MostrarSubmenuParedes (fsm_t* this);
+void MostrarSubmenuTCP (fsm_t* this);
+void MostrarSubmenuAyuda (fsm_t* this);
 
 //------------------------------------------------------
 // SUBRUTINAS DE ATENCION A LAS INTERRUPCIONES
