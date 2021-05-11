@@ -143,52 +143,40 @@ void explora_teclado(int teclaPulsada) {
 	switch(teclaPulsada) {
 		// A completar por el alumno...
 		// Hecho
-		case '1':
-			// Activamos el flag del 1
+				case '1':
+			// Activamos el flag del submenu de pelotas
 			piLock(SYSTEM_FLAGS_KEY);
-			flags |= FLAG_NUM_1;
+			flags |= FLAG_MENU_PELOTAS;
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case '2':
-			// Activamos el flag del 2
+			// Activamos el flag del submenu paredes
 			piLock(SYSTEM_FLAGS_KEY);
-			flags |= FLAG_NUM_2;
+			flags |= FLAG_MENU_PAREDES;
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case '3':
-			// Activamos el flag del 3
+			// Activamos el flag del submenu TCP
 			piLock(SYSTEM_FLAGS_KEY);
-			flags |= FLAG_NUM_3;
-			piUnlock(SYSTEM_FLAGS_KEY);
-			break;
-		case '5':
-			// Activamos el flag del 5
-			piLock(SYSTEM_FLAGS_KEY);
-			flags |= FLAG_NUM_5;
+			flags |= FLAG_MENU_TCP;
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case '7':
-			// Activamos el flag del 7
+			// Activamos el flag de menos para los submenús
 			piLock(SYSTEM_FLAGS_KEY);
-			flags |= FLAG_NUM_7;
-			piUnlock(SYSTEM_FLAGS_KEY);
-			break;
-		case '8':
-			// Activamos el flag del 8
-			piLock(SYSTEM_FLAGS_KEY);
-			flags |= FLAG_NUM_8;
+			flags |= FLAG_MENOS;
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case '9':
-			// Activamos el flag del 9
+			// Activamos el flag de más para los submenús
 			piLock(SYSTEM_FLAGS_KEY);
-			flags |= FLAG_NUM_9;
+			flags |= FLAG_MAS;
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case '4':
-			// Activamos el flag del 4
+			// Activamos el flag del submenu de ayuda
 			piLock(SYSTEM_FLAGS_KEY);
-			flags |= FLAG_NUM_4;
+			flags |= FLAG_MENU_AYUDA;
 			piUnlock(SYSTEM_FLAGS_KEY);
 			if (arkanoPi_fsm->current_state != WAIT_MENU) {
 				break;
@@ -197,8 +185,9 @@ void explora_teclado(int teclaPulsada) {
 		case 'a':
 			// A completar por el alumno...
 			// Hecho
-			// Activamos los flags de movimiento y de boton pulsado
+			// Activamos los flags de inicio juego (para el menú), de movimiento y de boton pulsado
 			piLock(SYSTEM_FLAGS_KEY);
+			flags |= FLAG_INICIO_JUEGO;
 			flags |= FLAG_MOV_IZQUIERDA;
 			flags |= FLAG_BOTON;
 			piUnlock(SYSTEM_FLAGS_KEY);
@@ -214,10 +203,7 @@ void explora_teclado(int teclaPulsada) {
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case '6':
-			// Activamos el flag del 6
-			piLock(SYSTEM_FLAGS_KEY);
-			flags |= FLAG_NUM_6;
-			piUnlock(SYSTEM_FLAGS_KEY);
+			// El 6 no inicia el juego mientras estamos en el menú
 			if (arkanoPi_fsm->current_state != WAIT_MENU) {
 				break;
 			}
@@ -225,8 +211,9 @@ void explora_teclado(int teclaPulsada) {
 		case 'd':
 			// A completar por el alumno...
 			// Hecho
-			// Activamos los flags de movimiento y de boton pulsado
+			// Activamos los flags de inicio juego (para el menú), de movimiento y de boton pulsado
 			piLock(SYSTEM_FLAGS_KEY);
+			flags |= FLAG_INICIO_JUEGO;
 			flags |= FLAG_MOV_DERECHA;
 			flags |= FLAG_BOTON;
 			piUnlock(SYSTEM_FLAGS_KEY);
@@ -287,7 +274,9 @@ int main () {
 		{ WAIT_MENU, CompruebaTCP, WAIT_TCP, MostrarSubmenuTCP},
 		{ WAIT_MENU, CompruebaAyuda, WAIT_AYUDA, MostrarSubmenuAyuda},
 		// Submenu Pelotas
-		{ WAIT_PELOTAS, CompruebaNumerosPulsados, WAIT_MENU, MostrarMenu},
+		{ WAIT_PELOTAS, CompruebaMenosPulsado, WAIT_PELOTAS, MostrarSubmenuPelotas },
+		{ WAIT_PELOTAS, CompruebaMasPulsado, WAIT_PELOTAS, MostrarSubmenuPelotas },
+		//{ WAIT_PELOTAS, CompruebaMasPulsado, WAIT_MENU, MostrarMenu },
 		// Transiciones juego
 		{ WAIT_START, CompruebaBotonPulsado, WAIT_PUSH, InicializaJuego },
 		{ WAIT_PUSH, CompruebaTimeoutActualizacionJuego, WAIT_PUSH, ActualizarJuego },
@@ -320,6 +309,53 @@ int main () {
 	arkanoPi_fsm = fsm_new(WAIT_MENU, arkanoPi, &sistema);
 	// Creamos nuevas máquinas de estados para la exploración del teclado
 	fsm_t* teclado_fsm = fsm_new(TECLADO_ESPERA_COLUMNA, fsm_trans_excitacion_columnas, &teclado);
+	fsm_t* tecla_fsm = fsm_new(TECLADO_ESPERA_TECLA, fsm_trans_deteccion_pulsaciones, &teclado);
+	// Creamos nuevas máquinas de estados para la actualización de columnas en el display
+	fsm_t* display_fsm = fsm_new(DISPLAY_ESPERA_COLUMNA, fsm_trans_excitacion_display, &led_display);
+
+	// Establecemos el número de pelotas por defecto en 2
+	sistema.arkanoPi.numeroPelotas = MAX_PELOTAS;
+
+	// A completar por el alumno...
+	// Hecho
+
+	piLock(STD_IO_BUFFER_KEY);
+	// Mostramos el menú de selección del juego
+	MostrarMenu();
+	if (!(servidor.flags & FLAG_TCP_ERROR))
+		printf("\nEscuchando conexiones de periféricos en el puerto %d.\n", servidor.puerto);
+	else
+		printf("Error en TCP: %s", servidor.mensaje_error);
+	fflush(stdout);
+	piUnlock(STD_IO_BUFFER_KEY);
+
+	// Habilitamos el display para mostrar la pantalla inicial
+	pseudoWiringPiEnableDisplay(1);
+
+	next = millis();
+	while (1) {
+		// Ejecutamos las comprobaciones de las máquinas de estado del teclado
+		fsm_fire(teclado_fsm);
+		fsm_fire(tecla_fsm);
+		fsm_fire(display_fsm);
+		fsm_fire(arkanoPi_fsm);
+
+		// A completar por el alumno...
+		// Hecho
+
+		next += CLK_MS;
+		delay_until(next);
+	}
+
+	// Destruimos los timers anteriormente creados para liberar la memoria
+	tmr_destroy((tmr_t*) (sistema.arkanoPi.tmr_actualizacion_juego));
+	tmr_destroy((tmr_t*) (teclado.tmr_duracion_columna));
+	tmr_destroy((tmr_t*) (led_display.tmr_refresco_display));
+	fsm_destroy(arkanoPi_fsm);
+	fsm_destroy(teclado_fsm);
+	fsm_destroy(tecla_fsm);
+	fsm_destroy(display_fsm);
+}
 	fsm_t* tecla_fsm = fsm_new(TECLADO_ESPERA_TECLA, fsm_trans_deteccion_pulsaciones, &teclado);
 	// Creamos nuevas máquinas de estados para la actualización de columnas en el display
 	fsm_t* display_fsm = fsm_new(DISPLAY_ESPERA_COLUMNA, fsm_trans_excitacion_display, &led_display);

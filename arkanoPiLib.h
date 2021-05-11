@@ -53,6 +53,7 @@ typedef struct {
 	tipo_pantalla ladrillos;
 	tipo_pala pala;
 	tipo_pelota pelota[MAX_PELOTAS];
+	int numeroPelotas;
 	tmr_t* tmr_actualizacion_juego;
 } tipo_arkanoPi;
 

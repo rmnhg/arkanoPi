@@ -178,7 +178,7 @@ void ActualizaPantalla(tipo_arkanoPi* p_arkanoPi) {
 		(tipo_pantalla*)(p_arkanoPi->p_pantalla));
 
 	// Pinta las pelotas
-	for (int i = 0; i < MAX_PELOTAS; i++) {
+	for (int i = 0; i < p_arkanoPi->numeroPelotas; i++) {
 		if (p_arkanoPi->pelota[i].y >= 0) {
 			PintaPelota(
 				(tipo_pelota*)(&(p_arkanoPi->pelota[i])),
@@ -193,13 +193,13 @@ void InicializaArkanoPi(tipo_arkanoPi *p_arkanoPi) {
 }
 
 void ResetArkanoPi(tipo_arkanoPi *p_arkanoPi) {
-	int posiciones_pelotas[MAX_PELOTAS][3]; // En la segunda dimensión, se guarda la x, la y y la paridad de la x
+	int posiciones_pelotas[p_arkanoPi->numeroPelotas][3]; // En la segunda dimensión, se guarda la x, la y y la paridad de la x
 	int pelotas_unicas = FALSE;
 	int paridad_igual = TRUE; // Significa que todas las pelotas tienen paridad en la x igual
 	ReseteaPantalla((tipo_pantalla*)(p_arkanoPi->p_pantalla));
 	InicializaLadrillos((tipo_pantalla*)(&(p_arkanoPi->ladrillos)));
 	// Inicializamos las pelotas
-	for (int i = 0; i < MAX_PELOTAS; i++) {
+	for (int i = 0; i < p_arkanoPi->numeroPelotas; i++) {
 		InicializaPelota((tipo_pelota*)(&(p_arkanoPi->pelota[i])));
 		posiciones_pelotas[i][0] = p_arkanoPi->pelota[i].x;
 		posiciones_pelotas[i][1] = p_arkanoPi->pelota[i].y;
@@ -210,14 +210,14 @@ void ResetArkanoPi(tipo_arkanoPi *p_arkanoPi) {
 	while (!pelotas_unicas || paridad_igual) {	// Si las pelotas no son unicas o la paridad es igual
 		pelotas_unicas = TRUE; // Caso ideal
 		paridad_igual = TRUE; // Caso peor
-		for (int i = 0; i < MAX_PELOTAS; i++) {
-			for (int j = 0; j < MAX_PELOTAS - 1; j++) {
+		for (int i = 0; i < p_arkanoPi->numeroPelotas; i++) {
+			for (int j = 0; j < p_arkanoPi->numeroPelotas - 1; j++) {
 				// Si una pelota tiene distinta paridad a otra, se guarda y no se vuelve a comprobar
 				if ((i != j) && paridad_igual && (posiciones_pelotas[i][2] != posiciones_pelotas[j][2])) {
 					paridad_igual = FALSE;
 				}
 				// Si llegamos a la última pelota y todas tienen la misma paridad, se cambia
-				if ((i == MAX_PELOTAS-1) && (j == MAX_PELOTAS-2) && paridad_igual) {
+				if ((i == p_arkanoPi->numeroPelotas-1) && (j == p_arkanoPi->numeroPelotas-2) && paridad_igual) {
 					paridad_igual = FALSE;
 					if (posiciones_pelotas[j][0] < NUM_COLUMNAS_DISPLAY - 1) {
 						posiciones_pelotas[j][0]++;
@@ -495,13 +495,37 @@ int CompruebaAyuda(fsm_t* this) {
 }
 
 int CompruebaNumerosPulsados(fsm_t* this) {
+	// TODO: modificarlo o quitarlo porque usamos solomás y menos
 	int result = 0;
 
 	// Comprobamos si los flags de alguno de los números está activo
 	piLock(SYSTEM_FLAGS_KEY);
+	/*
 	result = (flags & FLAG_NUM_1) || (flags & FLAG_NUM_2) || (flags & FLAG_NUM_3)
 	      || (flags & FLAG_NUM_4) || (flags & FLAG_NUM_5) || (flags & FLAG_NUM_6)
-		  || (flags & FLAG_NUM_7) || (flags & FLAG_NUM_8) || (flags & FLAG_NUM_9);
+		  || (flags & FLAG_NUM_7) || (flags & FLAG_NUM_8) || (flags & FLAG_NUM_9);*/
+	piUnlock(SYSTEM_FLAGS_KEY);
+
+	return result;
+}
+
+int CompruebaMenosPulsado(fsm_t* this) {
+	int result = 0;
+
+	// Comprobamos si el flag del menos está activo
+	piLock(SYSTEM_FLAGS_KEY);
+	result = (flags & FLAG_MENOS)
+	piUnlock(SYSTEM_FLAGS_KEY);
+
+	return result;
+}
+
+int CompruebaMasPulsado(fsm_t* this) {
+	int result = 0;
+
+	// Comprobamos si el flag del menos está activo
+	piLock(SYSTEM_FLAGS_KEY);
+	result = (flags & FLAG_MAS)
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	return result;
@@ -599,7 +623,7 @@ void MuevePalaDerecha (fsm_t* this) {
 
 void ActualizarJuego (fsm_t* this) {
 	tipo_arkanoPi* p_arkanoPi;
-	int pelotasEnJuego = MAX_PELOTAS;
+	int pelotasEnJuego = p_arkanoPi->numeroPelotas;
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
 	/*
@@ -615,7 +639,7 @@ void ActualizarJuego (fsm_t* this) {
 	flags &= (~FLAG_BOTON);
 	piUnlock(SYSTEM_FLAGS_KEY);
 
-	for (int i = 0; i < MAX_PELOTAS; i++) {
+	for (int i = 0; i < p_arkanoPi->numeroPelotas; i++) {
 		if (p_arkanoPi->pelota[i].y >= 0) {
 			/*if (CompruebaReboteParedesVerticales(*(p_arkanoPi), i)){
 				p_arkanoPi->pelota[i].trayectoria.xv *=-1;
@@ -628,7 +652,7 @@ void ActualizarJuego (fsm_t* this) {
 				p_arkanoPi->pelota[i].y = -1;
 				pelotasEnJuego--;
 				// Comprobamos si la otra pelota también ha fallado
-				for (int j = 0; j < MAX_PELOTAS; j++) {
+				for (int j = 0; j < p_arkanoPi->numeroPelotas; j++) {
 					if ((j != i) && (p_arkanoPi->pelota[j].y < 0)) {
 						pelotasEnJuego--;
 					}
@@ -786,11 +810,16 @@ void MostrarSubmenuPelotas (fsm_t* this) {
 	// Cancelamos el flag del submenu del número de pelotas
 	piLock(SYSTEM_FLAGS_KEY);
 	flags &= ~FLAG_MENU_PELOTAS;
+	if (flags & FLAG_MAS) {
+		p_arkanoPi->numeroPelotas++;
+	} else if (flags & FLAG_MENOS) {
+		p_arkanoPi->numeroPelotas--;
+	}
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	pseudoWiringPiEnableDisplay(0);
 	piLock(STD_IO_BUFFER_KEY);
-	enviarConsola("\nPulse un número del 1 al 9 para definir el número de pelotas.\n");
+	enviarConsola("\nPulse el número 7 para disminuir el número de pelotas o 9 para aumentarlo.\nActualmente hay %d pelotas.\n", p_arkanoPi->numeroPelotas);
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
 }
