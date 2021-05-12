@@ -54,6 +54,8 @@ typedef struct {
 	tipo_pala pala;
 	tipo_pelota pelota[MAX_PELOTAS];
 	int numeroPelotas;
+	int paredesHabilitadas;
+	int TCPHabilitado;
 	tmr_t* tmr_actualizacion_juego;
 } tipo_arkanoPi;
 
@@ -70,12 +72,23 @@ void ResetArkanoPi(tipo_arkanoPi *p_arkanoPi);
 void ReseteaMatriz(tipo_pantalla *p_pantalla);
 
 inline static void mostrarInstruccionesJuego() {
-	enviarConsola("Instrucciones de uso:\n"
+	enviarConsola("\nInstrucciones de uso:\n"
 				  "\tCualquier tecla inicia el juego.\n"
 				  "\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n"
 				  "\tLa tecla C actualiza la posición de la pelota en la pantalla.\n"
 				  "\tLa tecla B pausa el juego.\n"
+				  "\tLa tecla 5 abre el menú del juego.\n"
 				  "\tLa tecla F cierra el juego.\n");
+	fflush(stdout);
+}
+
+inline static void MostrarMenu() {
+	enviarConsola("\n¡Bienvenido a arkanoPi!\n"
+			"\tPulsa 1 para cambiar el números de pelotas en juego (1 - 9).\n"
+			"\tPulsa 2 para alternar las paredes del juego.\n"
+			"\tPulsa 3 para alternar el soporte de periféricos externos.\n"
+			"\tPulsa 4 para ver la ayuda.\n"
+			"\tPulsa A o D para comenzar la partida.\n");
 	fflush(stdout);
 }
 
@@ -84,7 +97,7 @@ inline static void mostrarInstruccionesJuego() {
 //------------------------------------------------------
 void CambiarDireccionPelota(tipo_pelota *p_pelota, enum t_direccion direccion);
 void ActualizaPosicionPala(tipo_pala *p_pala, enum t_direccion direccion);
-void ActualizaPosicionPelota (tipo_pelota *p_pelota);
+void ActualizaPosicionPelota (tipo_pelota *p_pelota, int paredesHabilitadas);
 int CompruebaReboteLadrillo (tipo_arkanoPi *p_arkanoPi, int pelota);
 int CompruebaReboteParedesVerticales (tipo_arkanoPi arkanoPi, int pelota);
 int CompruebaReboteTecho (tipo_arkanoPi arkanoPi, int pelota);
@@ -118,6 +131,9 @@ int CompruebaParedes(fsm_t* this);
 int CompruebaTCP(fsm_t* this);
 int CompruebaAyuda(fsm_t* this);
 int CompruebaNumerosPulsados(fsm_t* this);
+int CompruebaMenosPulsado(fsm_t* this);
+int CompruebaMasPulsado(fsm_t* this);
+int CompruebaSalirMenuPulsado(fsm_t* this);
 
 //------------------------------------------------------
 // FUNCIONES DE ACCION DE LA MAQUINA DE ESTADOS
@@ -129,7 +145,7 @@ void ActualizarJuego (fsm_t* this);
 void FinalJuego (fsm_t* this);
 void ReseteaJuego (fsm_t* this);
 void PausarJuego (fsm_t* this);
-void MostrarMenu();
+void ActivarMenu (fsm_t* this);
 void MostrarSubmenuPelotas (fsm_t* this);
 void MostrarSubmenuParedes (fsm_t* this);
 void MostrarSubmenuTCP (fsm_t* this);

@@ -347,3 +347,13 @@ PI_THREAD (thread_conexion) {
 	}
 	return NULL;
 }
+
+/**
+ * Función que desconecta a todos los perféricos del servidor
+ */
+void cerrarConexion() {
+	// Para desconectar a todos los periféricos del servidor.
+	for (int i = 0; i < MAX_PERIFERICOS_CONECTADOS; i++) {
+		servidor.periferico[i].conexion_fd = -1;
+	}
+}

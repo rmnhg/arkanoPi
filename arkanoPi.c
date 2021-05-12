@@ -143,7 +143,7 @@ void explora_teclado(int teclaPulsada) {
 	switch(teclaPulsada) {
 		// A completar por el alumno...
 		// Hecho
-				case '1':
+		case '1':
 			// Activamos el flag del submenu de pelotas
 			piLock(SYSTEM_FLAGS_KEY);
 			flags |= FLAG_MENU_PELOTAS;
@@ -159,6 +159,12 @@ void explora_teclado(int teclaPulsada) {
 			// Activamos el flag del submenu TCP
 			piLock(SYSTEM_FLAGS_KEY);
 			flags |= FLAG_MENU_TCP;
+			piUnlock(SYSTEM_FLAGS_KEY);
+			break;
+		case '5':
+			// Activamos el flag del submenu TCP
+			piLock(SYSTEM_FLAGS_KEY);
+			flags |= FLAG_SALIR;
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case '7':
@@ -199,7 +205,9 @@ void explora_teclado(int teclaPulsada) {
 			// Activamos los flags de timer y de boton pulsado
 			piLock(SYSTEM_FLAGS_KEY);
 			flags |= FLAG_TIMER_JUEGO;
-			flags |= FLAG_BOTON;
+			if (arkanoPi_fsm->current_state != WAIT_MENU) {
+				flags |= FLAG_BOTON;
+			}
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case '6':
@@ -225,7 +233,9 @@ void explora_teclado(int teclaPulsada) {
 			// Activamos los flags de movimiento y de boton pulsado
 			piLock(SYSTEM_FLAGS_KEY);
 			flags |= FLAG_PAUSA;
-			flags |= FLAG_BOTON;
+			if (arkanoPi_fsm->current_state != WAIT_MENU) {
+				flags |= FLAG_BOTON;
+			}
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case 'F':
@@ -273,10 +283,21 @@ int main () {
 		{ WAIT_MENU, CompruebaParedes, WAIT_PAREDES, MostrarSubmenuParedes},
 		{ WAIT_MENU, CompruebaTCP, WAIT_TCP, MostrarSubmenuTCP},
 		{ WAIT_MENU, CompruebaAyuda, WAIT_AYUDA, MostrarSubmenuAyuda},
+		{ WAIT_MENU, CompruebaBotonPulsado, WAIT_PUSH, InicializaJuego },
 		// Submenu Pelotas
 		{ WAIT_PELOTAS, CompruebaMenosPulsado, WAIT_PELOTAS, MostrarSubmenuPelotas },
 		{ WAIT_PELOTAS, CompruebaMasPulsado, WAIT_PELOTAS, MostrarSubmenuPelotas },
-		//{ WAIT_PELOTAS, CompruebaMasPulsado, WAIT_MENU, MostrarMenu },
+		{ WAIT_PELOTAS, CompruebaSalirMenuPulsado, WAIT_MENU, ActivarMenu },
+		// Submenu Paredes
+		{ WAIT_PAREDES, CompruebaMenosPulsado, WAIT_PAREDES, MostrarSubmenuParedes },
+		{ WAIT_PAREDES, CompruebaMasPulsado, WAIT_PAREDES, MostrarSubmenuParedes },
+		{ WAIT_PAREDES, CompruebaSalirMenuPulsado, WAIT_MENU, ActivarMenu },
+		// Submenu TCP
+		{ WAIT_TCP, CompruebaMenosPulsado, WAIT_TCP, MostrarSubmenuTCP },
+		{ WAIT_TCP, CompruebaMasPulsado, WAIT_TCP, MostrarSubmenuTCP },
+		{ WAIT_TCP, CompruebaSalirMenuPulsado, WAIT_MENU, ActivarMenu },
+		// Submenu Ayuda
+		{ WAIT_AYUDA, CompruebaSalirMenuPulsado, WAIT_MENU, ActivarMenu },
 		// Transiciones juego
 		{ WAIT_START, CompruebaBotonPulsado, WAIT_PUSH, InicializaJuego },
 		{ WAIT_PUSH, CompruebaTimeoutActualizacionJuego, WAIT_PUSH, ActualizarJuego },
@@ -286,6 +307,7 @@ int main () {
 		{ WAIT_PUSH, CompruebaPausaPulsada, WAIT_PAUSE, PausarJuego },
 		{ WAIT_PAUSE, CompruebaPausaPulsada, WAIT_PUSH, PausarJuego },
 		{ WAIT_END,  CompruebaBotonPulsado, WAIT_START, ReseteaJuego },
+		{ WAIT_START, CompruebaSalirMenuPulsado, WAIT_MENU, ActivarMenu },
 		{-1, NULL, -1, NULL }
 	};
 
@@ -314,51 +336,13 @@ int main () {
 	fsm_t* display_fsm = fsm_new(DISPLAY_ESPERA_COLUMNA, fsm_trans_excitacion_display, &led_display);
 
 	// Establecemos el número de pelotas por defecto en 2
-	sistema.arkanoPi.numeroPelotas = MAX_PELOTAS;
+	sistema.arkanoPi.numeroPelotas = 2;
 
-	// A completar por el alumno...
-	// Hecho
+	// Establecemos que no habrá paredes en un principio
+	sistema.arkanoPi.paredesHabilitadas = 0;
 
-	piLock(STD_IO_BUFFER_KEY);
-	// Mostramos el menú de selección del juego
-	MostrarMenu();
-	if (!(servidor.flags & FLAG_TCP_ERROR))
-		printf("\nEscuchando conexiones de periféricos en el puerto %d.\n", servidor.puerto);
-	else
-		printf("Error en TCP: %s", servidor.mensaje_error);
-	fflush(stdout);
-	piUnlock(STD_IO_BUFFER_KEY);
-
-	// Habilitamos el display para mostrar la pantalla inicial
-	pseudoWiringPiEnableDisplay(1);
-
-	next = millis();
-	while (1) {
-		// Ejecutamos las comprobaciones de las máquinas de estado del teclado
-		fsm_fire(teclado_fsm);
-		fsm_fire(tecla_fsm);
-		fsm_fire(display_fsm);
-		fsm_fire(arkanoPi_fsm);
-
-		// A completar por el alumno...
-		// Hecho
-
-		next += CLK_MS;
-		delay_until(next);
-	}
-
-	// Destruimos los timers anteriormente creados para liberar la memoria
-	tmr_destroy((tmr_t*) (sistema.arkanoPi.tmr_actualizacion_juego));
-	tmr_destroy((tmr_t*) (teclado.tmr_duracion_columna));
-	tmr_destroy((tmr_t*) (led_display.tmr_refresco_display));
-	fsm_destroy(arkanoPi_fsm);
-	fsm_destroy(teclado_fsm);
-	fsm_destroy(tecla_fsm);
-	fsm_destroy(display_fsm);
-}
-	fsm_t* tecla_fsm = fsm_new(TECLADO_ESPERA_TECLA, fsm_trans_deteccion_pulsaciones, &teclado);
-	// Creamos nuevas máquinas de estados para la actualización de columnas en el display
-	fsm_t* display_fsm = fsm_new(DISPLAY_ESPERA_COLUMNA, fsm_trans_excitacion_display, &led_display);
+	// Establecemos que la conexión TCP del servidor está activada
+	sistema.arkanoPi.TCPHabilitado = 1;
 
 	// A completar por el alumno...
 	// Hecho
