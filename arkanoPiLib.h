@@ -10,6 +10,10 @@
 #include "tmr.h"
 
 void enviarConsola(const char *format, ...);
+PI_THREAD (thread_conexion);
+void cerrarConexion();
+int compruebaServidorHabilitado();
+
 
 enum t_direccion {
 	ARRIBA_IZQUIERDA,
@@ -55,7 +59,7 @@ typedef struct {
 	tipo_pelota pelota[MAX_PELOTAS];
 	int numeroPelotas;
 	int paredesHabilitadas;
-	int TCPHabilitado;
+	int primerAccesoSubmenu;
 	tmr_t* tmr_actualizacion_juego;
 } tipo_arkanoPi;
 

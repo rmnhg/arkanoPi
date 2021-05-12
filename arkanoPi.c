@@ -250,9 +250,12 @@ void explora_teclado(int teclaPulsada) {
 			tmr_destroy((tmr_t*) (teclado.tmr_duracion_columna));
 			tmr_destroy((tmr_t*) (led_display.tmr_refresco_display));
 			// Se cierran las conexiones
-			close(servidor.socket_fd);
-			close(servidor.periferico[0].conexion_fd);
-			close(servidor.periferico[1].conexion_fd);
+			if (servidor.servidorHabilitado) {
+				servidor.servidorHabilitado = 0;
+				close(servidor.socket_fd);
+				close(servidor.periferico[0].conexion_fd);
+				close(servidor.periferico[1].conexion_fd);
+			}
 			exit(0);
 			break;
 		default:
@@ -342,12 +345,16 @@ int main () {
 	sistema.arkanoPi.paredesHabilitadas = 0;
 
 	// Establecemos que la conexión TCP del servidor está activada
-	sistema.arkanoPi.TCPHabilitado = 1;
+	servidor.servidorHabilitado = 1;
 
 	// A completar por el alumno...
 	// Hecho
 
 	piLock(STD_IO_BUFFER_KEY);
+
+	// Ponemos que es la primera vez que se muestra un submenú
+	sistema.arkanoPi.primerAccesoSubmenu = 1;
+
 	// Mostramos el menú de selección del juego
 	MostrarMenu();
 	if (!(servidor.flags & FLAG_TCP_ERROR))

@@ -822,12 +822,15 @@ void ActivarMenu (fsm_t* this) {
 	tipo_arkanoPi *p_arkanoPi;
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
-	// Cancelamos el flag de pausa
+	// Cancelamos los flags de salir del submenú y de botón por si estaba activado, para no empezar el juego directamente
 	piLock(SYSTEM_FLAGS_KEY);
 	flags &= ~FLAG_SALIR;
+	flags &= ~FLAG_BOTON;
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	pseudoWiringPiEnableDisplay(0);
+	// Ponemos que es la primera vez que se muestra un submenú
+	p_arkanoPi->primerAccesoSubmenu = 1;
 	MostrarMenu();
 }
 
@@ -894,21 +897,39 @@ void MostrarSubmenuTCP (fsm_t* this) {
 	piLock(SYSTEM_FLAGS_KEY);
 	flags &= ~FLAG_MENU_TCP;
 	if (flags & FLAG_MAS) {
-		p_arkanoPi->TCPHabilitado = 1;
+		if (!compruebaServidorHabilitado()) {
+			// Lanzamos un thread para gestionar las conexiones TCP de los periféricos externos
+			int result = piThreadCreate(thread_conexion);
+			if (result != 0) {
+				printf("No se pudo crear el thread thread_conexion.\n");
+				return;
+			}
+		}
 		flags &= ~FLAG_MAS;
 	} else if (flags & FLAG_MENOS) {
-		p_arkanoPi->TCPHabilitado = 0;
+		if (compruebaServidorHabilitado()) {
+			cerrarConexion();
+		}
 		flags &= ~FLAG_MENOS;
 	}
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	pseudoWiringPiEnableDisplay(0);
 	piLock(STD_IO_BUFFER_KEY);
-	if (p_arkanoPi->TCPHabilitado)
+	if (p_arkanoPi->primerAccesoSubmenu) {
+		p_arkanoPi->primerAccesoSubmenu = 0;
+	} else {
+		printf("\033[A\033[2K\033[A\033[2K\033[A\033[2K\033[A");
+	}
+	if (compruebaServidorHabilitado())
 		enviarConsola("\nPulse el número 7 para deshabilitar la conexión TCP o 9 para habilitarlo.\nActualmente está habilitado.\nPara volver al menú pulse 5.\n");
 	else
 		enviarConsola("\nPulse el número 7 para deshabilitar la conexión TCP o 9 para habilitarlo.\nActualmente está deshabilitado.\nPara volver al menú pulse 5.\n");
-	printf("\033[A\033[A"); // Para reescribir sobre las líneas anteriores.
+	//printf("\033[A\033[A"); // Para reescribir sobre las líneas anteriores.
+	// \u001b[1G is a "Cursor Horizontal Absolute" code. The 1 means it tries to move the cursor to the first character of the line.
+	// \u001b[2K is a "Erase in Line" code. The 2 makes it mean "Erase the entire line".
+	// \033[A\033[2K\033[A\033[2K
+	// printf("\033[2J\033[1;1H");
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
 }

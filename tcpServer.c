@@ -6,7 +6,8 @@ TipoServidor servidor = {
 	.puerto = PUERTO,
     .socket_fd = 0,
     .flags = 0,
-	.perifericos_conectados = 0
+	.perifericos_conectados = 0,
+	.servidorHabilitado = 1
 };
 
 /**
@@ -78,13 +79,13 @@ PI_THREAD(thread_aceptar_periferico) {
 }
 
 /**
- * Envía la pantalla del juego a los perifericos a partir de la string str_pantalla.
+ * Envía el texto de la string str a todos los periféricos conectados.
  */
-void enviarPantalla(char * str_pantalla) {
+void enviarTexto(char * str) {
 	if (servidor.perifericos_conectados) {
 		for (int i = 0; i < MAX_PERIFERICOS_CONECTADOS; i++) {
 			if (servidor.periferico[i].conexion_fd != -1) {
-				if (send(servidor.periferico[i].conexion_fd, str_pantalla, strlen(str_pantalla), MSG_NOSIGNAL) < 0) {
+				if (send(servidor.periferico[i].conexion_fd, str, strlen(str), MSG_NOSIGNAL) < 0) {
 					#ifdef MOSTRAR_MENSAJES
 					piLock(STD_IO_BUFFER_KEY);
 					#ifdef DEBUG
@@ -118,30 +119,13 @@ void enviarConsola(const char *format, ...) {
 	vfprintf(stdout, format, arg);
 	vsprintf(str_consola, format, arg);
 	va_end(arg);
-	if (servidor.perifericos_conectados) {
-		for (int i = 0; i < MAX_PERIFERICOS_CONECTADOS; i++) {
-			if (servidor.periferico[i].conexion_fd != -1) {
-				if (send(servidor.periferico[i].conexion_fd, str_consola, strlen(str_consola), MSG_NOSIGNAL) < 0) {
-					#ifdef MOSTRAR_MENSAJES
-					piLock(STD_IO_BUFFER_KEY);
-					#ifdef DEBUG
-					perror("send");
-					#endif
-					printf("El periférico con id %d se ha desconectado.\nEscuchando de nuevo conexión con periférico en el puerto %d.\n", i, servidor.puerto);
-					piUnlock(STD_IO_BUFFER_KEY);
-					#endif
-					servidor.perifericos_conectados--;
-					close(servidor.periferico[i].conexion_fd);
-					servidor.periferico[i].conexion_fd = -1;
-					servidor.periferico[i].supervisado = 'n';
-					// Se comienza a escuchar a perifericos externos
-					if (piThreadCreate(thread_aceptar_periferico) != 0) {
-						error("No se pudo crear el thread de thread_aceptar_periferico.\n");
-					}
-				}
-			}
-		}
+	// Sustituimos los saltos de línea por '#' para evitar mandar más de un mensaje por string.
+	// No llegamos al salto del final para que el búffer sepa que ahí acaba el mensaje que se debe enviar.
+	for (int i = 0; i < strlen(str_consola) - 2; i++) {
+		if (*(str_consola + i) == '\n')
+			*(str_consola + i) = '#';
 	}
+	enviarTexto(str_consola);
 }
 
 void timer_envio_pantalla_isr(union sigval value) {
@@ -165,7 +149,7 @@ void timer_envio_pantalla_isr(union sigval value) {
 
 	str_pantalla[56] = '\n';
 	str_pantalla[57] = '\0';
-	enviarPantalla(str_pantalla);
+	enviarTexto(str_pantalla);
 
 	tmr_startms((tmr_t*) (servidor.timer_pantalla), TIMEOUT_ENVIO_PANTALLA);
 }
@@ -183,7 +167,7 @@ PI_THREAD(thread_obtener_mensajes) {
 			break;
 		}
 	}
-	while (1) {
+	while (servidor.servidorHabilitado) {
 		if (servidor.flags & FLAG_TCP_ERROR)
 			break;
 		if (servidor.perifericos_conectados && !(servidor.flags & FLAG_TCP_MENSAJE)) {
@@ -296,9 +280,10 @@ void iniciarServidor() {
  * Thread que inicia y gestiona la conexión TCP de forma general.
  */
 PI_THREAD (thread_conexion) {
+	servidor.servidorHabilitado = 1;
 	iniciarServidor();
 
-	while(1) {
+	while(servidor.servidorHabilitado) {
 		if (servidor.perifericos_conectados) {
 			if (servidor.flags & FLAG_TCP_ERROR) {
 				servidor.flags &= ~FLAG_TCP_ERROR;
@@ -353,7 +338,21 @@ PI_THREAD (thread_conexion) {
  */
 void cerrarConexion() {
 	// Para desconectar a todos los periféricos del servidor.
+	// Se cierran las conexiones
+	enviarTexto("$Servidor_cerrado");
+	servidor.servidorHabilitado = 0;
+	close(servidor.socket_fd);
+	close(servidor.periferico[0].conexion_fd);
+	close(servidor.periferico[1].conexion_fd);
+	// Se eliminan las referencias a los clientes
 	for (int i = 0; i < MAX_PERIFERICOS_CONECTADOS; i++) {
 		servidor.periferico[i].conexion_fd = -1;
 	}
+}
+
+/**
+ * Función que devuelve un 1 si el servidor está habilitado o un 0 si no lo está.
+ */
+int compruebaServidorHabilitado() {
+	return servidor.servidorHabilitado;
 }
