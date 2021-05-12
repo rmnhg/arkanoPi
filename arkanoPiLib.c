@@ -856,8 +856,12 @@ void MostrarSubmenuPelotas (fsm_t* this) {
 
 	pseudoWiringPiEnableDisplay(0);
 	piLock(STD_IO_BUFFER_KEY);
+	if (p_arkanoPi->primerAccesoSubmenu) {
+		p_arkanoPi->primerAccesoSubmenu = 0;
+	} else {
+		printf("\033[A\033[2K\033[A\033[2K\033[A\033[2K\033[A");
+	}
 	enviarConsola("\nPulse el número 7 para disminuir el número de pelotas o 9 para aumentarlo.\nActualmente hay %d pelotas.\nPara volver al menú pulse 5.\n", p_arkanoPi->numeroPelotas);
-	printf("\033[A\033[A"); // Para reescribir sobre las líneas anteriores.
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
 }
@@ -880,11 +884,15 @@ void MostrarSubmenuParedes (fsm_t* this) {
 
 	pseudoWiringPiEnableDisplay(0);
 	piLock(STD_IO_BUFFER_KEY);
+	if (p_arkanoPi->primerAccesoSubmenu) {
+		p_arkanoPi->primerAccesoSubmenu = 0;
+	} else {
+		printf("\033[A\033[2K\033[A\033[2K\033[A\033[2K\033[A");
+	}
 	if (p_arkanoPi->paredesHabilitadas)
 		enviarConsola("\nPulse el número 7 para deshabilitar las paredes o 9 para habilitarlo.\nActualmente están habilitadas.\nPara volver al menú pulse 5.\n");
 	else
 		enviarConsola("\nPulse el número 7 para deshabilitar las paredes o 9 para habilitarlo.\nActualmente están deshabilitadas.\nPara volver al menú pulse 5.\n");
-	printf("\033[A\033[A"); // Para reescribir sobre las líneas anteriores.
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
 }
@@ -898,6 +906,7 @@ void MostrarSubmenuTCP (fsm_t* this) {
 	flags &= ~FLAG_MENU_TCP;
 	if (flags & FLAG_MAS) {
 		if (!compruebaServidorHabilitado()) {
+			habilitarServidor();
 			// Lanzamos un thread para gestionar las conexiones TCP de los periféricos externos
 			int result = piThreadCreate(thread_conexion);
 			if (result != 0) {

@@ -99,7 +99,7 @@ void enviarTexto(char * str) {
 					servidor.periferico[i].conexion_fd = -1;
 					servidor.periferico[i].supervisado = 'n';
 					// Se comienza a escuchar a perifericos externos
-					if (piThreadCreate(thread_aceptar_periferico) != 0) {
+					if (pthread_create(&(servidor.thread_acepta_perifericos), NULL, thread_aceptar_periferico, NULL) != 0) {
 						error("No se pudo crear el thread de thread_aceptar_periferico.\n");
 					}
 				}
@@ -131,27 +131,29 @@ void enviarConsola(const char *format, ...) {
 void timer_envio_pantalla_isr(union sigval value) {
 	char str_pantalla[NUM_FILAS_DISPLAY * NUM_COLUMNAS_DISPLAY + 2];
 
-	// Se transmite la pantalla
-	for (int i = 0; i < NUM_FILAS_DISPLAY; i++) {
-		for (int j = 0; j < NUM_COLUMNAS_DISPLAY; j++) {
-			switch(led_display.pantalla.matriz[i][j]) {
-				case 1:
-					str_pantalla[i*NUM_COLUMNAS_DISPLAY + j] = '1';
-					break;
-				case 8:
-					str_pantalla[i*NUM_COLUMNAS_DISPLAY + j] = '8';
-					break;
-				default:
-					str_pantalla[i*NUM_COLUMNAS_DISPLAY + j] = '0';
+	if (servidor.servidorHabilitado) {
+		// Se transmite la pantalla
+		for (int i = 0; i < NUM_FILAS_DISPLAY; i++) {
+			for (int j = 0; j < NUM_COLUMNAS_DISPLAY; j++) {
+				switch(led_display.pantalla.matriz[i][j]) {
+					case 1:
+						str_pantalla[i*NUM_COLUMNAS_DISPLAY + j] = '1';
+						break;
+					case 8:
+						str_pantalla[i*NUM_COLUMNAS_DISPLAY + j] = '8';
+						break;
+					default:
+						str_pantalla[i*NUM_COLUMNAS_DISPLAY + j] = '0';
+				}
 			}
 		}
+
+		str_pantalla[56] = '\n';
+		str_pantalla[57] = '\0';
+		enviarTexto(str_pantalla);
+
+		tmr_startms((tmr_t*) (servidor.timer_pantalla), TIMEOUT_ENVIO_PANTALLA);
 	}
-
-	str_pantalla[56] = '\n';
-	str_pantalla[57] = '\0';
-	enviarTexto(str_pantalla);
-
-	tmr_startms((tmr_t*) (servidor.timer_pantalla), TIMEOUT_ENVIO_PANTALLA);
 }
 
 /**
@@ -187,7 +189,7 @@ PI_THREAD(thread_obtener_mensajes) {
 					servidor.periferico[idPeriferico].conexion_fd = -1;
 					servidor.periferico[idPeriferico].supervisado = 'n';
 					// Se comienza a escuchar a perifericos externos
-					if (piThreadCreate(thread_aceptar_periferico) != 0) {
+					if (pthread_create(&(servidor.thread_acepta_perifericos), NULL, thread_aceptar_periferico, NULL) != 0) {
 						error("No se pudo crear el thread de thread_aceptar_periferico.\n");
 					}
 				} else {
@@ -261,7 +263,7 @@ void iniciarServidor() {
 	}
 
 	// Se comienza a escuchar a perifericos externos
-	err = piThreadCreate(thread_aceptar_periferico);
+	err = pthread_create(&(servidor.thread_acepta_perifericos), NULL, thread_aceptar_periferico, NULL);
 	if (err != 0) {
 		error("No se pudo crear el thread de thread_aceptar_periferico.\n");
 		return;
@@ -341,13 +343,14 @@ void cerrarConexion() {
 	// Se cierran las conexiones
 	enviarTexto("$Servidor_cerrado");
 	servidor.servidorHabilitado = 0;
-	close(servidor.socket_fd);
-	close(servidor.periferico[0].conexion_fd);
-	close(servidor.periferico[1].conexion_fd);
+	pthread_cancel(servidor.thread_acepta_perifericos);
+	tmr_destroy((tmr_t*) (servidor.timer_pantalla));
 	// Se eliminan las referencias a los clientes
 	for (int i = 0; i < MAX_PERIFERICOS_CONECTADOS; i++) {
+		close(servidor.periferico[i].conexion_fd);
 		servidor.periferico[i].conexion_fd = -1;
 	}
+	close(servidor.socket_fd);
 }
 
 /**
@@ -355,4 +358,11 @@ void cerrarConexion() {
  */
 int compruebaServidorHabilitado() {
 	return servidor.servidorHabilitado;
+}
+
+/**
+ * Función que devuelve un 1 si el servidor está habilitado o un 0 si no lo está.
+ */
+void habilitarServidor() {
+	servidor.servidorHabilitado = 1;
 }

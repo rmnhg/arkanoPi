@@ -35,6 +35,7 @@ typedef struct {
 	TipoPeriferico periferico[MAX_PERIFERICOS_CONECTADOS]; // Array que almacena las estructuras de los periféricos
 	tmr_t* timer_pantalla; // Envía una pantalla nueva cada tiempo de refresco de pantalla
 	int servidorHabilitado; // Habilita el servidor o lo deshabilita
+	pthread_t thread_acepta_perifericos; // Thread que acepta los perifericos que se pueden conectar
 } TipoServidor;
 
 
@@ -48,5 +49,6 @@ PI_THREAD (thread_conexion);
 void enviarConsola(const char *format, ...);
 void cerrarConexion();
 int compruebaServidorHabilitado();
+void habilitarServidor();
 
 #endif /* TCPSERVER_H_ */

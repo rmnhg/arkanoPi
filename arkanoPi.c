@@ -250,12 +250,7 @@ void explora_teclado(int teclaPulsada) {
 			tmr_destroy((tmr_t*) (teclado.tmr_duracion_columna));
 			tmr_destroy((tmr_t*) (led_display.tmr_refresco_display));
 			// Se cierran las conexiones
-			if (servidor.servidorHabilitado) {
-				servidor.servidorHabilitado = 0;
-				close(servidor.socket_fd);
-				close(servidor.periferico[0].conexion_fd);
-				close(servidor.periferico[1].conexion_fd);
-			}
+			cerrarConexion();
 			exit(0);
 			break;
 		default:

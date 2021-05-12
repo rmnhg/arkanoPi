@@ -13,6 +13,7 @@ void enviarConsola(const char *format, ...);
 PI_THREAD (thread_conexion);
 void cerrarConexion();
 int compruebaServidorHabilitado();
+void habilitarServidor();
 
 
 enum t_direccion {
