@@ -14,6 +14,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import es.ramonhg.arkanopi.R;
 import es.ramonhg.arkanopi.ui.model.MainViewModel;
 
@@ -141,111 +143,63 @@ public class MixedFragment extends Fragment {
         // Envío de pulsado de teclas
         for (int fila = 0; fila < 4; fila++) {
             for (int columna = 0; columna < 4; columna++) {
-                int f = fila;
-                int c = columna;
-                tecla[fila][columna].setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (mViewModel.getTcpClient() != null)
-                            mViewModel.getTcpClient().sendMessage(""+f+c);
-                        else
-                            Toast.makeText(getContext(), "No está conectado al servidor", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                if (fila != 3 && columna != 3) {
+                    int f = fila;
+                    int c = columna;
+                    tecla[fila][columna].setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (mViewModel.getTcpClient() != null)
+                                mViewModel.getTcpClient().sendMessage(""+f+c);
+                            else
+                                Toast.makeText(getContext(), "No está conectado al servidor", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         }
+        // Un toque simple en la F solo desconecta el móvil del servidor.
+        tecla[3][3].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mViewModel.getTcpClient() != null) {
+                    Snackbar.make(v, getResources().getText(R.string.snackbar_desconectar_cliente), Snackbar.LENGTH_LONG)
+                            .setAction(R.string.snackbar_ok, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    mViewModel.getTcpClient().sendMessage("$Desconectar_cliente");
+                                    mViewModel.setTcpClient(null);
+                                }
+                            })
+                            .show();
+                } else
+                    Toast.makeText(getContext(), "No está conectado al servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+        // Mantener pulsada la F detiene el servidor.
+        tecla[3][3].setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (mViewModel.getTcpClient() != null) {
+                    Snackbar.make(v, getResources().getText(R.string.snackbar_desconectar_cliente), Snackbar.LENGTH_LONG)
+                            .setAction(R.string.snackbar_ok, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    mViewModel.getTcpClient().sendMessage("33");
+                                    mViewModel.setTcpClient(null);
+                                }
+                            })
+                            .show();
+                } else
+                    Toast.makeText(getContext(), "No está conectado al servidor", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
-
-    /**
-     * Método que actualiza los elementos de la pantalla con cada mensaje recibido por TCP.
-     * @param screenMessage el mensaje procesado recibido por TCP.
-     */
-    public void updateScreen (String screenMessage) {
-        ((MainActivity) getActivity()).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                boolean jugando = false;
-                // Si la longitud del mensaje recibido no es la de una pantalla, es un mensaje de
-                // consola.
-                if (screenMessage.length() != 7*8) {
-                    // Se acumulan los mensajes recibidos de la consola y no se muestran hasta que
-                    // se muestre la siguiente pantalla.
-                    if (mViewModel.getConsoleContent() != null)
-                        mViewModel.setConsoleContent(mViewModel.getConsoleContent() + '\n' + screenMessage);
-                    else
-                        mViewModel.setConsoleContent(screenMessage);
-                } else if (primeraPantallaEscrita || !screenMessage.equals(mViewModel.getScreenContent())) {
-                    // Se muestran los mensajes de la consola almacenados
-                    consoleTextView.setText(mViewModel.getConsoleContent());
-                    mViewModel.setConsoleContent(null);
-                    // Si se ha cambiado de fragment o ha llegado una pantalla distinta a la
-                    // almacenada, se pinta la pantalla de LEDs.
-                    primeraPantallaEscrita = false;
-                    mViewModel.setScreenContent(screenMessage);
-                    char[] screenDigits = screenMessage.toCharArray();
-
-                    for (int i = 6 * 8; i < 6 * 8 + 8; i++) {
-                        // Se comprueba si se está jugando o no viendo si en la última fila hay unos
-                        // (la pala). Si no, estaremos mostrando una pantalla inicial o final.
-                        if (screenDigits[i] != '0') {
-                            jugando = true;
-                            mViewModel.setConsoleContent(null);
-                            consoleTextView.setText("");
-                            break;
-                        }
-                    }
-
-                    for (int i = 0; i < 7; i++) {
-                        for (int j = 0; j < 8; j++) {
-                            int strIndex = i * 8 + j;
-                            char digit = screenDigits[strIndex];
-                            if (jugando) {
-                                if (digit == '8') { // Pelota
-                                    led[i][j].setBackgroundColor(getResources().getColor(R.color.blue));
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                        led[i][j].setBackgroundTintList(getResources().getColorStateList(R.color.blue));
-                                    }
-                                } else if (digit == '1' && i < 3) { // Ladrillos
-                                    led[i][j].setBackgroundColor(getResources().getColor(R.color.red));
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                        led[i][j].setBackgroundTintList(getResources().getColorStateList(R.color.red));
-                                    }
-                                } else if (digit == '1' && i == 6) { // pala
-                                    led[i][j].setBackgroundColor(getResources().getColor(R.color.green));
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                        led[i][j].setBackgroundTintList(getResources().getColorStateList(R.color.green));
-                                    }
-                                } else { // LED apagado
-                                    led[i][j].setBackgroundColor(getResources().getColor(R.color.black));
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                        led[i][j].setBackgroundTintList(getResources().getColorStateList(R.color.black));
-                                    }
-                                }
-                            } else {
-                                // Estamos en una pantalla final o inicial. Los LEDs encendidos
-                                // se pintarán de color rojo.
-                                if (digit == '1') { // LED encendido
-                                    led[i][j].setBackgroundColor(getResources().getColor(R.color.red));
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                        led[i][j].setBackgroundTintList(getResources().getColorStateList(R.color.red));
-                                    }
-                                } else { // LED apagado
-                                    led[i][j].setBackgroundColor(getResources().getColor(R.color.black));
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                        led[i][j].setBackgroundTintList(getResources().getColorStateList(R.color.black));
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
     }
 
     public void setPrimeraPantallaEscrita(boolean primeraPantallaEscrita) {

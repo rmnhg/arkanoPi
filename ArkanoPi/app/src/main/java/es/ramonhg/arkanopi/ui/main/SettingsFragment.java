@@ -21,8 +21,9 @@ import es.ramonhg.arkanopi.ui.model.MainViewModel;
 public class SettingsFragment extends Fragment implements AdapterView.OnItemSelectedListener {
     public static final String TAG = "SettingsFragment";
     Button back, connect;
-    Spinner tipoConexion;
+    Spinner tipoConexion, selectorPartida;
     String[] periferico = {"Ambos", "Pantalla", "Teclado"};
+    String[] partida = {"Host", "Partida 1", "Partida 2"};
     private MainViewModel mViewModel;
     private View mView;
 
@@ -60,6 +61,32 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
                 tipoConexion.setSelection(i);
             }
         }
+        selectorPartida = mView.findViewById(R.id.partida_spinner);
+        selectorPartida.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                mViewModel.setPartidaActual(partida[position]);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        //Creating the ArrayAdapter instance having the country list
+        selectorPartida.setSelection(1);
+        ArrayAdapter aa2 = new ArrayAdapter(this.getContext(), android.R.layout.simple_spinner_item, partida);
+        aa2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        selectorPartida.setAdapter(aa2);
+        // Ponemos la partida guardada anteriormente
+        for (int i = 0; i < partida.length; i++) {
+            if (partida[i].equals(mViewModel.getPartidaActual())) {
+                selectorPartida.setSelection(i);
+            }
+        }
+
+        // Se vuelve a la vista acorde con el tipo de periférico seleccionado
         back = mView.findViewById(R.id.backButton);
         back.setOnClickListener(new View.OnClickListener() {
             @Override

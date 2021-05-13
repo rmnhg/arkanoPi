@@ -58,14 +58,21 @@ public class MainActivity extends AppCompatActivity {
             //here the messageReceived method is implemented
             public void messageReceived(String message) {
                 //this method calls the onProgressUpdate
-                ScreenFragment screenFragment = ((ScreenFragment) getSupportFragmentManager().findFragmentByTag("ScreenFragment"));
-                if (screenFragment != null)
-                    //screenFragment.updateScreen(processTCPMessage(message));
-                    mViewModel.updateScreen(processTCPMessage(message), screenFragment.getConsoleTextView(), screenFragment.getMatrizDeLeds(), screenFragment.getPrimeraPantallaEscrita(), "ScreenFragment");
-                MixedFragment mixedFragment = ((MixedFragment) getSupportFragmentManager().findFragmentByTag("MixedFragment"));
-                if (mixedFragment != null)
-                    //mixedFragment.updateScreen(processTCPMessage(message));
-                    mViewModel.updateScreen(processTCPMessage(message), mixedFragment.getConsoleTextView(), mixedFragment.getMatrizDeLeds(), mixedFragment.getPrimeraPantallaEscrita(), "MixedFragment");
+                if (processTCPMessage(message).toCharArray()[0] != '$') { // No es un mensaje de control
+                    ScreenFragment screenFragment = ((ScreenFragment) getSupportFragmentManager().findFragmentByTag("ScreenFragment"));
+                    if (screenFragment != null)
+                        //screenFragment.updateScreen(processTCPMessage(message));
+                        mViewModel.updateScreen(processTCPMessage(message), screenFragment.getConsoleTextView(), screenFragment.getMatrizDeLeds(), screenFragment.getPrimeraPantallaEscrita(), "ScreenFragment");
+                    MixedFragment mixedFragment = ((MixedFragment) getSupportFragmentManager().findFragmentByTag("MixedFragment"));
+                    if (mixedFragment != null)
+                        //mixedFragment.updateScreen(processTCPMessage(message));
+                        mViewModel.updateScreen(processTCPMessage(message), mixedFragment.getConsoleTextView(), mixedFragment.getMatrizDeLeds(), mixedFragment.getPrimeraPantallaEscrita(), "MixedFragment");
+                } else {  // Es un mensaje de control
+                    if (processTCPMessage(message).contains("$Servidor_cerrado")) {
+                        mViewModel.setTcpClient(null);
+                        Toast.makeText(getBaseContext(), "Se ha desconectado del servidor", Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
         }, new TCPClient.OnExternalCommunication() {
             @Override
