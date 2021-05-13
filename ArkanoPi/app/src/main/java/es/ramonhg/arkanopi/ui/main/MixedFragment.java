@@ -19,6 +19,7 @@ import es.ramonhg.arkanopi.ui.model.MainViewModel;
 
 public class MixedFragment extends Fragment {
     public static final String TAG = "MixedFragment";
+    private String mTag = TAG;
     private View mView;
 
     TextView consoleTextView;
@@ -56,6 +57,10 @@ public class MixedFragment extends Fragment {
 
         // Preparación de los mensajes de la consola
         consoleTextView = mView.findViewById(R.id.consoleTextView);
+        // Se muestra el mensaje de la consola actualizado almacenado si no está escrito ya
+        if (consoleTextView.getText() != null && !(consoleTextView.getText().equals(mViewModel.getConsoleContent()))) {
+            consoleTextView.setText(mViewModel.getConsoleContent());
+        }
 
         // Preparación matriz de lEDs
         led[0][0] = mView.findViewById(R.id.led00);
@@ -241,5 +246,21 @@ public class MixedFragment extends Fragment {
                 }
             }
         });
+    }
+
+    public void setPrimeraPantallaEscrita(boolean primeraPantallaEscrita) {
+        this.primeraPantallaEscrita = primeraPantallaEscrita;
+    }
+
+    public boolean getPrimeraPantallaEscrita() {
+        return primeraPantallaEscrita;
+    }
+
+    public Button[][] getMatrizDeLeds() {
+        return led;
+    }
+
+    public TextView getConsoleTextView() {
+        return consoleTextView;
     }
 }

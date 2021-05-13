@@ -60,10 +60,12 @@ public class MainActivity extends AppCompatActivity {
                 //this method calls the onProgressUpdate
                 ScreenFragment screenFragment = ((ScreenFragment) getSupportFragmentManager().findFragmentByTag("ScreenFragment"));
                 if (screenFragment != null)
-                    screenFragment.updateScreen(processTCPMessage(message));
+                    //screenFragment.updateScreen(processTCPMessage(message));
+                    mViewModel.updateScreen(processTCPMessage(message), screenFragment.getConsoleTextView(), screenFragment.getMatrizDeLeds(), screenFragment.getPrimeraPantallaEscrita(), "ScreenFragment");
                 MixedFragment mixedFragment = ((MixedFragment) getSupportFragmentManager().findFragmentByTag("MixedFragment"));
                 if (mixedFragment != null)
-                    mixedFragment.updateScreen(processTCPMessage(message));
+                    //mixedFragment.updateScreen(processTCPMessage(message));
+                    mViewModel.updateScreen(processTCPMessage(message), mixedFragment.getConsoleTextView(), mixedFragment.getMatrizDeLeds(), mixedFragment.getPrimeraPantallaEscrita(), "MixedFragment");
             }
         }, new TCPClient.OnExternalCommunication() {
             @Override

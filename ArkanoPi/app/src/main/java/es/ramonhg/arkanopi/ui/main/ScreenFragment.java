@@ -20,6 +20,7 @@ import es.ramonhg.arkanopi.ui.model.MainViewModel;
 
 public class ScreenFragment extends Fragment {
     public static final String TAG = "ScreenFragment";
+    private String mTag = TAG;
     private View mView;
 
     TextView consoleTextView;
@@ -56,6 +57,10 @@ public class ScreenFragment extends Fragment {
 
         // Preparación de los mensajes de la consola
         consoleTextView = mView.findViewById(R.id.consoleTextView);
+        // Se muestra el mensaje de la consola actualizado almacenado si no está escrito ya
+        if (consoleTextView.getText() != null && !(consoleTextView.getText().equals(mViewModel.getConsoleContent()))) {
+            consoleTextView.setText(mViewModel.getConsoleContent());
+        }
 
         // Preparación matriz de lEDs
         led[0][0] = mView.findViewById(R.id.led00);
@@ -123,31 +128,26 @@ public class ScreenFragment extends Fragment {
 
     /**
      * Método que actualiza los elementos de la pantalla con cada mensaje recibido por TCP.
-     * @param screenMessage el mensaje procesado recibido por TCP.
+     * @param receivedMessage el mensaje procesado recibido por TCP.
      */
-    public void updateScreen (String screenMessage) {
+    public void updateScreen (String receivedMessage) {
         ((MainActivity) getActivity()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 boolean jugando = false;
                 // Si la longitud del mensaje recibido no es la de una pantalla, es un mensaje de
                 // consola.
-                if (screenMessage.length() != 7*8) {
-                    // Se acumulan los mensajes recibidos de la consola y no se muestran hasta que
-                    // se muestre la siguiente pantalla.
-                    if (mViewModel.getConsoleContent() != null)
-                        mViewModel.setConsoleContent(mViewModel.getConsoleContent() + '\n' + screenMessage);
-                    else
-                        mViewModel.setConsoleContent(screenMessage);
-                } else if (primeraPantallaEscrita || !screenMessage.equals(mViewModel.getScreenContent())) {
-                    // Se muestran los mensajes de la consola almacenados
+                if (receivedMessage.length() != 7*8) {
+                    receivedMessage.replace('#', '\n');
+                    mViewModel.setConsoleContent(receivedMessage);
+                    // Se muestra el mensaje de la consola recibido
                     consoleTextView.setText(mViewModel.getConsoleContent());
-                    mViewModel.setConsoleContent(null);
+                } else if (primeraPantallaEscrita || !receivedMessage.equals(mViewModel.getScreenContent())) {
                     // Si se ha cambiado de fragment o ha llegado una pantalla distinta a la
                     // almacenada, se pinta la pantalla de LEDs.
                     primeraPantallaEscrita = false;
-                    mViewModel.setScreenContent(screenMessage);
-                    char[] screenDigits = screenMessage.toCharArray();
+                    mViewModel.setScreenContent(receivedMessage);
+                    char[] screenDigits = receivedMessage.toCharArray();
 
                     for (int i = 6 * 8; i < 6 * 8 + 8; i++) {
                         // Se comprueba si se está jugando o no viendo si en la última fila hay unos
@@ -206,5 +206,21 @@ public class ScreenFragment extends Fragment {
                 }
             }
         });
+    }
+
+    public void setPrimeraPantallaEscrita(boolean primeraPantallaEscrita) {
+        this.primeraPantallaEscrita = primeraPantallaEscrita;
+    }
+
+    public boolean getPrimeraPantallaEscrita() {
+        return primeraPantallaEscrita;
+    }
+
+    public Button[][] getMatrizDeLeds() {
+        return led;
+    }
+
+    public TextView getConsoleTextView() {
+        return consoleTextView;
     }
 }

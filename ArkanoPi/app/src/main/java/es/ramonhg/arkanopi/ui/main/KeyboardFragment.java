@@ -19,6 +19,7 @@ import es.ramonhg.arkanopi.ui.model.MainViewModel;
 
 public class KeyboardFragment extends Fragment {
     public static final String TAG = "KeyboardFragment";
+    private String mTag = TAG;
     private View mView;
 
     Button settings;

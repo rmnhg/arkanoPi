@@ -1,9 +1,14 @@
 package es.ramonhg.arkanopi.ui.model;
 
 import android.inputmethodservice.Keyboard;
+import android.os.Build;
+import android.widget.Button;
+import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModel;
 
+import es.ramonhg.arkanopi.R;
 import es.ramonhg.arkanopi.ui.main.KeyboardFragment;
 import es.ramonhg.arkanopi.ui.main.MainActivity;
 import es.ramonhg.arkanopi.ui.main.ScreenFragment;
@@ -103,5 +108,96 @@ public class MainViewModel extends ViewModel {
 
     public void setConsoleContent(String consoleContent) {
         this.consoleContent = consoleContent;
+    }
+
+    /**
+     * Método que actualiza los elementos de la pantalla con cada mensaje recibido por TCP.
+     * @param receivedMessage el mensaje procesado recibido por TCP.
+     * @param consoleTextView el TexView que contiene el texto de la consola en el fragment
+     * @param led array de Buttons que representa el array de LEDs
+     * @param primeraPantallaEscrita boolean que representa si un fragment pinta la matriz de LEDs por primera vez
+     * @param fragmentType nombre del fragmento que se cambia
+     */
+    public void updateScreen(String receivedMessage, TextView consoleTextView, Button[][] led, boolean primeraPantallaEscrita, String fragmentType) {
+        boolean forzarDibujadoPantalla = primeraPantallaEscrita;
+        getMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                boolean jugando = false;
+                // Si la longitud del mensaje recibido no es la de una pantalla, es un mensaje de
+                // consola.
+                if (receivedMessage.length() != 7*8) {
+                    String realMessage = receivedMessage.replace('#', '\n');
+                    setConsoleContent(realMessage);
+                    // Se muestra el mensaje de la consola recibido
+                    consoleTextView.setText(getConsoleContent());
+                } else if (forzarDibujadoPantalla || !receivedMessage.equals(getScreenContent())) {
+                    // Si se ha cambiado de fragment o ha llegado una pantalla distinta a la
+                    // almacenada, se pinta la pantalla de LEDs.
+                    if (fragmentType.equals("ScreenFragment")) {
+                        getScreenFragment().setPrimeraPantallaEscrita(false);
+                    } else {
+                        getMixedFragment().setPrimeraPantallaEscrita(false);
+                    }
+                    setScreenContent(receivedMessage);
+                    char[] screenDigits = receivedMessage.toCharArray();
+
+                    for (int i = 6 * 8; i < 6 * 8 + 8; i++) {
+                        // Se comprueba si se está jugando o no viendo si en la última fila hay unos
+                        // (la pala). Si no, estaremos mostrando una pantalla inicial o final.
+                        if (screenDigits[i] != '0') {
+                            jugando = true;
+                            setConsoleContent(null);
+                            consoleTextView.setText("");
+                            break;
+                        }
+                    }
+
+                    for (int i = 0; i < 7; i++) {
+                        for (int j = 0; j < 8; j++) {
+                            int strIndex = i * 8 + j;
+                            char digit = screenDigits[strIndex];
+                            if (jugando) {
+                                if (digit == '8') { // Pelota
+                                    led[i][j].setBackgroundColor(getMainActivity().getResources().getColor(R.color.blue));
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        led[i][j].setBackgroundTintList(getMainActivity().getResources().getColorStateList(R.color.blue));
+                                    }
+                                } else if (digit == '1' && i < 3) { // Ladrillos
+                                    led[i][j].setBackgroundColor(getMainActivity().getResources().getColor(R.color.red));
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        led[i][j].setBackgroundTintList(getMainActivity().getResources().getColorStateList(R.color.red));
+                                    }
+                                } else if (digit == '1' && i == 6) { // pala
+                                    led[i][j].setBackgroundColor(getMainActivity().getResources().getColor(R.color.green));
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        led[i][j].setBackgroundTintList(getMainActivity().getResources().getColorStateList(R.color.green));
+                                    }
+                                } else { // LED apagado
+                                    led[i][j].setBackgroundColor(getMainActivity().getResources().getColor(R.color.black));
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        led[i][j].setBackgroundTintList(getMainActivity().getResources().getColorStateList(R.color.black));
+                                    }
+                                }
+                            } else {
+                                // Estamos en una pantalla final o inicial. Los LEDs encendidos
+                                // se pintarán de color rojo.
+                                if (digit == '1') { // LED encendido
+                                    led[i][j].setBackgroundColor(getMainActivity().getResources().getColor(R.color.red));
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        led[i][j].setBackgroundTintList(getMainActivity().getResources().getColorStateList(R.color.red));
+                                    }
+                                } else { // LED apagado
+                                    led[i][j].setBackgroundColor(getMainActivity().getResources().getColor(R.color.black));
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        led[i][j].setBackgroundTintList(getMainActivity().getResources().getColorStateList(R.color.black));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 }
