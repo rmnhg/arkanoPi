@@ -9,7 +9,7 @@
 #include "ledDisplay.h"
 #include "tmr.h"
 
-void enviarConsola(const char *format, ...);
+void enviarConsola(int partida, const char *format, ...);
 PI_THREAD (thread_conexion);
 void cerrarConexion();
 int compruebaServidorHabilitado();
@@ -61,6 +61,7 @@ typedef struct {
 	int numeroPelotas;
 	int paredesHabilitadas;
 	int primerAccesoSubmenu;
+	int partida; // Número de la partida que se juega con esta estructura arkanoPi
 	tmr_t* tmr_actualizacion_juego;
 } tipo_arkanoPi;
 
@@ -76,8 +77,8 @@ void InicializaArkanoPi(tipo_arkanoPi *p_arkanoPi);
 void ResetArkanoPi(tipo_arkanoPi *p_arkanoPi);
 void ReseteaMatriz(tipo_pantalla *p_pantalla);
 
-inline static void mostrarInstruccionesJuego() {
-	enviarConsola("\nInstrucciones de uso:\n"
+inline static void mostrarInstruccionesJuego(int partida) {
+	enviarConsola(partida, "\nInstrucciones de uso:\n"
 				  "\tCualquier tecla inicia el juego.\n"
 				  "\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n"
 				  "\tLa tecla C actualiza la posición de la pelota en la pantalla.\n"
@@ -87,8 +88,8 @@ inline static void mostrarInstruccionesJuego() {
 	fflush(stdout);
 }
 
-inline static void MostrarMenu() {
-	enviarConsola("\n¡Bienvenido a arkanoPi!\n"
+inline static void MostrarMenu(int partida) {
+	enviarConsola(partida, "\n¡Bienvenido a arkanoPi!\n"
 			"\tPulsa 1 para cambiar el números de pelotas en juego (1 - 9).\n"
 			"\tPulsa 2 para alternar las paredes del juego.\n"
 			"\tPulsa 3 para alternar el soporte de periféricos externos.\n"

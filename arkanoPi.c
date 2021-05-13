@@ -5,7 +5,7 @@ int flags = 0;
 
 TipoSistema sistema;
 
-fsm_t* arkanoPi_fsm;
+fsm_t* arkanoPi_fsm[MAX_PERIFERICOS_CONECTADOS];
 
 // Declaracion del objeto teclado
 TipoTeclado teclado = {
@@ -43,30 +43,7 @@ TipoTeclado teclado = {
 };
 
 // Declaracion del objeto display
-TipoLedDisplay led_display = {
-	.pines_control_columnas = {
-			GPIO_LED_DISPLAY_COL_1,
-			GPIO_LED_DISPLAY_COL_2,
-			GPIO_LED_DISPLAY_COL_3
-		// A completar por el alumno...
-		// Hecho
-	},
-	.filas = {
-			GPIO_LED_DISPLAY_ROW_1,
-			GPIO_LED_DISPLAY_ROW_2,
-			GPIO_LED_DISPLAY_ROW_3,
-			GPIO_LED_DISPLAY_ROW_4,
-			GPIO_LED_DISPLAY_ROW_5,
-			GPIO_LED_DISPLAY_ROW_6,
-			GPIO_LED_DISPLAY_ROW_7
-		// A completar por el alumno...
-		// Hecho
-	},
-	.p_columna = 0,
-	.flags = 0
-	// A completar por el alumno...
-	// ...
-};
+TipoLedDisplay led_display[MAX_PERIFERICOS_CONECTADOS];
 
 //------------------------------------------------------
 // FUNCIONES DE CONFIGURACION/INICIALIZACION
@@ -108,8 +85,10 @@ int ConfiguraInicializaSistema (TipoSistema *p_sistema) {
 	InicializaTeclado(&teclado);
 
 	// Pintamos la pantalla inicial en la matriz de LEDs
-	PintaMensajeInicialPantalla(&(led_display.pantalla), &pantalla_inicial);
-	InicializaLedDisplay(&led_display);
+	for (int partida = 0; partida < MAX_PERIFERICOS_CONECTADOS; partida++) {
+		PintaMensajeInicialPantalla(&(led_display[partida].pantalla), &pantalla_inicial);
+	}
+	InicializaLedDisplay(&led_display[0]);
 
 	// Nos falta escribir las instrucciones del juego, deshabilitamos la pantalla
 	pseudoWiringPiEnableDisplay(0);
@@ -132,14 +111,14 @@ PI_THREAD (thread_explora_teclado_PC) {
 		if(kbhit()) {
 			teclaPulsada = kbread();
 
-			explora_teclado(teclaPulsada);
+			explora_teclado(teclaPulsada, 0);
 		}
 
 		piUnlock(STD_IO_BUFFER_KEY);
 	}
 }
 
-void explora_teclado(int teclaPulsada) {
+void explora_teclado(int teclaPulsada, int partida) {
 	switch(teclaPulsada) {
 		// A completar por el alumno...
 		// Hecho
@@ -184,7 +163,7 @@ void explora_teclado(int teclaPulsada) {
 			piLock(SYSTEM_FLAGS_KEY);
 			flags |= FLAG_MENU_AYUDA;
 			piUnlock(SYSTEM_FLAGS_KEY);
-			if (arkanoPi_fsm->current_state != WAIT_MENU) {
+			if (arkanoPi_fsm[partida]->current_state != WAIT_MENU) {
 				break;
 			}
 		case 'A':
@@ -205,14 +184,14 @@ void explora_teclado(int teclaPulsada) {
 			// Activamos los flags de timer y de boton pulsado
 			piLock(SYSTEM_FLAGS_KEY);
 			flags |= FLAG_TIMER_JUEGO;
-			if (arkanoPi_fsm->current_state != WAIT_MENU) {
+			if (arkanoPi_fsm[partida]->current_state != WAIT_MENU) {
 				flags |= FLAG_BOTON;
 			}
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case '6':
 			// El 6 no inicia el juego mientras estamos en el menú
-			if (arkanoPi_fsm->current_state != WAIT_MENU) {
+			if (arkanoPi_fsm[partida]->current_state != WAIT_MENU) {
 				break;
 			}
 		case 'D':
@@ -233,7 +212,7 @@ void explora_teclado(int teclaPulsada) {
 			// Activamos los flags de movimiento y de boton pulsado
 			piLock(SYSTEM_FLAGS_KEY);
 			flags |= FLAG_PAUSA;
-			if (arkanoPi_fsm->current_state != WAIT_MENU) {
+			if (arkanoPi_fsm[partida]->current_state != WAIT_MENU) {
 				flags |= FLAG_BOTON;
 			}
 			piUnlock(SYSTEM_FLAGS_KEY);
@@ -243,12 +222,12 @@ void explora_teclado(int teclaPulsada) {
 			// Se deshabilita la pantalla para mostrar el mensaje final
 			pseudoWiringPiEnableDisplay(0);
 			piLock(STD_IO_BUFFER_KEY);
-			enviarConsola("\nGracias por jugar a arkanoPi.\n");
+			enviarConsola(partida, "\nGracias por jugar a arkanoPi.\n");
 			piUnlock(STD_IO_BUFFER_KEY);
 			// Destruimos los timers anteriormente creados para liberar la memoria
-			tmr_destroy((tmr_t*) (sistema.arkanoPi.tmr_actualizacion_juego));
+			tmr_destroy((tmr_t*) (sistema.arkanoPi[partida].tmr_actualizacion_juego));
 			tmr_destroy((tmr_t*) (teclado.tmr_duracion_columna));
-			tmr_destroy((tmr_t*) (led_display.tmr_refresco_display));
+			tmr_destroy((tmr_t*) (led_display[partida].tmr_refresco_display));
 			// Se cierran las conexiones
 			cerrarConexion();
 			exit(0);
@@ -309,49 +288,78 @@ int main () {
 		{-1, NULL, -1, NULL }
 	};
 
-	// Inicializamos el temporizador de actualización de la pantalla LED
-	sistema.arkanoPi.tmr_actualizacion_juego = tmr_new(tmr_actualizacion_juego_isr);
-
-	// Creamos e iniciamos el temporizador relativo a la exploración del teclado
-	teclado.tmr_duracion_columna = tmr_new(timer_duracion_columna_isr);
-	tmr_startms((tmr_t*) (teclado.tmr_duracion_columna), TIMEOUT_COLUMNA_TECLADO);
-
-	// Creamos e iniciamos el temporizador relativo a la actualización de la matriz de LEDs
-	led_display.tmr_refresco_display = tmr_new(timer_refresco_display_isr);
-	tmr_startms((tmr_t*) (led_display.tmr_refresco_display), TIMEOUT_COLUMNA_DISPLAY);
-
-	// Configuracion e incializacion del sistema
-	// Hecho
-	// Inicializamos el puntero a la pantalla
-	sistema.arkanoPi.p_pantalla = &(led_display.pantalla);
-	ConfiguraInicializaSistema(&sistema);
-
-	arkanoPi_fsm = fsm_new(WAIT_MENU, arkanoPi, &sistema);
-	// Creamos nuevas máquinas de estados para la exploración del teclado
-	fsm_t* teclado_fsm = fsm_new(TECLADO_ESPERA_COLUMNA, fsm_trans_excitacion_columnas, &teclado);
-	fsm_t* tecla_fsm = fsm_new(TECLADO_ESPERA_TECLA, fsm_trans_deteccion_pulsaciones, &teclado);
-	// Creamos nuevas máquinas de estados para la actualización de columnas en el display
-	fsm_t* display_fsm = fsm_new(DISPLAY_ESPERA_COLUMNA, fsm_trans_excitacion_display, &led_display);
-
-	// Establecemos el número de pelotas por defecto en 2
-	sistema.arkanoPi.numeroPelotas = 2;
-
-	// Establecemos que no habrá paredes en un principio
-	sistema.arkanoPi.paredesHabilitadas = 0;
+	// Creamos las distintas fsms que usaremos:
+	fsm_t* teclado_fsm[MAX_PERIFERICOS_CONECTADOS];
+	fsm_t* tecla_fsm[MAX_PERIFERICOS_CONECTADOS];
+	fsm_t* display_fsm[MAX_PERIFERICOS_CONECTADOS];
 
 	// Establecemos que la conexión TCP del servidor está activada
 	servidor.servidorHabilitado = 1;
 
-	// A completar por el alumno...
-	// Hecho
+	for (int partida = 0; partida < MAX_PERIFERICOS_CONECTADOS; partida++) {
+		led_display[partida].pines_control_columnas[0] = GPIO_LED_DISPLAY_COL_1;
+		led_display[partida].pines_control_columnas[1] = GPIO_LED_DISPLAY_COL_2;
+		led_display[partida].pines_control_columnas[2] = GPIO_LED_DISPLAY_COL_3;
+		led_display[partida].filas[0] = GPIO_LED_DISPLAY_ROW_1;
+		led_display[partida].filas[1] = GPIO_LED_DISPLAY_ROW_2;
+		led_display[partida].filas[2] = GPIO_LED_DISPLAY_ROW_3;
+		led_display[partida].filas[3] = GPIO_LED_DISPLAY_ROW_4;
+		led_display[partida].filas[4] = GPIO_LED_DISPLAY_ROW_5;
+		led_display[partida].filas[5] = GPIO_LED_DISPLAY_ROW_6;
+		led_display[partida].filas[6] = GPIO_LED_DISPLAY_ROW_7;
+		led_display[partida].p_columna = 0;
+		led_display[partida].flags = 0;
+
+		// Asignamos una partida a cada arkanoPi
+		sistema.arkanoPi[partida].partida = partida;
+
+		// Inicializamos el temporizador de actualización de la pantalla LED
+		sistema.arkanoPi[partida].tmr_actualizacion_juego = tmr_new(tmr_actualizacion_juego_isr);
+
+		// Creamos e iniciamos el temporizador relativo a la exploración del teclado
+		teclado.tmr_duracion_columna = tmr_new(timer_duracion_columna_isr);
+		tmr_startms((tmr_t*) (teclado.tmr_duracion_columna), TIMEOUT_COLUMNA_TECLADO);
+
+		// Creamos e iniciamos el temporizador relativo a la actualización de la matriz de LEDs (solo en la primera partida)
+		led_display[0].tmr_refresco_display = tmr_new(timer_refresco_display_isr);
+		tmr_startms((tmr_t*) (led_display[0].tmr_refresco_display), TIMEOUT_COLUMNA_DISPLAY);
+
+		// Configuracion e incializacion del sistema
+		// Hecho
+		// Inicializamos el puntero a la pantalla
+		sistema.arkanoPi[partida].p_pantalla = &(led_display[partida].pantalla);
+		ConfiguraInicializaSistema(&sistema);
+
+		arkanoPi_fsm[partida] = fsm_new(WAIT_MENU, arkanoPi, &sistema);
+		// Creamos nuevas máquinas de estados para la exploración del teclado
+		teclado_fsm[partida] = fsm_new(TECLADO_ESPERA_COLUMNA, fsm_trans_excitacion_columnas, &teclado);
+		tecla_fsm[partida] = fsm_new(TECLADO_ESPERA_TECLA, fsm_trans_deteccion_pulsaciones, &teclado);
+		// Creamos nuevas máquinas de estados para la actualización de columnas en el display
+		display_fsm[partida] = fsm_new(DISPLAY_ESPERA_COLUMNA, fsm_trans_excitacion_display, &led_display[partida]);
+
+		// Establecemos el número de pelotas por defecto en 2
+		sistema.arkanoPi[partida].numeroPelotas = 2;
+
+		// Establecemos que no habrá paredes en un principio
+		sistema.arkanoPi[partida].paredesHabilitadas = 0;
+
+		// A completar por el alumno...
+		// Hecho
+
+		piLock(STD_IO_BUFFER_KEY);
+
+		// Ponemos que es la primera vez que se muestra un submenú
+		sistema.arkanoPi[partida].primerAccesoSubmenu = 1;
+
+		// Mostramos el menú de selección del juego
+		MostrarMenu(partida);
+		piUnlock(STD_IO_BUFFER_KEY);
+
+		// Habilitamos el display para mostrar la pantalla inicial
+		pseudoWiringPiEnableDisplay(1);
+	}
 
 	piLock(STD_IO_BUFFER_KEY);
-
-	// Ponemos que es la primera vez que se muestra un submenú
-	sistema.arkanoPi.primerAccesoSubmenu = 1;
-
-	// Mostramos el menú de selección del juego
-	MostrarMenu();
 	if (!(servidor.flags & FLAG_TCP_ERROR))
 		printf("\nEscuchando conexiones de periféricos en el puerto %d.\n", servidor.puerto);
 	else
@@ -359,16 +367,15 @@ int main () {
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
 
-	// Habilitamos el display para mostrar la pantalla inicial
-	pseudoWiringPiEnableDisplay(1);
-
 	next = millis();
 	while (1) {
-		// Ejecutamos las comprobaciones de las máquinas de estado del teclado
-		fsm_fire(teclado_fsm);
-		fsm_fire(tecla_fsm);
-		fsm_fire(display_fsm);
-		fsm_fire(arkanoPi_fsm);
+		for (int partida = 0; partida < MAX_PERIFERICOS_CONECTADOS; partida++) {
+			// Ejecutamos las comprobaciones de las máquinas de estado del teclado
+			fsm_fire(teclado_fsm[partida]);
+			fsm_fire(tecla_fsm[partida]);
+			fsm_fire(display_fsm[partida]);
+			fsm_fire(arkanoPi_fsm[partida]);
+		}
 
 		// A completar por el alumno...
 		// Hecho
@@ -378,11 +385,13 @@ int main () {
 	}
 
 	// Destruimos los timers anteriormente creados para liberar la memoria
-	tmr_destroy((tmr_t*) (sistema.arkanoPi.tmr_actualizacion_juego));
 	tmr_destroy((tmr_t*) (teclado.tmr_duracion_columna));
-	tmr_destroy((tmr_t*) (led_display.tmr_refresco_display));
-	fsm_destroy(arkanoPi_fsm);
-	fsm_destroy(teclado_fsm);
-	fsm_destroy(tecla_fsm);
-	fsm_destroy(display_fsm);
+	for (int partida = 0; partida < MAX_PERIFERICOS_CONECTADOS; partida++) {
+		tmr_destroy((tmr_t*) (led_display[partida].tmr_refresco_display));
+		tmr_destroy((tmr_t*) (sistema.arkanoPi[partida].tmr_actualizacion_juego));
+		fsm_destroy(arkanoPi_fsm[partida]);
+		fsm_destroy(teclado_fsm[partida]);
+		fsm_destroy(tecla_fsm[partida]);
+		fsm_destroy(display_fsm[partida]);
+	}
 }

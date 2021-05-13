@@ -14,6 +14,8 @@
 #define NUM_COLUMNAS_DISPLAY	8
 #define NUM_FILAS_DISPLAY		7
 
+#define MAX_PERIFERICOS_CONECTADOS 2
+
 // FLAGS FSM CONTROL DE EXCITACION DISPLAY
 // ATENCION: Valores a modificar por el alumno
 #define FLAG_TIMEOUT_COLUMNA_DISPLAY 	0x01
@@ -35,7 +37,7 @@ typedef struct {
 	int flags;
 } TipoLedDisplay;
 
-extern TipoLedDisplay led_display;
+extern TipoLedDisplay led_display[MAX_PERIFERICOS_CONECTADOS];
 extern tipo_pantalla pantalla_inicial;
 extern tipo_pantalla pantalla_final;
 extern fsm_trans_t fsm_trans_excitacion_display[];

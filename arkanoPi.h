@@ -10,8 +10,10 @@
 #include "ledDisplay.h"
 #include "tcpServer.h" // para conectar hardware extrerno simulado en móviles Android
 
+#define MAX_PERIFERICOS_CONECTADOS 2
+
 typedef struct {
-	tipo_arkanoPi arkanoPi;
+	tipo_arkanoPi arkanoPi[MAX_PERIFERICOS_CONECTADOS];
 	// Aqui podrian añadirse otros juegos...
 	// tipo_otroJuego1 otroJuego1;
 	// tipo_otroJuego2 otroJuego2;
@@ -51,6 +53,6 @@ void tmr_actualizacion_juego_isr(union sigval value);
 // FUNCIONES LIGADAS A THREADS ADICIONALES
 //------------------------------------------------------
 PI_THREAD(thread_explora_teclado_PC);
-void explora_teclado(int teclaPulsada);
+void explora_teclado(int teclaPulsada, int partida);
 
 #endif /* ARKANOPI_H_ */

@@ -22,6 +22,7 @@ typedef struct {
     int conexion_fd; // Almacena el descriptor de archivo asociado a la conexion con el periférico
 	socklen_t long_periferico; // Longitud de la dirección del periférico
 	char supervisado; // Almacena una 's' si se están esperando mensajes del periférico u otro carácter si no se están esperando
+	int partida; //Almacena la partida que controla el periférico
 } TipoPeriferico;
 
 typedef struct {
@@ -43,10 +44,10 @@ typedef struct {
 #define FLAG_TCP_MENSAJE	0x02
 
 extern TipoServidor servidor;
-extern TipoLedDisplay led_display;
+extern TipoLedDisplay led_display[MAX_PERIFERICOS_CONECTADOS];
 
 PI_THREAD (thread_conexion);
-void enviarConsola(const char *format, ...);
+void enviarConsola(int partida, const char *format, ...);
 void cerrarConexion();
 int compruebaServidorHabilitado();
 void habilitarServidor();

@@ -134,7 +134,7 @@ void ProcesaTeclaPulsada (fsm_t* this) {
 	piLock(SYSTEM_FLAGS_KEY);
 	p_teclado->flags &= ~FLAG_TECLA_PULSADA;
 	piUnlock(SYSTEM_FLAGS_KEY);
-	explora_teclado(tecladoTL04[p_teclado->teclaPulsada.row][p_teclado->teclaPulsada.col]);
+	explora_teclado(tecladoTL04[p_teclado->teclaPulsada.row][p_teclado->teclaPulsada.col], p_teclado->partida);
 	p_teclado->teclaPulsada.row = -1;
 	p_teclado->teclaPulsada.col = -1;
 }

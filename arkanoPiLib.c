@@ -750,7 +750,7 @@ void FinalJuego (fsm_t* this) {
 
 	// Imprimimos por consola los resultados de la partida
 	piLock(STD_IO_BUFFER_KEY);
-	enviarConsola("\nHas destruido %d ladrillos. ¡Enhorabuena!\n"
+	enviarConsola(p_arkanoPi->partida, "\nHas destruido %d ladrillos. ¡Enhorabuena!\n"
 				  "Pulsa cualquier tecla para jugar de nuevo.\n"
 				  "Si quieres salir pulsa la tecla F.\n", NUM_COLUMNAS_DISPLAY * 2 - CalculaLadrillosRestantes(&(p_arkanoPi->ladrillos)));
 	fflush(stdout);
@@ -758,7 +758,7 @@ void FinalJuego (fsm_t* this) {
 
 	// Pintamos la pantalla final y habilitamos la pantalla para que se muestre
 	piLock(MATRIX_KEY);
-	PintaMensajeInicialPantalla(&(led_display.pantalla), &pantalla_final);
+	PintaMensajeInicialPantalla(&(led_display[p_arkanoPi->partida].pantalla), &pantalla_final);
 	piUnlock(MATRIX_KEY);
 	pseudoWiringPiEnableDisplay(1);
 
@@ -790,12 +790,12 @@ void ReseteaJuego (fsm_t* this) {
 
 	// Imprimimos el saludo y las instrucciones del juego
 	piLock(STD_IO_BUFFER_KEY);
-	mostrarInstruccionesJuego();
+	mostrarInstruccionesJuego(p_arkanoPi->partida);
 	piUnlock(STD_IO_BUFFER_KEY);
 
 	// Pintamos la pantalla inicial
 	piLock(MATRIX_KEY);
-	PintaMensajeInicialPantalla(&(led_display.pantalla), &pantalla_inicial);
+	PintaMensajeInicialPantalla(&(led_display[p_arkanoPi->partida].pantalla), &pantalla_inicial);
 	piUnlock(MATRIX_KEY);
 
 	// Volvemos a habilitar la pantalla
@@ -831,7 +831,7 @@ void ActivarMenu (fsm_t* this) {
 	pseudoWiringPiEnableDisplay(0);
 	// Ponemos que es la primera vez que se muestra un submenú
 	p_arkanoPi->primerAccesoSubmenu = 1;
-	MostrarMenu();
+	MostrarMenu(p_arkanoPi->partida);
 }
 
 void MostrarSubmenuPelotas (fsm_t* this) {
@@ -861,7 +861,7 @@ void MostrarSubmenuPelotas (fsm_t* this) {
 	} else {
 		printf("\033[A\033[2K\033[A\033[2K\033[A\033[2K\033[A");
 	}
-	enviarConsola("\nPulse el número 7 para disminuir el número de pelotas o 9 para aumentarlo.\nActualmente hay %d pelotas.\nPara volver al menú pulse 5.\n", p_arkanoPi->numeroPelotas);
+	enviarConsola(p_arkanoPi->partida, "\nPulse el número 7 para disminuir el número de pelotas o 9 para aumentarlo.\nActualmente hay %d pelotas.\nPara volver al menú pulse 5.\n", p_arkanoPi->numeroPelotas);
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
 }
@@ -890,9 +890,9 @@ void MostrarSubmenuParedes (fsm_t* this) {
 		printf("\033[A\033[2K\033[A\033[2K\033[A\033[2K\033[A");
 	}
 	if (p_arkanoPi->paredesHabilitadas)
-		enviarConsola("\nPulse el número 7 para deshabilitar las paredes o 9 para habilitarlo.\nActualmente están habilitadas.\nPara volver al menú pulse 5.\n");
+		enviarConsola(p_arkanoPi->partida, "\nPulse el número 7 para deshabilitar las paredes o 9 para habilitarlo.\nActualmente están habilitadas.\nPara volver al menú pulse 5.\n");
 	else
-		enviarConsola("\nPulse el número 7 para deshabilitar las paredes o 9 para habilitarlo.\nActualmente están deshabilitadas.\nPara volver al menú pulse 5.\n");
+		enviarConsola(p_arkanoPi->partida, "\nPulse el número 7 para deshabilitar las paredes o 9 para habilitarlo.\nActualmente están deshabilitadas.\nPara volver al menú pulse 5.\n");
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
 }
@@ -931,9 +931,9 @@ void MostrarSubmenuTCP (fsm_t* this) {
 		printf("\033[A\033[2K\033[A\033[2K\033[A\033[2K\033[A");
 	}
 	if (compruebaServidorHabilitado())
-		enviarConsola("\nPulse el número 7 para deshabilitar la conexión TCP o 9 para habilitarlo.\nActualmente está habilitado.\nPara volver al menú pulse 5.\n");
+		enviarConsola(p_arkanoPi->partida, "\nPulse el número 7 para deshabilitar la conexión TCP o 9 para habilitarlo.\nActualmente está habilitado.\nPara volver al menú pulse 5.\n");
 	else
-		enviarConsola("\nPulse el número 7 para deshabilitar la conexión TCP o 9 para habilitarlo.\nActualmente está deshabilitado.\nPara volver al menú pulse 5.\n");
+		enviarConsola(p_arkanoPi->partida, "\nPulse el número 7 para deshabilitar la conexión TCP o 9 para habilitarlo.\nActualmente está deshabilitado.\nPara volver al menú pulse 5.\n");
 	//printf("\033[A\033[A"); // Para reescribir sobre las líneas anteriores.
 	// \u001b[1G is a "Cursor Horizontal Absolute" code. The 1 means it tries to move the cursor to the first character of the line.
 	// \u001b[2K is a "Erase in Line" code. The 2 makes it mean "Erase the entire line".
@@ -954,7 +954,7 @@ void MostrarSubmenuAyuda (fsm_t* this) {
 
 	pseudoWiringPiEnableDisplay(0);
 	piLock(STD_IO_BUFFER_KEY);
-	mostrarInstruccionesJuego();
+	mostrarInstruccionesJuego(p_arkanoPi->partida);
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
 }

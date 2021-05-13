@@ -51,6 +51,7 @@ typedef struct {
 	TipoTecla teclaPulsada; // Variable que almacena la ultima tecla pulsada
 	tmr_t* tmr_duracion_columna; // Temporizador responsable de medir el tiempo de activacion de cada columna
 	int flags; // Variable para gestion de flags especificamente ligados a la gestion del teclado
+	int partida; // Partida actual de la que se han cogido las teclas
 } TipoTeclado;
 
 extern TipoTeclado teclado;

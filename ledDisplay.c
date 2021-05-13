@@ -87,9 +87,9 @@ void ExcitaColumnas(int columna) {
 	for (int i = 0; i < NUM_PINES_CONTROL_COLUMNAS_DISPLAY; i++) {
 		// Ponemos los pines del descodificador de la columna a HIGH o a LOW en función de la columna que seleccionamos
 		if (columnaBinaria[columna][i] == 1)
-			digitalWrite(led_display.pines_control_columnas[i], HIGH);
+			digitalWrite(led_display[0].pines_control_columnas[i], HIGH);
 		else
-			digitalWrite(led_display.pines_control_columnas[i], LOW);
+			digitalWrite(led_display[0].pines_control_columnas[i], LOW);
 	}
 }
 
@@ -157,7 +157,7 @@ void ActualizaExcitacionDisplay (fsm_t* this) {
 	piUnlock(MATRIX_KEY);
 
 	// Reseteamos el temporizador
-	tmr_startms((tmr_t*) (led_display.tmr_refresco_display), TIMEOUT_COLUMNA_DISPLAY);
+	tmr_startms((tmr_t*) (led_display[0].tmr_refresco_display), TIMEOUT_COLUMNA_DISPLAY);
 
 }
 
@@ -169,6 +169,6 @@ void timer_refresco_display_isr (union sigval value) {
 	// A completar por el alumno...
 	// ...
 	piLock(SYSTEM_FLAGS_KEY);
-	led_display.flags |= FLAG_TIMEOUT_COLUMNA_DISPLAY;
+	led_display[0].flags |= FLAG_TIMEOUT_COLUMNA_DISPLAY;
 	piUnlock(SYSTEM_FLAGS_KEY);
 }
