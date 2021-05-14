@@ -56,9 +56,9 @@ void ActualizaExcitacionTecladoGPIO (int columna) {
 	for (int i = 0; i < NUM_COLUMNAS_TECLADO; i++) {
 		// Ponemos la columna pasado como parámetro a HIGH y el resto a LOW
 		if (i == columna)
-			digitalWrite(teclado.columnas[i], HIGH);
+			digitalWrite(teclado[0].columnas[i], HIGH);
 		else
-			digitalWrite(teclado.columnas[i], LOW);
+			digitalWrite(teclado[0].columnas[i], LOW);
 	}
 	piUnlock(KEYBOARD_KEY);
 }
@@ -115,9 +115,9 @@ void TecladoExcitaColumna (fsm_t* this) {
 
 	// Se cambia a la columna siguiente
 	if (p_teclado->columna_actual == COLUMNA_4) {
-		teclado.columna_actual = COLUMNA_1;
+		teclado[0].columna_actual = COLUMNA_1;
 	} else {
-		teclado.columna_actual++;
+		teclado[0].columna_actual++;
 	}
 
 	// Llamada a ActualizaExcitacionTecladoGPIO con columna a activar como argumento
@@ -149,18 +149,18 @@ void teclado_fila_1_isr (void) {
 	// Hecho
 
 	// Pin event (key / button event) debouncing procedure
-	if (millis() < teclado.debounceTime[FILA_1]) {
-		teclado.debounceTime[FILA_1] = millis() + DEBOUNCE_TIME;
+	if (millis() < teclado[0].debounceTime[FILA_1]) {
+		teclado[0].debounceTime[FILA_1] = millis() + DEBOUNCE_TIME;
 		return;
 	}
 
 	piLock(SYSTEM_FLAGS_KEY);
-	teclado.teclaPulsada.row = FILA_1;
-	teclado.teclaPulsada.col = teclado.columna_actual;
-	teclado.flags |= FLAG_TECLA_PULSADA;
+	teclado[0].teclaPulsada.row = FILA_1;
+	teclado[0].teclaPulsada.col = teclado[0].columna_actual;
+	teclado[0].flags |= FLAG_TECLA_PULSADA;
 	piUnlock(SYSTEM_FLAGS_KEY);
 
-	teclado.debounceTime[FILA_1] = millis() + DEBOUNCE_TIME;
+	teclado[0].debounceTime[FILA_1] = millis() + DEBOUNCE_TIME;
 }
 
 void teclado_fila_2_isr (void) {
@@ -168,18 +168,18 @@ void teclado_fila_2_isr (void) {
 	// Hecho
 
 	// Pin event (key / button event) debouncing procedure
-	if (millis() < teclado.debounceTime[FILA_2]) {
-		teclado.debounceTime[FILA_2] = millis() + DEBOUNCE_TIME;
+	if (millis() < teclado[0].debounceTime[FILA_2]) {
+		teclado[0].debounceTime[FILA_2] = millis() + DEBOUNCE_TIME;
 		return;
 	}
 
 	piLock(SYSTEM_FLAGS_KEY);
-	teclado.teclaPulsada.row = FILA_2;
-	teclado.teclaPulsada.col = teclado.columna_actual;
-	teclado.flags |= FLAG_TECLA_PULSADA;
+	teclado[0].teclaPulsada.row = FILA_2;
+	teclado[0].teclaPulsada.col = teclado[0].columna_actual;
+	teclado[0].flags |= FLAG_TECLA_PULSADA;
 	piUnlock(SYSTEM_FLAGS_KEY);
 
-	teclado.debounceTime[FILA_2] = millis() + DEBOUNCE_TIME;
+	teclado[0].debounceTime[FILA_2] = millis() + DEBOUNCE_TIME;
 }
 
 void teclado_fila_3_isr (void) {
@@ -187,18 +187,18 @@ void teclado_fila_3_isr (void) {
 	// Hecho
 
 	// Pin event (key / button event) debouncing procedure
-	if (millis() < teclado.debounceTime[FILA_3]) {
-		teclado.debounceTime[FILA_3] = millis() + DEBOUNCE_TIME;
+	if (millis() < teclado[0].debounceTime[FILA_3]) {
+		teclado[0].debounceTime[FILA_3] = millis() + DEBOUNCE_TIME;
 		return;
 	}
 
 	piLock(SYSTEM_FLAGS_KEY);
-	teclado.teclaPulsada.row = FILA_3;
-	teclado.teclaPulsada.col = teclado.columna_actual;
-	teclado.flags |= FLAG_TECLA_PULSADA;
+	teclado[0].teclaPulsada.row = FILA_3;
+	teclado[0].teclaPulsada.col = teclado[0].columna_actual;
+	teclado[0].flags |= FLAG_TECLA_PULSADA;
 	piUnlock(SYSTEM_FLAGS_KEY);
 
-	teclado.debounceTime[FILA_3] = millis() + DEBOUNCE_TIME;
+	teclado[0].debounceTime[FILA_3] = millis() + DEBOUNCE_TIME;
 }
 
 void teclado_fila_4_isr (void) {
@@ -206,24 +206,24 @@ void teclado_fila_4_isr (void) {
 	// Hecho
 
 	// Pin event (key / button event) debouncing procedure
-	if (millis() < teclado.debounceTime[FILA_4]) {
-		teclado.debounceTime[FILA_4] = millis() + DEBOUNCE_TIME;
+	if (millis() < teclado[0].debounceTime[FILA_4]) {
+		teclado[0].debounceTime[FILA_4] = millis() + DEBOUNCE_TIME;
 		return;
 	}
 
 	piLock(SYSTEM_FLAGS_KEY);
-	teclado.teclaPulsada.row = FILA_4;
-	teclado.teclaPulsada.col = teclado.columna_actual;
-	teclado.flags |= FLAG_TECLA_PULSADA;
+	teclado[0].teclaPulsada.row = FILA_4;
+	teclado[0].teclaPulsada.col = teclado[0].columna_actual;
+	teclado[0].flags |= FLAG_TECLA_PULSADA;
 	piUnlock(SYSTEM_FLAGS_KEY);
 
-	teclado.debounceTime[FILA_4] = millis() + DEBOUNCE_TIME;
+	teclado[0].debounceTime[FILA_4] = millis() + DEBOUNCE_TIME;
 }
 
 void timer_duracion_columna_isr (union sigval value) {
 	// A completar por el alumno
 	// Hecho
 	piLock(SYSTEM_FLAGS_KEY);
-	teclado.flags |= FLAG_TIMEOUT_COLUMNA_TECLADO;
+	teclado[0].flags |= FLAG_TIMEOUT_COLUMNA_TECLADO;
 	piUnlock(SYSTEM_FLAGS_KEY);
 }

@@ -37,6 +37,7 @@ typedef struct {
 	tmr_t* timer_pantalla; // Envía una pantalla nueva cada tiempo de refresco de pantalla
 	int servidorHabilitado; // Habilita el servidor o lo deshabilita
 	pthread_t thread_acepta_perifericos; // Thread que acepta los perifericos que se pueden conectar
+	int partidaMensajeActual; // Entero que identifica la partida a la que se debe enviar el mensaje actualmente guardado
 } TipoServidor;
 
 
@@ -44,7 +45,7 @@ typedef struct {
 #define FLAG_TCP_MENSAJE	0x02
 
 extern TipoServidor servidor;
-extern TipoLedDisplay led_display[MAX_PERIFERICOS_CONECTADOS];
+extern TipoLedDisplay led_display[MAX_PERIFERICOS_CONECTADOS + 1];
 
 PI_THREAD (thread_conexion);
 void enviarConsola(int partida, const char *format, ...);

@@ -24,6 +24,8 @@
 #define	DEBOUNCE_TIME			160
 #define TIMEOUT_ACTUALIZA_JUEGO 1000
 
+#define MAX_PERIFERICOS_CONECTADOS 2
+
 // A 'key' which we can lock and unlock - values are 0 through 3
 //	This is interpreted internally as a pthread_mutex by wiringPi
 //	which is hiding some of that to make life simple.
@@ -92,6 +94,6 @@ enum fsm_state {
 	WAIT_PAUSE,
 	WAIT_END};
 
-extern int flags;
+extern int flags[MAX_PERIFERICOS_CONECTADOS + 1];
 
 #endif /* SYSTEMLIB_H_ */
