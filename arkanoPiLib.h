@@ -15,6 +15,7 @@ void cerrarConexion();
 int compruebaServidorHabilitado();
 void habilitarServidor();
 
+int * timer_access_flags (int partida);
 
 enum t_direccion {
 	ARRIBA_IZQUIERDA,
@@ -62,6 +63,7 @@ typedef struct {
 	int paredesHabilitadas;
 	int primerAccesoSubmenu;
 	int partida; // Número de la partida que se juega con esta estructura arkanoPi
+	int flags; // Flags de cada partida
 	tmr_t* tmr_actualizacion_juego;
 } tipo_arkanoPi;
 

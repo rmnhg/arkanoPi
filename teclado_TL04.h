@@ -56,10 +56,10 @@ typedef struct {
 	int partida; // Partida actual de la que se han cogido las teclas
 } TipoTeclado;
 
-extern TipoTeclado teclado[MAX_PERIFERICOS_CONECTADOS + 1];
+extern TipoTeclado teclado;
 extern fsm_trans_t fsm_trans_excitacion_columnas[];
 extern fsm_trans_t fsm_trans_deteccion_pulsaciones[];
-extern int flags[MAX_PERIFERICOS_CONECTADOS + 1]; // Flags generales de sistema (necesario para comunicacion inter-FMs)
+extern char tecladoTL04[4][4];
 
 //------------------------------------------------------
 // PROCEDIMIENTOS DE INICIALIZACION DE LOS OBJETOS ESPECIFICOS

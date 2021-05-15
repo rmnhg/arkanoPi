@@ -55,4 +55,5 @@ void tmr_actualizacion_juego_isr(union sigval value);
 PI_THREAD(thread_explora_teclado_PC);
 void explora_teclado(int teclaPulsada, int partida);
 
+
 #endif /* ARKANOPI_H_ */

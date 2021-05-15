@@ -137,17 +137,34 @@ void timer_envio_pantalla_isr(union sigval value) {
 	if (servidor.servidorHabilitado) {
 		for (int periferico = 0; periferico < MAX_PERIFERICOS_CONECTADOS; periferico++) {
 			// Se transmite la pantalla
-			for (int i = 0; i < NUM_FILAS_DISPLAY; i++) {
-				for (int j = 0; j < NUM_COLUMNAS_DISPLAY; j++) {
-					switch(led_display[servidor.periferico[periferico].partida].pantalla.matriz[i][j]) {
-						case 1:
-							str_pantalla[i*NUM_COLUMNAS_DISPLAY + j] = '1';
-							break;
-						case 8:
-							str_pantalla[i*NUM_COLUMNAS_DISPLAY + j] = '8';
-							break;
-						default:
-							str_pantalla[i*NUM_COLUMNAS_DISPLAY + j] = '0';
+			if (servidor.periferico[periferico].partida == 0) {
+				for (int i = 0; i < NUM_FILAS_DISPLAY; i++) {
+					for (int j = 0; j < NUM_COLUMNAS_DISPLAY; j++) {
+						switch(led_display.pantalla.matriz[i][j]) {
+							case 1:
+								str_pantalla[i*NUM_COLUMNAS_DISPLAY + j] = '1';
+								break;
+							case 8:
+								str_pantalla[i*NUM_COLUMNAS_DISPLAY + j] = '8';
+								break;
+							default:
+								str_pantalla[i*NUM_COLUMNAS_DISPLAY + j] = '0';
+						}
+					}
+				}	
+			} else {
+				for (int i = 0; i < NUM_FILAS_DISPLAY; i++) {
+					for (int j = 0; j < NUM_COLUMNAS_DISPLAY; j++) {
+						switch(pantallas_remotas[servidor.periferico[periferico].partida - 1].matriz[i][j]) {
+							case 1:
+								str_pantalla[i*NUM_COLUMNAS_DISPLAY + j] = '1';
+								break;
+							case 8:
+								str_pantalla[i*NUM_COLUMNAS_DISPLAY + j] = '8';
+								break;
+							default:
+								str_pantalla[i*NUM_COLUMNAS_DISPLAY + j] = '0';
+						}
 					}
 				}
 			}
@@ -205,13 +222,13 @@ PI_THREAD(thread_obtener_mensajes) {
 						error("No se pudo crear el thread de thread_aceptar_periferico.\n");
 					}
 				} else {
-					if (!strcmp(servidor.mensaje, "$Desconectar_client\n")) {
+					if (strstr(servidor.mensaje, "$Desconectar_client") != NULL) {
 						desconectarPeriferico(idPeriferico);
-					} else if (!strcmp(servidor.mensaje, "$Cambiar_a_partida_0\n")) {
+					} else if (strstr(servidor.mensaje, "$Cambiar_a_partida_0") != NULL) {
 						servidor.periferico[idPeriferico].partida = 0;
-					} else if (!strcmp(servidor.mensaje, "$Cambiar_a_partida_1\n")) {
+					} else if (strstr(servidor.mensaje, "$Cambiar_a_partida_1") != NULL) {
 						servidor.periferico[idPeriferico].partida = 1;
-					} else if (!strcmp(servidor.mensaje, "$Cambiar_a_partida_2\n")) {
+					} else if (strstr(servidor.mensaje, "$Cambiar_a_partida_2") != NULL) {
 						servidor.periferico[idPeriferico].partida = 2;
 					} else {
 						servidor.flags |= FLAG_TCP_MENSAJE;
@@ -305,7 +322,7 @@ void iniciarServidor() {
  * Thread que inicia y gestiona la conexión TCP de forma general.
  */
 PI_THREAD (thread_conexion) {
-	int partidaActual = -1;
+	int partidaActual = -1, posicionTecla = -1, fila = -1, columna = -1;
 	servidor.servidorHabilitado = 1;
 	iniciarServidor();
 
@@ -321,39 +338,20 @@ PI_THREAD (thread_conexion) {
 				break;
 			} else if (servidor.flags & FLAG_TCP_MENSAJE)  {
 				partidaActual = servidor.partidaMensajeActual;
-				servidor.flags &= ~FLAG_TCP_MENSAJE;
+				posicionTecla = atoi((const char *)servidor.mensaje);
+				fila = posicionTecla / 10;
+				columna = posicionTecla % 10;
 				// Llegará XY siendo X la fila e Y la columna de la tecla pulsada
-				for (int i = 0; i < 2; i++) {
-					switch(*(servidor.mensaje + i)) {
-						case '0':
-							if (i == 0)
-								teclado[partidaActual].teclaPulsada.row = FILA_1;
-							else
-								teclado[partidaActual].teclaPulsada.col = COLUMNA_1;
-							break;
-						case '1':
-							if (i == 0)
-								teclado[partidaActual].teclaPulsada.row = FILA_2;
-							else
-								teclado[partidaActual].teclaPulsada.col = COLUMNA_2;
-							break;
-						case '2':
-							if (i == 0)
-								teclado[partidaActual].teclaPulsada.row = FILA_3;
-							else
-								teclado[partidaActual].teclaPulsada.col = COLUMNA_3;
-							break;
-						case '3':
-							if (i == 0)
-								teclado[partidaActual].teclaPulsada.row = FILA_4;
-							else
-								teclado[partidaActual].teclaPulsada.col = COLUMNA_4;
-							break;
-					}
+				if (partidaActual != 0) {
+					explora_teclado(tecladoTL04[fila][columna], partidaActual);
+				} else {
+					teclado.teclaPulsada.row = fila;
+					teclado.teclaPulsada.col = columna;
+					piLock(SYSTEM_FLAGS_KEY);
+					teclado.flags |= FLAG_TECLA_PULSADA;
+					piUnlock(SYSTEM_FLAGS_KEY);
 				}
-				piLock(SYSTEM_FLAGS_KEY);
-				teclado[partidaActual].flags |= FLAG_TECLA_PULSADA;
-				piUnlock(SYSTEM_FLAGS_KEY);
+				servidor.flags &= ~FLAG_TCP_MENSAJE;
 			}
 		}
 	}

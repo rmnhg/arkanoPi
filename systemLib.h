@@ -94,6 +94,4 @@ enum fsm_state {
 	WAIT_PAUSE,
 	WAIT_END};
 
-extern int flags[MAX_PERIFERICOS_CONECTADOS + 1];
-
 #endif /* SYSTEMLIB_H_ */
