@@ -82,27 +82,29 @@ PI_THREAD(thread_aceptar_periferico) {
 }
 
 /**
- * Envía el texto de la string str a un periférico en concreto.
+ * Envía el texto de la string str a los periféricos que estén jugando la partida pasada como parámetro.
  */
-void enviarTexto(char * str, int periferico) {
-	if (servidor.perifericos_conectados && servidor.servidorHabilitado) {
-		if (servidor.periferico[periferico].conexion_fd != -1) {
-			if (send(servidor.periferico[periferico].conexion_fd, str, strlen(str), MSG_NOSIGNAL) < 0) {
-				#ifdef MOSTRAR_MENSAJES
-				piLock(STD_IO_BUFFER_KEY);
-				#ifdef DEBUG
-				perror("send");
-				#endif
-				printf("El periférico con id %d se ha desconectado.\nEscuchando de nuevo conexión con periférico en el puerto %d.\n", periferico, servidor.puerto);
-				piUnlock(STD_IO_BUFFER_KEY);
-				#endif
-				servidor.perifericos_conectados--;
-				close(servidor.periferico[periferico].conexion_fd);
-				servidor.periferico[periferico].conexion_fd = -1;
-				servidor.periferico[periferico].supervisado = 'n';
-				// Se comienza a escuchar a perifericos externos
-				if (pthread_create(&(servidor.thread_acepta_perifericos), NULL, thread_aceptar_periferico, NULL) != 0) {
-					error("No se pudo crear el thread de thread_aceptar_periferico.\n");
+void enviarTexto(char * str, int partida) {
+	for (int idPeriferico = 0; idPeriferico < MAX_PERIFERICOS_CONECTADOS; idPeriferico++) {
+		if (servidor.perifericos_conectados && servidor.servidorHabilitado) {
+			if (servidor.periferico[idPeriferico].conexion_fd != -1 && servidor.periferico[idPeriferico].partida == partida) {
+				if (send(servidor.periferico[idPeriferico].conexion_fd, str, strlen(str), MSG_NOSIGNAL) < 0) {
+					#ifdef MOSTRAR_MENSAJES
+					piLock(STD_IO_BUFFER_KEY);
+					#ifdef DEBUG
+					perror("send");
+					#endif
+					printf("El periférico con id %d se ha desconectado.\nEscuchando de nuevo conexión con periférico en el puerto %d.\n", periferico, servidor.puerto);
+					piUnlock(STD_IO_BUFFER_KEY);
+					#endif
+					servidor.perifericos_conectados--;
+					close(servidor.periferico[idPeriferico].conexion_fd);
+					servidor.periferico[idPeriferico].conexion_fd = -1;
+					servidor.periferico[idPeriferico].supervisado = 'n';
+					// Se comienza a escuchar a perifericos externos
+					if (pthread_create(&(servidor.thread_acepta_perifericos), NULL, thread_aceptar_periferico, NULL) != 0) {
+						error("No se pudo crear el thread de thread_aceptar_periferico.\n");
+					}
 				}
 			}
 		}
@@ -117,10 +119,10 @@ void enviarConsola(int partida, const char *format, ...) {
 	// Componemos la string final y la mostramos en la consola (stdout) y la enviamos a los periféricos conectados.
 	va_list arg;
 	va_start(arg, format);
-	if (partida == 0) {
-		vfprintf(stdout, format, arg);
-	}
 	vsprintf(str_consola, format, arg);
+	if (partida == 0) {
+		fprintf(stdout, "%s", str_consola);
+	}
 	va_end(arg);
 	// Sustituimos los saltos de línea por '#' para evitar mandar más de un mensaje por string.
 	// No llegamos al salto del final para que el búffer sepa que ahí acaba el mensaje que se debe enviar.
@@ -131,15 +133,19 @@ void enviarConsola(int partida, const char *format, ...) {
 	enviarTexto(str_consola, partida);
 }
 
+/**
+ * Función de interrupción del timer que recorre todas las pantallas y
+ * las transforma en una string de dígitos consecutivos para su envío.
+ */
 void timer_envio_pantalla_isr(union sigval value) {
 	char str_pantalla[NUM_FILAS_DISPLAY * NUM_COLUMNAS_DISPLAY + 2];
 
 	if (servidor.servidorHabilitado) {
-		for (int periferico = 0; periferico < MAX_PERIFERICOS_CONECTADOS; periferico++) {
+		for (int partida = 0; partida < MAX_PERIFERICOS_CONECTADOS + 1; partida++) {
 			// Se transmite la pantalla
-			if (servidor.periferico[periferico].partida == 0) {
-				for (int i = 0; i < NUM_FILAS_DISPLAY; i++) {
-					for (int j = 0; j < NUM_COLUMNAS_DISPLAY; j++) {
+			for (int i = 0; i < NUM_FILAS_DISPLAY; i++) {
+				for (int j = 0; j < NUM_COLUMNAS_DISPLAY; j++) {
+					if (partida == 0) {
 						switch(led_display.pantalla.matriz[i][j]) {
 							case 1:
 								str_pantalla[i*NUM_COLUMNAS_DISPLAY + j] = '1';
@@ -150,12 +156,8 @@ void timer_envio_pantalla_isr(union sigval value) {
 							default:
 								str_pantalla[i*NUM_COLUMNAS_DISPLAY + j] = '0';
 						}
-					}
-				}	
-			} else {
-				for (int i = 0; i < NUM_FILAS_DISPLAY; i++) {
-					for (int j = 0; j < NUM_COLUMNAS_DISPLAY; j++) {
-						switch(pantallas_remotas[servidor.periferico[periferico].partida - 1].matriz[i][j]) {
+					} else {
+						switch(pantallas_remotas[partida - 1].matriz[i][j]) {
 							case 1:
 								str_pantalla[i*NUM_COLUMNAS_DISPLAY + j] = '1';
 								break;
@@ -168,10 +170,9 @@ void timer_envio_pantalla_isr(union sigval value) {
 					}
 				}
 			}
-
 			str_pantalla[56] = '\n';
 			str_pantalla[57] = '\0';
-			enviarTexto(str_pantalla, periferico);
+			enviarTexto(str_pantalla, partida);
 		}
 
 		tmr_startms((tmr_t*) (servidor.timer_pantalla), TIMEOUT_ENVIO_PANTALLA);
@@ -342,14 +343,16 @@ PI_THREAD (thread_conexion) {
 				fila = posicionTecla / 10;
 				columna = posicionTecla % 10;
 				// Llegará XY siendo X la fila e Y la columna de la tecla pulsada
-				if (partidaActual != 0) {
-					explora_teclado(tecladoTL04[fila][columna], partidaActual);
-				} else {
-					teclado.teclaPulsada.row = fila;
-					teclado.teclaPulsada.col = columna;
-					piLock(SYSTEM_FLAGS_KEY);
-					teclado.flags |= FLAG_TECLA_PULSADA;
-					piUnlock(SYSTEM_FLAGS_KEY);
+				if (partidaActual >= 0 && partidaActual <= MAX_PERIFERICOS_CONECTADOS) {
+					if (partidaActual != 0) {
+						explora_teclado(tecladoTL04[fila][columna], partidaActual);
+					} else {
+						teclado.teclaPulsada.row = fila;
+						teclado.teclaPulsada.col = columna;
+						piLock(SYSTEM_FLAGS_KEY);
+						teclado.flags |= FLAG_TECLA_PULSADA;
+						piUnlock(SYSTEM_FLAGS_KEY);
+					}
 				}
 				servidor.flags &= ~FLAG_TCP_MENSAJE;
 			}

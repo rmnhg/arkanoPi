@@ -149,45 +149,71 @@ void explora_teclado(int teclaPulsada, int partida) {
 		case '1':
 			// Activamos el flag del submenu de pelotas
 			piLock(SYSTEM_FLAGS_KEY);
-			sistema.arkanoPi[partida].flags |= FLAG_MENU_PELOTAS;
+			if (arkanoPi_fsm[partida]->current_state == WAIT_MENU) {
+				sistema.arkanoPi[partida].flags |= FLAG_MENU_PELOTAS;
+			}
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case '2':
 			// Activamos el flag del submenu paredes
 			piLock(SYSTEM_FLAGS_KEY);
-			sistema.arkanoPi[partida].flags |= FLAG_MENU_PAREDES;
+			if (arkanoPi_fsm[partida]->current_state == WAIT_MENU) {
+				sistema.arkanoPi[partida].flags |= FLAG_MENU_PAREDES;
+			}
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case '3':
 			// Activamos el flag del submenu TCP
 			piLock(SYSTEM_FLAGS_KEY);
-			sistema.arkanoPi[partida].flags |= FLAG_MENU_TCP;
+			if (arkanoPi_fsm[partida]->current_state == WAIT_MENU) {
+				sistema.arkanoPi[partida].flags |= FLAG_MENU_TCP;
+			}
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case '5':
-			// Activamos el flag del submenu TCP
+			// Activamos el flaG para ir o volver al menú
 			piLock(SYSTEM_FLAGS_KEY);
-			sistema.arkanoPi[partida].flags |= FLAG_SALIR;
+			switch (arkanoPi_fsm[partida]->current_state) {
+				case WAIT_PELOTAS:
+				case WAIT_PAREDES:
+				case WAIT_TCP:
+				case WAIT_AYUDA:
+					sistema.arkanoPi[partida].flags |= FLAG_SALIR;
+			}
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case '7':
 			// Activamos el flag de menos para los submenús
 			piLock(SYSTEM_FLAGS_KEY);
-			sistema.arkanoPi[partida].flags |= FLAG_MENOS;
+			switch (arkanoPi_fsm[partida]->current_state) {
+				case WAIT_PELOTAS:
+				case WAIT_PAREDES:
+				case WAIT_TCP:
+				case WAIT_AYUDA:
+					sistema.arkanoPi[partida].flags |= FLAG_MENOS;
+					break;
+			}
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case '9':
 			// Activamos el flag de más para los submenús
 			piLock(SYSTEM_FLAGS_KEY);
-			sistema.arkanoPi[partida].flags |= FLAG_MAS;
+			switch (arkanoPi_fsm[partida]->current_state) {
+				case WAIT_PELOTAS:
+				case WAIT_PAREDES:
+				case WAIT_TCP:
+				case WAIT_AYUDA:
+					sistema.arkanoPi[partida].flags |= FLAG_MAS;
+					break;
+			}
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case '4':
 			// Activamos el flag del submenu de ayuda
-			piLock(SYSTEM_FLAGS_KEY);
-			sistema.arkanoPi[partida].flags |= FLAG_MENU_AYUDA;
-			piUnlock(SYSTEM_FLAGS_KEY);
-			if (arkanoPi_fsm[partida]->current_state != WAIT_MENU) {
+			if (arkanoPi_fsm[partida]->current_state == WAIT_MENU) {
+				piLock(SYSTEM_FLAGS_KEY);
+				sistema.arkanoPi[partida].flags |= FLAG_MENU_AYUDA;
+				piUnlock(SYSTEM_FLAGS_KEY);
 				break;
 			}
 		case 'A':
@@ -196,9 +222,16 @@ void explora_teclado(int teclaPulsada, int partida) {
 			// Hecho
 			// Activamos los flags de inicio juego (para el menú), de movimiento y de boton pulsado
 			piLock(SYSTEM_FLAGS_KEY);
-			sistema.arkanoPi[partida].flags |= FLAG_INICIO_JUEGO;
-			sistema.arkanoPi[partida].flags |= FLAG_MOV_IZQUIERDA;
-			sistema.arkanoPi[partida].flags |= FLAG_BOTON;
+			switch (arkanoPi_fsm[partida]->current_state) {
+				case WAIT_START:
+				case WAIT_END:
+				case WAIT_MENU:
+					sistema.arkanoPi[partida].flags |= FLAG_BOTON;
+					break;
+				case WAIT_PUSH:
+					sistema.arkanoPi[partida].flags |= FLAG_MOV_IZQUIERDA;
+					break;
+			}
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case 'C':
@@ -207,15 +240,20 @@ void explora_teclado(int teclaPulsada, int partida) {
 			// Hecho
 			// Activamos los flags de timer y de boton pulsado
 			piLock(SYSTEM_FLAGS_KEY);
-			sistema.arkanoPi[partida].flags |= FLAG_TIMER_JUEGO;
-			if (arkanoPi_fsm[partida]->current_state != WAIT_MENU) {
-				sistema.arkanoPi[partida].flags |= FLAG_BOTON;
+			switch (arkanoPi_fsm[partida]->current_state) {
+				case WAIT_START:
+				case WAIT_END:
+					sistema.arkanoPi[partida].flags |= FLAG_BOTON;
+					break;
+				case WAIT_PUSH:
+					sistema.arkanoPi[partida].flags |= FLAG_TIMER_JUEGO;
+					break;
 			}
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case '6':
 			// El 6 no inicia el juego mientras estamos en el menú
-			if (arkanoPi_fsm[partida]->current_state != WAIT_MENU) {
+			if (arkanoPi_fsm[partida]->current_state == WAIT_MENU) {
 				break;
 			}
 		case 'D':
@@ -224,9 +262,16 @@ void explora_teclado(int teclaPulsada, int partida) {
 			// Hecho
 			// Activamos los flags de inicio juego (para el menú), de movimiento y de boton pulsado
 			piLock(SYSTEM_FLAGS_KEY);
-			sistema.arkanoPi[partida].flags |= FLAG_INICIO_JUEGO;
-			sistema.arkanoPi[partida].flags |= FLAG_MOV_DERECHA;
-			sistema.arkanoPi[partida].flags |= FLAG_BOTON;
+			switch (arkanoPi_fsm[partida]->current_state) {
+				case WAIT_START:
+				case WAIT_END:
+				case WAIT_MENU:
+					sistema.arkanoPi[partida].flags |= FLAG_BOTON;
+					break;
+				case WAIT_PUSH:
+					sistema.arkanoPi[partida].flags |= FLAG_MOV_DERECHA;
+					break;
+			}
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
 		case 'B':
@@ -235,9 +280,14 @@ void explora_teclado(int teclaPulsada, int partida) {
 			// Hecho
 			// Activamos los flags de movimiento y de boton pulsado
 			piLock(SYSTEM_FLAGS_KEY);
-			sistema.arkanoPi[partida].flags |= FLAG_PAUSA;
-			if (arkanoPi_fsm[partida]->current_state != WAIT_MENU) {
-				sistema.arkanoPi[partida].flags |= FLAG_BOTON;
+			switch (arkanoPi_fsm[partida]->current_state) {
+				case WAIT_START:
+				case WAIT_END:
+					sistema.arkanoPi[partida].flags |= FLAG_BOTON;
+					break;
+				case WAIT_PUSH:
+					sistema.arkanoPi[partida].flags |= FLAG_PAUSA;
+					break;
 			}
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;
@@ -249,7 +299,8 @@ void explora_teclado(int teclaPulsada, int partida) {
 			enviarConsola(partida, "\nGracias por jugar a arkanoPi.\n");
 			piUnlock(STD_IO_BUFFER_KEY);
 			// Destruimos los timers anteriormente creados para liberar la memoria
-			tmr_destroy((tmr_t*) (sistema.arkanoPi[partida].tmr_actualizacion_juego));
+			for (int i = 0; i < MAX_PERIFERICOS_CONECTADOS + 1; i++)
+				tmr_destroy((tmr_t*) (sistema.arkanoPi[i].tmr_actualizacion_juego));
 			tmr_destroy((tmr_t*) (teclado.tmr_duracion_columna));
 			tmr_destroy((tmr_t*) (led_display.tmr_refresco_display));
 			// Se cierran las conexiones
@@ -259,6 +310,12 @@ void explora_teclado(int teclaPulsada, int partida) {
 		default:
 			// Activamos el flag de boton pulsado
 			piLock(SYSTEM_FLAGS_KEY);
+			switch (arkanoPi_fsm[partida]->current_state) {
+				case WAIT_START:
+				case WAIT_END:
+					sistema.arkanoPi[partida].flags |= FLAG_BOTON;
+					break;
+			}
 			sistema.arkanoPi[partida].flags |= FLAG_BOTON;
 			piUnlock(SYSTEM_FLAGS_KEY);
 			break;

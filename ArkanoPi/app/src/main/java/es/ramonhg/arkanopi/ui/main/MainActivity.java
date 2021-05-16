@@ -13,7 +13,6 @@ import es.ramonhg.arkanopi.ui.model.MainViewModel;
 
 public class MainActivity extends AppCompatActivity {
     private MainViewModel mViewModel;
-    private final boolean debug = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,17 +69,38 @@ public class MainActivity extends AppCompatActivity {
                 } else {  // Es un mensaje de control
                     if (processTCPMessage(message).contains("$Servidor_cerrado")) {
                         mViewModel.setTcpClient(null);
+                        SettingsFragment settingsFragment = ((SettingsFragment) getSupportFragmentManager().findFragmentByTag("SettingsFragment"));
+                        if (settingsFragment != null)
+                            settingsFragment.enableNewConnection();
                         Toast.makeText(getBaseContext(), "Se ha desconectado del servidor", Toast.LENGTH_SHORT).show();
                     }
                 }
+            }
+        }, new TCPClient.OnInitialSetup() {
+            @Override
+            public void sendSetupCommands() {
+                mViewModel.sendPartidaActual();
+            }
+        }, new TCPClient.OnError() {
+            @Override
+            public void errorInConnection() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mViewModel.setTcpClient(null);
+                        SettingsFragment settingsFragment = ((SettingsFragment) getSupportFragmentManager().findFragmentByTag("SettingsFragment"));
+                        if (settingsFragment != null)
+                            settingsFragment.enableNewConnection();
+                        Toast.makeText(getBaseContext(), "¡Ha habido un error! ¡Se detiene la conexión!", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         }, new TCPClient.OnExternalCommunication() {
             @Override
             public void showInfoMessage(String message) {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        if (debug) // Ralentiza mucho la pantalla
-                            Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
                     }
                 });
             }

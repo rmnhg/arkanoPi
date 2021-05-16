@@ -230,6 +230,10 @@ void ResetArkanoPi(tipo_arkanoPi *p_arkanoPi) {
 				// Si una pelota tiene la misma posición que otra, se cambia su posición
 				if ((i != j) && (posiciones_pelotas[i][0] == posiciones_pelotas[j][0]) && (posiciones_pelotas[i][1] == posiciones_pelotas[j][1])) {
 					InicializaPelota((tipo_pelota*)(&(p_arkanoPi->pelota[i])));
+					//Actualizamos su posición en el array de posiciones
+					posiciones_pelotas[i][0] = p_arkanoPi->pelota[i].x;
+					posiciones_pelotas[i][1] = p_arkanoPi->pelota[i].y;
+					posiciones_pelotas[i][2] = p_arkanoPi->pelota[i].x % 2;
 					// Como hemos cambiado la posición de la pelota, habrá que comprobar e nuevo las condiciones que queremos
 					pelotas_unicas = FALSE;
 					paridad_igual = TRUE;
@@ -584,7 +588,8 @@ void InicializaJuego(fsm_t* this) {
 	piUnlock(STD_IO_BUFFER_KEY);
 
 	// Habilitamos la pantalla emulada
-	pseudoWiringPiEnableDisplay(1);
+	if (p_arkanoPi->partida == 0)
+		pseudoWiringPiEnableDisplay(1);
 
 	// Inicializamos el primer timer
 	tmr_startms((tmr_t*)p_arkanoPi->tmr_actualizacion_juego, TIMEOUT_ACTUALIZA_JUEGO);
@@ -756,7 +761,6 @@ void FinalJuego (fsm_t* this) {
 	tipo_arkanoPi *p_arkanoPi;
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 	// Se crea una string para evitar envíos erróneos por TCP
-	char * ladrillos_restantes = malloc(2*sizeof(char));
 
 	// Eliminamos los flags que estamos atendiendo
 	piLock(SYSTEM_FLAGS_KEY);
@@ -766,10 +770,9 @@ void FinalJuego (fsm_t* this) {
 
 	// Imprimimos por consola los resultados de la partida
 	piLock(STD_IO_BUFFER_KEY);
-	sprintf(ladrillos_restantes, "%d", NUM_COLUMNAS_DISPLAY * 2 - CalculaLadrillosRestantes(&(p_arkanoPi->ladrillos)));
-	enviarConsola(p_arkanoPi->partida, "\nHas destruido %s ladrillos. ¡Enhorabuena!\n"
+	enviarConsola(p_arkanoPi->partida, "\nHas destruido %d ladrillos. ¡Enhorabuena!\n"
 				  "Pulsa cualquier tecla para jugar de nuevo.\n"
-				  "Si quieres salir pulsa la tecla F.\n", ladrillos_restantes);
+				  "Si quieres salir pulsa la tecla F.\n", NUM_COLUMNAS_DISPLAY * 2 - CalculaLadrillosRestantes(&(p_arkanoPi->ladrillos)));
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
 
