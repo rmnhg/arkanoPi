@@ -39,6 +39,8 @@ typedef struct {
 	int servidorHabilitado; // Habilita el servidor o lo deshabilita
 	pthread_t thread_acepta_perifericos; // Thread que acepta los perifericos que se pueden conectar
 	int partidaMensajeActual; // Entero que identifica la partida a la que se debe enviar el mensaje actualmente guardado
+	char * str_consola[MAX_PERIFERICOS_CONECTADOS + 1]; // Strings que almacenan el último texto mostrado por consola en cada partida
+	int aceptandoPerifericos; // Entero que permite comprobar si el thread que acepta periféricos se ha cerrado
 } TipoServidor;
 
 #define FLAG_TCP_ERROR		0x01
@@ -52,6 +54,7 @@ void enviarConsola(int partida, const char *format, ...);
 void cerrarConexion();
 int compruebaServidorHabilitado();
 void habilitarServidor();
+void enviarTexto(char * str, int partida);
 
 void explora_teclado(int teclaPulsada, int partida);
 

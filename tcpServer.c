@@ -42,6 +42,7 @@ int escucha() {
 	}
 	return 0;
 }
+
 /**
  * Thread que está pendiente de aceptar y almacenar hasta MAX_PERIFERICOS_CONECTADOS perifericos.
  * Si hay más perifericos, los acepta y los almacena donde estaban los anteriores perifericos
@@ -52,6 +53,7 @@ PI_THREAD(thread_aceptar_periferico) {
 	TipoPeriferico * p_periferico;
 	char buffer_error[MAX_CARACTERES];
 
+	servidor.aceptandoPerifericos = 1;
 	for (int i = 0; i < MAX_PERIFERICOS_CONECTADOS; i++) {
 		if (servidor.periferico[i].conexion_fd == -1) {
 			p_periferico = &(servidor.periferico[i]);
@@ -74,10 +76,14 @@ PI_THREAD(thread_aceptar_periferico) {
 				servidor.perifericos_conectados++;
 				// A cada periférico se le asigna su propia partida en un principio
 				servidor.periferico[i].partida = i + 1;
+				// Se envía la consola almacenada por si no la recibió anteriormente
+				enviarTexto(servidor.str_consola[i + 1], i + 1);
 				tmr_startms((tmr_t*) (servidor.timer_pantalla), TIMEOUT_ENVIO_PANTALLA);
 			}
 		}
 	}
+	servidor.aceptandoPerifericos = 0;
+
 	return NULL;
 }
 
@@ -85,8 +91,14 @@ PI_THREAD(thread_aceptar_periferico) {
  * Envía el texto de la string str a los periféricos que estén jugando la partida pasada como parámetro.
  */
 void enviarTexto(char * str, int partida) {
+	// Sustituimos los saltos de línea por '#' para evitar mandar más de un mensaje por string.
+	// No llegamos al salto del final para que el búffer sepa que ahí acaba el mensaje que se debe enviar.
+	for (int i = 0; i < strlen(str) - 2; i++) {
+		if (*(str + i) == '\n')
+			*(str + i) = '#';
+	}
 	for (int idPeriferico = 0; idPeriferico < MAX_PERIFERICOS_CONECTADOS; idPeriferico++) {
-		if (servidor.perifericos_conectados && servidor.servidorHabilitado) {
+		if (servidor.perifericos_conectados && (servidor.servidorHabilitado || (strstr(str, "$Servidor_cerrado") != NULL))) {
 			if (servidor.periferico[idPeriferico].conexion_fd != -1 && servidor.periferico[idPeriferico].partida == partida) {
 				if (send(servidor.periferico[idPeriferico].conexion_fd, str, strlen(str), MSG_NOSIGNAL) < 0) {
 					#ifdef MOSTRAR_MENSAJES
@@ -123,13 +135,10 @@ void enviarConsola(int partida, const char *format, ...) {
 	if (partida == 0) {
 		fprintf(stdout, "%s", str_consola);
 	}
+	// Almacenamos la consola que se envía por si hubiera que enviarla de nuevo
+	bzero(servidor.str_consola[partida], MAX_CARACTERES);
+	sprintf(servidor.str_consola[partida], "%s", str_consola);
 	va_end(arg);
-	// Sustituimos los saltos de línea por '#' para evitar mandar más de un mensaje por string.
-	// No llegamos al salto del final para que el búffer sepa que ahí acaba el mensaje que se debe enviar.
-	for (int i = 0; i < strlen(str_consola) - 2; i++) {
-		if (*(str_consola + i) == '\n')
-			*(str_consola + i) = '#';
-	}
 	enviarTexto(str_consola, partida);
 }
 
@@ -176,6 +185,12 @@ void timer_envio_pantalla_isr(union sigval value) {
 		}
 
 		tmr_startms((tmr_t*) (servidor.timer_pantalla), TIMEOUT_ENVIO_PANTALLA);
+		if (!servidor.aceptandoPerifericos && servidor.perifericos_conectados < MAX_PERIFERICOS_CONECTADOS) {
+			// Se pueden conectar más periféricos. Se inicia el thread acepta periféricos.
+			if (pthread_create(&(servidor.thread_acepta_perifericos), NULL, thread_aceptar_periferico, NULL) != 0) {
+				error("No se pudo crear el thread de thread_aceptar_periferico.\n");
+			}
+		}
 	}
 }
 
@@ -204,7 +219,7 @@ PI_THREAD(thread_obtener_mensajes) {
 			break;
 		if (servidor.perifericos_conectados && !(servidor.flags & FLAG_TCP_MENSAJE)) {
 			if (servidor.periferico[idPeriferico].conexion_fd != -1) {
-				bzero(servidor.mensaje, sizeof(servidor.mensaje)); 
+				bzero(servidor.mensaje, sizeof(servidor.mensaje));
 				if(read(servidor.periferico[idPeriferico].conexion_fd, servidor.mensaje, sizeof(servidor.mensaje)) <= 0) {
 					#ifdef MOSTRAR_MENSAJES
 					piLock(STD_IO_BUFFER_KEY);
@@ -227,10 +242,16 @@ PI_THREAD(thread_obtener_mensajes) {
 						desconectarPeriferico(idPeriferico);
 					} else if (strstr(servidor.mensaje, "$Cambiar_a_partida_0") != NULL) {
 						servidor.periferico[idPeriferico].partida = 0;
+						// Se envía la consola almacenada en la nueva partida
+						enviarTexto(servidor.str_consola[0], 0);
 					} else if (strstr(servidor.mensaje, "$Cambiar_a_partida_1") != NULL) {
 						servidor.periferico[idPeriferico].partida = 1;
+						// Se envía la consola almacenada en la nueva partida
+						enviarTexto(servidor.str_consola[1], 1);
 					} else if (strstr(servidor.mensaje, "$Cambiar_a_partida_2") != NULL) {
 						servidor.periferico[idPeriferico].partida = 2;
+						// Se envía la consola almacenada en la nueva partida
+						enviarTexto(servidor.str_consola[2], 2);
 					} else {
 						servidor.flags |= FLAG_TCP_MENSAJE;
 						servidor.partidaMensajeActual = servidor.periferico[idPeriferico].partida;
@@ -309,6 +330,10 @@ void iniciarServidor() {
 		error("No se pudo crear el thread de thread_aceptar_periferico.\n");
 		return;
 	}
+	// Se reserva memoria para las strings de la consola
+	for (int partida = 0; partida < MAX_PERIFERICOS_CONECTADOS + 1; partida++) {
+		servidor.str_consola[partida] = (char *) malloc(MAX_CARACTERES * sizeof(char));
+	}
 	// Se comienza a obtener sus mensajes
 	for (int i = 0; i < MAX_PERIFERICOS_CONECTADOS; i++) {
 		err = piThreadCreate(thread_obtener_mensajes);
@@ -366,12 +391,12 @@ PI_THREAD (thread_conexion) {
  */
 void cerrarConexion() {
 	// Para desconectar a todos los periféricos del servidor.
-	// Se cierran las conexiones
+	// Se notifica a los periféricos y se cierran las conexiones
+	for (int partida = 0; partida < MAX_PERIFERICOS_CONECTADOS + 1; partida++) {
+		enviarTexto("$Servidor_cerrado", partida);
+	}
 	servidor.servidorHabilitado = 0;
 	delay(TIMEOUT_ENVIO_PANTALLA);
-	for (int i = 0; i < MAX_PERIFERICOS_CONECTADOS; i++) {
-		enviarTexto("$Servidor_cerrado", i);
-	}
 	pthread_cancel(servidor.thread_acepta_perifericos);
 	//tmr_destroy((tmr_t*) (servidor.timer_pantalla));
 	// Se eliminan las referencias a los clientes

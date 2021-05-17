@@ -387,7 +387,7 @@ int CompruebaBotonPulsado (fsm_t* this) {
 
 	// Comprobamos si el flag del botón ha sido activado
 	piLock(SYSTEM_FLAGS_KEY);
-	result = (p_arkanoPi->flags & FLAG_BOTON);
+	result = (flags[p_arkanoPi->partida] & FLAG_BOTON);
 	piUnlock(SYSTEM_FLAGS_KEY);
 	// A completar por el alumno
 	// Hecho
@@ -402,7 +402,7 @@ int CompruebaPausaPulsada (fsm_t* this) {
 
 	// Comprobamos si el flag del botón de pausa ha sido activado
 	piLock(SYSTEM_FLAGS_KEY);
-	result = (p_arkanoPi->flags & FLAG_PAUSA);
+	result = (flags[p_arkanoPi->partida] & FLAG_PAUSA);
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	return result;
@@ -415,7 +415,7 @@ int CompruebaMovimientoIzquierda(fsm_t* this) {
 
 	// Comprobamos si el flag del movimiento a la izquierda ha sido activado
 	piLock(SYSTEM_FLAGS_KEY);
-	result = (p_arkanoPi->flags & FLAG_MOV_IZQUIERDA);
+	result = (flags[p_arkanoPi->partida] & FLAG_MOV_IZQUIERDA);
 	piUnlock(SYSTEM_FLAGS_KEY);
 	// A completar por el alumno
 	// Hecho
@@ -430,7 +430,7 @@ int CompruebaMovimientoDerecha(fsm_t* this) {
 
 	// Comprobamos si el flag del movimiento a la derecha ha sido activado
 	piLock(SYSTEM_FLAGS_KEY);
-	result = (p_arkanoPi->flags & FLAG_MOV_DERECHA);
+	result = (flags[p_arkanoPi->partida] & FLAG_MOV_DERECHA);
 	piUnlock(SYSTEM_FLAGS_KEY);
 	// A completar por el alumno
 	// Hecho
@@ -445,7 +445,7 @@ int CompruebaTimeoutActualizacionJuego (fsm_t* this) {
 
 	// Comprobamos si el flag del timer del juego ha sido activado
 	piLock(SYSTEM_FLAGS_KEY);
-	result = (p_arkanoPi->flags & FLAG_TIMER_JUEGO);
+	result = (flags[p_arkanoPi->partida] & FLAG_TIMER_JUEGO);
 	piUnlock(SYSTEM_FLAGS_KEY);
 	// A completar por el alumno
 	// Hecho
@@ -460,7 +460,7 @@ int CompruebaFinalJuego(fsm_t* this) {
 
 	// Comprobamos si el flag del fin del juego ha sido activado
 	piLock(SYSTEM_FLAGS_KEY);
-	result = (p_arkanoPi->flags & FLAG_FIN_JUEGO);
+	result = (flags[p_arkanoPi->partida] & FLAG_FIN_JUEGO);
 	piUnlock(SYSTEM_FLAGS_KEY);
 	// A completar por el alumno
 	// Hecho
@@ -475,7 +475,7 @@ int CompruebaNumeroPelotas(fsm_t* this) {
 
 	// Comprobamos si el flag del submenu de número de pelotas está activo
 	piLock(SYSTEM_FLAGS_KEY);
-	result = (p_arkanoPi->flags & FLAG_MENU_PELOTAS);
+	result = (flags[p_arkanoPi->partida] & FLAG_MENU_PELOTAS);
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	return result;
@@ -488,7 +488,7 @@ int CompruebaParedes(fsm_t* this) {
 
 	// Comprobamos si el flag del submenu de paredes está activo
 	piLock(SYSTEM_FLAGS_KEY);
-	result = (p_arkanoPi->flags & FLAG_MENU_PAREDES);
+	result = (flags[p_arkanoPi->partida] & FLAG_MENU_PAREDES);
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	return result;
@@ -501,7 +501,7 @@ int CompruebaTCP(fsm_t* this) {
 
 	// Comprobamos si el flag del submenu de TCP está activo
 	piLock(SYSTEM_FLAGS_KEY);
-	result = (p_arkanoPi->flags & FLAG_MENU_TCP);
+	result = (flags[p_arkanoPi->partida] & FLAG_MENU_TCP);
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	return result;
@@ -514,7 +514,7 @@ int CompruebaAyuda(fsm_t* this) {
 
 	// Comprobamos si el flag del submenu de ayuda está activo
 	piLock(SYSTEM_FLAGS_KEY);
-	result = (p_arkanoPi->flags & FLAG_MENU_AYUDA);
+	result = (flags[p_arkanoPi->partida] & FLAG_MENU_AYUDA);
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	return result;
@@ -527,7 +527,7 @@ int CompruebaMenosPulsado(fsm_t* this) {
 
 	// Comprobamos si el flag del menos está activo
 	piLock(SYSTEM_FLAGS_KEY);
-	result = (p_arkanoPi->flags & FLAG_MENOS);
+	result = (flags[p_arkanoPi->partida] & FLAG_MENOS);
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	return result;
@@ -540,7 +540,7 @@ int CompruebaMasPulsado(fsm_t* this) {
 
 	// Comprobamos si el flag del menos está activo
 	piLock(SYSTEM_FLAGS_KEY);
-	result = (p_arkanoPi->flags & FLAG_MAS);
+	result = (flags[p_arkanoPi->partida] & FLAG_MAS);
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	return result;
@@ -553,7 +553,7 @@ int CompruebaSalirMenuPulsado(fsm_t* this) {
 
 	// Comprobamos si el flag de salir del submenú está activo
 	piLock(SYSTEM_FLAGS_KEY);
-	result = (p_arkanoPi->flags & FLAG_SALIR);
+	result = (flags[p_arkanoPi->partida] & FLAG_SALIR);
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	return result;
@@ -573,10 +573,10 @@ void InicializaJuego(fsm_t* this) {
 
 	// Cancelamos los posibles flags generados por las teclas de control además del flag del botón
 	piLock(SYSTEM_FLAGS_KEY);
-	p_arkanoPi->flags &= ~FLAG_BOTON;
-	p_arkanoPi->flags &= ~FLAG_MOV_DERECHA;
-	p_arkanoPi->flags &= ~FLAG_MOV_IZQUIERDA;
-	p_arkanoPi->flags &= ~FLAG_TIMER_JUEGO;
+	flags[p_arkanoPi->partida] &= ~FLAG_BOTON;
+	flags[p_arkanoPi->partida] &= ~FLAG_MOV_DERECHA;
+	flags[p_arkanoPi->partida] &= ~FLAG_MOV_IZQUIERDA;
+	flags[p_arkanoPi->partida] &= ~FLAG_TIMER_JUEGO;
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	// Inicializamos las variables del juego
@@ -611,7 +611,7 @@ void MuevePalaIzquierda (fsm_t* this) {
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
 	piLock(SYSTEM_FLAGS_KEY);
-	p_arkanoPi->flags &= ~FLAG_MOV_IZQUIERDA;
+	flags[p_arkanoPi->partida] &= ~FLAG_MOV_IZQUIERDA;
 	piUnlock(SYSTEM_FLAGS_KEY);
 	ActualizaPosicionPala(&p_arkanoPi->pala, IZQUIERDA);
 	piLock(MATRIX_KEY);
@@ -632,7 +632,7 @@ void MuevePalaDerecha (fsm_t* this) {
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
 	piLock(SYSTEM_FLAGS_KEY);
-	p_arkanoPi->flags &= ~FLAG_MOV_DERECHA;
+	flags[p_arkanoPi->partida] &= ~FLAG_MOV_DERECHA;
 	piUnlock(SYSTEM_FLAGS_KEY);
 	ActualizaPosicionPala(&p_arkanoPi->pala, DERECHA);
 	piLock(MATRIX_KEY);
@@ -671,8 +671,8 @@ void ActualizarJuego (fsm_t* this) {
 
 	// Eliminamos los flags que ya hemos cubierto
 	piLock(SYSTEM_FLAGS_KEY);
-	p_arkanoPi->flags &= (~FLAG_TIMER_JUEGO);
-	p_arkanoPi->flags &= (~FLAG_BOTON);
+	flags[p_arkanoPi->partida] &= (~FLAG_TIMER_JUEGO);
+	flags[p_arkanoPi->partida] &= (~FLAG_BOTON);
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	for (int i = 0; i < p_arkanoPi->numeroPelotas; i++) {
@@ -697,8 +697,13 @@ void ActualizarJuego (fsm_t* this) {
 				// Si no quedan pelotas en juego se termina la partida
 				if (pelotasEnJuego == 0) {
 					piLock(SYSTEM_FLAGS_KEY);
-					p_arkanoPi->flags |= FLAG_FIN_JUEGO;
+					flags[p_arkanoPi->partida] |= FLAG_FIN_JUEGO;
 					piUnlock(SYSTEM_FLAGS_KEY);
+
+					// Pintamos la pantalla final y habilitamos la pantalla para que se muestre
+					piLock(MATRIX_KEY);
+					PintaMensajeInicialPantalla(p_arkanoPi->p_pantalla, &pantalla_final);
+					piUnlock(MATRIX_KEY);
 					return;
 				}
 				// Si quedan pelotas en juego pero se ha caido esta, se comprueban las demás
@@ -724,8 +729,13 @@ void ActualizarJuego (fsm_t* this) {
 
 				if (CalculaLadrillosRestantes(&(p_arkanoPi->ladrillos)) <= 0){
 					piLock(SYSTEM_FLAGS_KEY);
-					p_arkanoPi->flags |= FLAG_FIN_JUEGO;
+					flags[p_arkanoPi->partida] |= FLAG_FIN_JUEGO;
 					piUnlock(SYSTEM_FLAGS_KEY);
+
+					// Pintamos la pantalla final y habilitamos la pantalla para que se muestre
+					piLock(MATRIX_KEY);
+					PintaMensajeInicialPantalla(p_arkanoPi->p_pantalla, &pantalla_final);
+					piUnlock(MATRIX_KEY);
 					return;
 				}
 			}
@@ -738,8 +748,13 @@ void ActualizarJuego (fsm_t* this) {
 	// Si no quedan pelotas en juego se termina la partida
 	if (pelotasEnJuego == 0) {
 		piLock(SYSTEM_FLAGS_KEY);
-		p_arkanoPi->flags |= FLAG_FIN_JUEGO;
+		flags[p_arkanoPi->partida] |= FLAG_FIN_JUEGO;
 		piUnlock(SYSTEM_FLAGS_KEY);
+
+		// Pintamos la pantalla final y habilitamos la pantalla para que se muestre
+		piLock(MATRIX_KEY);
+		PintaMensajeInicialPantalla(p_arkanoPi->p_pantalla, &pantalla_final);
+		piUnlock(MATRIX_KEY);
 		return;
 	}
 
@@ -769,8 +784,8 @@ void FinalJuego (fsm_t* this) {
 
 	// Eliminamos los flags que estamos atendiendo
 	piLock(SYSTEM_FLAGS_KEY);
-	p_arkanoPi->flags &= ~FLAG_FIN_JUEGO;
-	p_arkanoPi->flags &= ~FLAG_BOTON;
+	flags[p_arkanoPi->partida] &= ~FLAG_FIN_JUEGO;
+	flags[p_arkanoPi->partida] &= ~FLAG_BOTON;
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	// Imprimimos por consola los resultados de la partida
@@ -781,10 +796,6 @@ void FinalJuego (fsm_t* this) {
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
 
-	// Pintamos la pantalla final y habilitamos la pantalla para que se muestre
-	piLock(MATRIX_KEY);
-	PintaMensajeInicialPantalla(p_arkanoPi->p_pantalla, &pantalla_final);
-	piUnlock(MATRIX_KEY);
 	if (p_arkanoPi->partida == 0)
 		pseudoWiringPiEnableDisplay(1);
 
@@ -802,10 +813,10 @@ void ReseteaJuego (fsm_t* this) {
 
 	// Cancelamos los posibles flags generados por las teclas de control además del flag del botón
 	piLock(SYSTEM_FLAGS_KEY);
-	p_arkanoPi->flags &= ~FLAG_BOTON;
-	p_arkanoPi->flags &= ~FLAG_MOV_DERECHA;
-	p_arkanoPi->flags &= ~FLAG_MOV_IZQUIERDA;
-	p_arkanoPi->flags &= ~FLAG_TIMER_JUEGO;
+	flags[p_arkanoPi->partida] &= ~FLAG_BOTON;
+	flags[p_arkanoPi->partida] &= ~FLAG_MOV_DERECHA;
+	flags[p_arkanoPi->partida] &= ~FLAG_MOV_IZQUIERDA;
+	flags[p_arkanoPi->partida] &= ~FLAG_TIMER_JUEGO;
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	// Inicializamos el juego
@@ -844,7 +855,7 @@ void PausarJuego (fsm_t* this) {
 
 	// Cancelamos el flag de pausa
 	piLock(SYSTEM_FLAGS_KEY);
-	p_arkanoPi->flags &= ~FLAG_PAUSA;
+	flags[p_arkanoPi->partida] &= ~FLAG_PAUSA;
 	piUnlock(SYSTEM_FLAGS_KEY);
 }
 
@@ -854,8 +865,8 @@ void ActivarMenu (fsm_t* this) {
 
 	// Cancelamos los flags de salir del submenú y de botón por si estaba activado, para no empezar el juego directamente
 	piLock(SYSTEM_FLAGS_KEY);
-	p_arkanoPi->flags &= ~FLAG_SALIR;
-	p_arkanoPi->flags &= ~FLAG_BOTON;
+	flags[p_arkanoPi->partida] &= ~FLAG_SALIR;
+	flags[p_arkanoPi->partida] &= ~FLAG_BOTON;
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	if (p_arkanoPi->partida == 0) {
@@ -872,17 +883,17 @@ void MostrarSubmenuPelotas (fsm_t* this) {
 
 	// Cancelamos el flag del submenu del número de pelotas
 	piLock(SYSTEM_FLAGS_KEY);
-	p_arkanoPi->flags &= ~FLAG_MENU_PELOTAS;
-	if (p_arkanoPi->flags & FLAG_MAS) {
+	flags[p_arkanoPi->partida] &= ~FLAG_MENU_PELOTAS;
+	if (flags[p_arkanoPi->partida] & FLAG_MAS) {
 		if (p_arkanoPi->numeroPelotas < MAX_PELOTAS) {
 			p_arkanoPi->numeroPelotas++;
 		}
-		p_arkanoPi->flags &= ~FLAG_MAS;
-	} else if (p_arkanoPi->flags & FLAG_MENOS) {
+		flags[p_arkanoPi->partida] &= ~FLAG_MAS;
+	} else if (flags[p_arkanoPi->partida] & FLAG_MENOS) {
 		if (p_arkanoPi->numeroPelotas > 1) {
 			p_arkanoPi->numeroPelotas--;
 		}
-		p_arkanoPi->flags &= ~FLAG_MENOS;
+		flags[p_arkanoPi->partida] &= ~FLAG_MENOS;
 	}
 	piUnlock(SYSTEM_FLAGS_KEY);
 
@@ -908,13 +919,13 @@ void MostrarSubmenuParedes (fsm_t* this) {
 
 	// Cancelamos el flag del submenu de paredes
 	piLock(SYSTEM_FLAGS_KEY);
-	p_arkanoPi->flags &= ~FLAG_MENU_PAREDES;
-	if (p_arkanoPi->flags & FLAG_MAS) {
+	flags[p_arkanoPi->partida] &= ~FLAG_MENU_PAREDES;
+	if (flags[p_arkanoPi->partida] & FLAG_MAS) {
 		p_arkanoPi->paredesHabilitadas = 1;
-		p_arkanoPi->flags &= ~FLAG_MAS;
-	} else if (p_arkanoPi->flags & FLAG_MENOS) {
+		flags[p_arkanoPi->partida] &= ~FLAG_MAS;
+	} else if (flags[p_arkanoPi->partida] & FLAG_MENOS) {
 		p_arkanoPi->paredesHabilitadas = 0;
-		p_arkanoPi->flags &= ~FLAG_MENOS;
+		flags[p_arkanoPi->partida] &= ~FLAG_MENOS;
 	}
 	piUnlock(SYSTEM_FLAGS_KEY);
 
@@ -943,8 +954,8 @@ void MostrarSubmenuTCP (fsm_t* this) {
 
 	// Cancelamos el flag del submenu de TCP
 	piLock(SYSTEM_FLAGS_KEY);
-	p_arkanoPi->flags &= ~FLAG_MENU_TCP;
-	if (p_arkanoPi->flags & FLAG_MAS) {
+	flags[p_arkanoPi->partida] &= ~FLAG_MENU_TCP;
+	if (flags[p_arkanoPi->partida] & FLAG_MAS) {
 		if (!compruebaServidorHabilitado()) {
 			habilitarServidor();
 			// Lanzamos un thread para gestionar las conexiones TCP de los periféricos externos
@@ -954,12 +965,12 @@ void MostrarSubmenuTCP (fsm_t* this) {
 				return;
 			}
 		}
-		p_arkanoPi->flags &= ~FLAG_MAS;
-	} else if (p_arkanoPi->flags & FLAG_MENOS) {
+		flags[p_arkanoPi->partida] &= ~FLAG_MAS;
+	} else if (flags[p_arkanoPi->partida] & FLAG_MENOS) {
 		if (compruebaServidorHabilitado()) {
 			cerrarConexion();
 		}
-		p_arkanoPi->flags &= ~FLAG_MENOS;
+		flags[p_arkanoPi->partida] &= ~FLAG_MENOS;
 	}
 	piUnlock(SYSTEM_FLAGS_KEY);
 
@@ -993,7 +1004,7 @@ void MostrarSubmenuAyuda (fsm_t* this) {
 
 	// Cancelamos el flag del submenu de ayuda
 	piLock(SYSTEM_FLAGS_KEY);
-	p_arkanoPi->flags &= ~FLAG_MENU_AYUDA;
+	flags[p_arkanoPi->partida] &= ~FLAG_MENU_AYUDA;
 	piUnlock(SYSTEM_FLAGS_KEY);
 
 	if (p_arkanoPi->partida == 0) {
@@ -1016,7 +1027,7 @@ void tmr_actualizacion_juego_isr(union sigval value) {
 	for (int partida = 0; partida < MAX_PERIFERICOS_CONECTADOS + 1; partida++) {
 		if (activarTimer[partida]) {
 			activarTimer[partida] = 0;
-			*(timer_access_flags(partida)) |= FLAG_TIMER_JUEGO;
+			flags[partida] |= FLAG_TIMER_JUEGO;
 		}
 	}
 	piUnlock(SYSTEM_FLAGS_KEY);

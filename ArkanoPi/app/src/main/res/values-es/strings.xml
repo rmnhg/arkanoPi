@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ArkanoPi</string>
+    <string name="snackbar_desconectar_cliente">¿Desea desconectarse del servidor?</string>
+    <string name="snackbar_detener_servidor">¿Desea detener el servidor y desconectarse?</string>
+    <string name="snackbar_ok">Sí</string>
 </resources>

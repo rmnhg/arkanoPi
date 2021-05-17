@@ -169,6 +169,7 @@ public class MixedFragment extends Fragment {
                                 public void onClick(View v) {
                                     mViewModel.getTcpClient().sendMessage("$Desconectar_cliente");
                                     mViewModel.setTcpClient(null);
+                                    Toast.makeText(getContext(), "Se ha desconectado del servidor", Toast.LENGTH_SHORT).show();
                                 }
                             })
                             .show();
@@ -187,6 +188,7 @@ public class MixedFragment extends Fragment {
                                 public void onClick(View v) {
                                     mViewModel.getTcpClient().sendMessage("33");
                                     mViewModel.setTcpClient(null);
+                                    Toast.makeText(getContext(), "Se ha desconectado del servidor", Toast.LENGTH_SHORT).show();
                                 }
                             })
                             .show();
