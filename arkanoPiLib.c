@@ -661,6 +661,7 @@ void ActualizarJuego (fsm_t* this) {
 	p_arkanoPi = (tipo_arkanoPi*)(this->user_data);
 
 	int pelotasEnJuego = p_arkanoPi->numeroPelotas;
+	int pelotasCaidas = 0; //Esta variable sirve para contar si no queda ninguna pelota en juego antes de actualizar la pantalla
 
 	/*
 	  Bola 0 caida, ¿bola 1 caida? -> Si (fin juego)
@@ -741,12 +742,12 @@ void ActualizarJuego (fsm_t* this) {
 			}
 			ActualizaPosicionPelota(&(p_arkanoPi->pelota[i]), p_arkanoPi->paredesHabilitadas);
 		} else {
-			pelotasEnJuego--;
+			pelotasCaidas++;;
 		}
 	}
 
 	// Si no quedan pelotas en juego se termina la partida
-	if (pelotasEnJuego == 0) {
+	if (pelotasCaidas == p_arkanoPi->numeroPelotas) {
 		piLock(SYSTEM_FLAGS_KEY);
 		flags[p_arkanoPi->partida] |= FLAG_FIN_JUEGO;
 		piUnlock(SYSTEM_FLAGS_KEY);

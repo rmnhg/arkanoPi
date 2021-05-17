@@ -114,7 +114,7 @@ public class KeyboardFragment extends Fragment {
             @Override
             public boolean onLongClick(View v) {
                 if (mViewModel.getTcpClient() != null) {
-                    Snackbar.make(v, getResources().getText(R.string.snackbar_desconectar_cliente), Snackbar.LENGTH_LONG)
+                    Snackbar.make(v, getResources().getText(R.string.snackbar_detener_servidor), Snackbar.LENGTH_LONG)
                             .setAction(R.string.snackbar_ok, new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
