@@ -1,6 +1,6 @@
 #include "arkanoPiLib.h"
 
-int partidaActualTimer = -1;
+int activarTimer[MAX_PERIFERICOS_CONECTADOS + 1] = {0, 0, 0};
 
 int ladrillos_basico[NUM_FILAS_DISPLAY][NUM_COLUMNAS_DISPLAY] = {
 	{1,1,1,1,1,1,1,1},
@@ -593,7 +593,9 @@ void InicializaJuego(fsm_t* this) {
 
 	// Inicializamos el primer timer
 	tmr_startms((tmr_t*)p_arkanoPi->tmr_actualizacion_juego, TIMEOUT_ACTUALIZA_JUEGO);
-	partidaActualTimer = p_arkanoPi->partida;
+	piLock(SYSTEM_FLAGS_KEY);
+	activarTimer[p_arkanoPi->partida] = 1;
+	piUnlock(SYSTEM_FLAGS_KEY);
 }
 
 // void MuevePalaIzquierda (void): funcion encargada de ejecutar
@@ -748,8 +750,11 @@ void ActualizarJuego (fsm_t* this) {
 	PintaPantallaPorTerminal(p_arkanoPi->p_pantalla);
 	piUnlock(STD_IO_BUFFER_KEY);
 
-	// Inicializamos el primer timer
+	// Inicializamos el timer
 	tmr_startms((tmr_t*)p_arkanoPi->tmr_actualizacion_juego, TIMEOUT_ACTUALIZA_JUEGO);
+	piLock(SYSTEM_FLAGS_KEY);
+	activarTimer[p_arkanoPi->partida] = 1;
+	piUnlock(SYSTEM_FLAGS_KEY);
 	// A completar por el alumno
 	// Hecho
 }
@@ -1008,7 +1013,12 @@ void tmr_actualizacion_juego_isr(union sigval value) {
 	// A completar por el alumno
 	// Hecho
 	piLock(SYSTEM_FLAGS_KEY);
-	*(timer_access_flags(partidaActualTimer)) |= FLAG_TIMER_JUEGO;
+	for (int partida = 0; partida < MAX_PERIFERICOS_CONECTADOS + 1; partida++) {
+		if (activarTimer[partida]) {
+			activarTimer[partida] = 0;
+			*(timer_access_flags(partida)) |= FLAG_TIMER_JUEGO;
+		}
+	}
 	piUnlock(SYSTEM_FLAGS_KEY);
 }
 
