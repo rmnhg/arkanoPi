@@ -143,7 +143,7 @@ public class MixedFragment extends Fragment {
         // Envío de pulsado de teclas
         for (int fila = 0; fila < 4; fila++) {
             for (int columna = 0; columna < 4; columna++) {
-                if (fila != 3 && columna != 3) {
+                if (!(fila == 3 && columna == 3)) {
                     int f = fila;
                     int c = columna;
                     tecla[fila][columna].setOnClickListener(new View.OnClickListener() {
@@ -169,6 +169,7 @@ public class MixedFragment extends Fragment {
                                 public void onClick(View v) {
                                     mViewModel.getTcpClient().sendMessage("$Desconectar_cliente");
                                     mViewModel.setTcpClient(null);
+                                    Toast.makeText(getContext(), "Se ha desconectado del servidor", Toast.LENGTH_SHORT).show();
                                 }
                             })
                             .show();
@@ -181,12 +182,13 @@ public class MixedFragment extends Fragment {
             @Override
             public boolean onLongClick(View v) {
                 if (mViewModel.getTcpClient() != null) {
-                    Snackbar.make(v, getResources().getText(R.string.snackbar_desconectar_cliente), Snackbar.LENGTH_LONG)
+                    Snackbar.make(v, getResources().getText(R.string.snackbar_detener_servidor), Snackbar.LENGTH_LONG)
                             .setAction(R.string.snackbar_ok, new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     mViewModel.getTcpClient().sendMessage("33");
                                     mViewModel.setTcpClient(null);
+                                    Toast.makeText(getContext(), "Se ha desconectado del servidor", Toast.LENGTH_SHORT).show();
                                 }
                             })
                             .show();

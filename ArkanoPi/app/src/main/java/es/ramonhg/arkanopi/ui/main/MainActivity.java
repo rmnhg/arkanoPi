@@ -13,7 +13,6 @@ import es.ramonhg.arkanopi.ui.model.MainViewModel;
 
 public class MainActivity extends AppCompatActivity {
     private MainViewModel mViewModel;
-    private final boolean debug = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             //here the messageReceived method is implemented
             public void messageReceived(String message) {
                 //this method calls the onProgressUpdate
-                if (processTCPMessage(message).toCharArray()[0] != '$') { // No es un mensaje de control
+                if (message != null && processTCPMessage(message).length() > 0 && processTCPMessage(message).toCharArray()[0] != '$') { // No es un mensaje de control
                     ScreenFragment screenFragment = ((ScreenFragment) getSupportFragmentManager().findFragmentByTag("ScreenFragment"));
                     if (screenFragment != null)
                         //screenFragment.updateScreen(processTCPMessage(message));
@@ -67,20 +66,57 @@ public class MainActivity extends AppCompatActivity {
                     if (mixedFragment != null)
                         //mixedFragment.updateScreen(processTCPMessage(message));
                         mViewModel.updateScreen(processTCPMessage(message), mixedFragment.getConsoleTextView(), mixedFragment.getMatrizDeLeds(), mixedFragment.getPrimeraPantallaEscrita(), "MixedFragment");
+
+                    if (screenFragment == null && mixedFragment == null) {
+                        if (processTCPMessage(message).contains("0")) { //Guardamos la pantalla para usarla después
+                            mViewModel.setScreenContent(processTCPMessage(message));
+                        } else { //Guardamos la consola para usarla después
+                            mViewModel.setConsoleContent(processTCPMessage(message).replace('#', '\n'));
+                        }
+                    }
                 } else {  // Es un mensaje de control
-                    if (processTCPMessage(message).contains("$Servidor_cerrado")) {
-                        mViewModel.setTcpClient(null);
-                        Toast.makeText(getBaseContext(), "Se ha desconectado del servidor", Toast.LENGTH_SHORT).show();
+                    if (message != null && processTCPMessage(message).length() > 0 && processTCPMessage(message).contains("$Servidor_cerrado")) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getBaseContext(), "Se ha desconectado del servidor", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        if (mViewModel.getTcpClient() != null) {
+                            mViewModel.getTcpClient().stopClient();
+                            mViewModel.setTcpClient(null);
+                        }
+                        SettingsFragment settingsFragment = ((SettingsFragment) getSupportFragmentManager().findFragmentByTag("SettingsFragment"));
+                        if (settingsFragment != null)
+                            settingsFragment.enableNewConnection();
                     }
                 }
+            }
+        }, new TCPClient.OnInitialSetup() {
+            @Override
+            public void sendSetupCommands() {
+                mViewModel.sendPartidaActual();
+            }
+        }, new TCPClient.OnError() {
+            @Override
+            public void errorInConnection() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mViewModel.setTcpClient(null);
+                        SettingsFragment settingsFragment = ((SettingsFragment) getSupportFragmentManager().findFragmentByTag("SettingsFragment"));
+                        if (settingsFragment != null)
+                            settingsFragment.enableNewConnection();
+                        Toast.makeText(getBaseContext(), "¡Ha habido un error! ¡Se detiene la conexión!", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         }, new TCPClient.OnExternalCommunication() {
             @Override
             public void showInfoMessage(String message) {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        if (debug) // Ralentiza mucho la pantalla
-                            Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
                     }
                 });
             }

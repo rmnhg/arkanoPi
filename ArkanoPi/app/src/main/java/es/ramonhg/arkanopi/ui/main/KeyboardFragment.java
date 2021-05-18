@@ -14,6 +14,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import es.ramonhg.arkanopi.R;
 import es.ramonhg.arkanopi.ui.model.MainViewModel;
 
@@ -73,19 +75,60 @@ public class KeyboardFragment extends Fragment {
         // Envío de pulsado de teclas
         for (int fila = 0; fila < 4; fila++) {
             for (int columna = 0; columna < 4; columna++) {
-                int f = fila;
-                int c = columna;
-                tecla[fila][columna].setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (mViewModel.getTcpClient() != null)
-                            mViewModel.getTcpClient().sendMessage(""+f+c);
-                        else
-                            Toast.makeText(getContext(), "No está conectado al servidor", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                if (!(fila == 3 && columna == 3)) {
+                    int f = fila;
+                    int c = columna;
+                    tecla[fila][columna].setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (mViewModel.getTcpClient() != null)
+                                mViewModel.getTcpClient().sendMessage(""+f+c);
+                            else
+                                Toast.makeText(getContext(), "No está conectado al servidor", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         }
+        // Un toque simple en la F solo desconecta el móvil del servidor.
+        tecla[3][3].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mViewModel.getTcpClient() != null) {
+                    Snackbar.make(v, getResources().getText(R.string.snackbar_desconectar_cliente), Snackbar.LENGTH_LONG)
+                            .setAction(R.string.snackbar_ok, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    mViewModel.getTcpClient().sendMessage("$Desconectar_cliente");
+                                    mViewModel.setTcpClient(null);
+                                    Toast.makeText(getContext(), "Se ha desconectado del servidor", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .show();
+                } else
+                    Toast.makeText(getContext(), "No está conectado al servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+        // Mantener pulsada la F detiene el servidor.
+        tecla[3][3].setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (mViewModel.getTcpClient() != null) {
+                    Snackbar.make(v, getResources().getText(R.string.snackbar_detener_servidor), Snackbar.LENGTH_LONG)
+                            .setAction(R.string.snackbar_ok, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    mViewModel.getTcpClient().sendMessage("33");
+                                    mViewModel.setTcpClient(null);
+                                    Toast.makeText(getContext(), "Se ha desconectado del servidor", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .show();
+                } else
+                    Toast.makeText(getContext(), "No está conectado al servidor", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
     }
 
 

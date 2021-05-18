@@ -13,7 +13,7 @@
 #define MAX_PERIFERICOS_CONECTADOS 2
 
 typedef struct {
-	tipo_arkanoPi arkanoPi[MAX_PERIFERICOS_CONECTADOS];
+	tipo_arkanoPi arkanoPi[MAX_PERIFERICOS_CONECTADOS + 1];
 	// Aqui podrian añadirse otros juegos...
 	// tipo_otroJuego1 otroJuego1;
 	// tipo_otroJuego2 otroJuego2;

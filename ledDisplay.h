@@ -37,7 +37,7 @@ typedef struct {
 	int flags;
 } TipoLedDisplay;
 
-extern TipoLedDisplay led_display[MAX_PERIFERICOS_CONECTADOS];
+extern TipoLedDisplay led_display;
 extern tipo_pantalla pantalla_inicial;
 extern tipo_pantalla pantalla_final;
 extern fsm_trans_t fsm_trans_excitacion_display[];

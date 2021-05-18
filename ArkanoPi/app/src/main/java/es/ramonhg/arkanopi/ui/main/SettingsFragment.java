@@ -65,7 +65,12 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
         selectorPartida.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mViewModel.setPartidaActual(partida[position]);
+                if (!partida[position].equals(mViewModel.getPartidaActual())) {
+                    mViewModel.setPartidaActual(partida[position]);
+                    //Si cambiamos de partida, se deben borrar los datos anteriores porque no son válidos
+                    mViewModel.setConsoleContent(null);
+                    mViewModel.setScreenContent("00000000000000000000000000000000000000000000000000000000");
+                }
             }
 
             @Override

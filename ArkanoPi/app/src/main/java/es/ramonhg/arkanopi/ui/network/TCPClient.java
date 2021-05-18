@@ -15,33 +15,40 @@ public class TCPClient {
     public String server_ip;
     public int server_port;
     public boolean connected;
-    // message to send to the server
+    private final boolean debug = false;
+    //Mensaje que se manda al servidor
     private String mServerMessage;
-    // sends message received notifications
+    //Envía notificaciones cuando se recibe un mensaje
     private OnMessageReceived mMessageListener = null;
-    // sends information messages about the connection
+    //Envía los comandos necesarios para establecer los parámetros adecuados en el servidor
+    private OnInitialSetup mSetupListener = null;
+    //Realiza las acciones necesarias cuando ocurre un error
+    private OnError mErrorListener = null;
+    //Envía mensajes de información sobre la conexión
     private OnExternalCommunication mCommunicationListener = null;
-    // while this is true, the server will continue running
+    //Mantiene la conexión activa
     private boolean mRun = false;
-    // used to send messages
+    //Buffer para mandar mensajes
     private PrintWriter mBufferOut;
-    // used to read messages from the server
+    //Buffer que recibe mensajes del servidor
     private BufferedReader mBufferIn;
 
     /**
-     * Constructor of the class. OnMessagedReceived listens for the messages received from server
+     * Constructor de la clase. OnMessagedReceived escucha los mensajes recibidos del servidor
      */
-    public TCPClient(OnMessageReceived listener, OnExternalCommunication mCommunicationListener, String server_ip, int server_port) {
+    public TCPClient(OnMessageReceived mMessageListener, OnInitialSetup mSetupListener, OnError mErrorListener,OnExternalCommunication mCommunicationListener, String server_ip, int server_port) {
         this.server_ip = server_ip;
         this.server_port = server_port;
-        mMessageListener = listener;
+        this.mMessageListener = mMessageListener;
+        this.mErrorListener = mErrorListener;
+        this.mSetupListener = mSetupListener;
         this.mCommunicationListener = mCommunicationListener;
     }
 
     /**
-     * Sends the message entered by client to the server
+     * Envía un mensaje específico al servidor.
      *
-     * @param message text entered by client
+     * @param message mensaje que se envía al servidor
      */
     public void sendMessage(final String message) {
         Runnable runnable = new Runnable() {
@@ -59,7 +66,7 @@ public class TCPClient {
     }
 
     /**
-     * Close the connection and release the members
+     * Cierra la conexión y libera los recursos
      */
     public void stopClient() {
 
@@ -77,52 +84,55 @@ public class TCPClient {
     }
 
     public void run() {
-
         mRun = true;
 
         try {
-            //here you must put your computer's IP address.
+            //Dirección IP del servidor
             InetAddress serverAddr = InetAddress.getByName(server_ip);
 
-            Log.d("TCP Client", "C: Connecting...");
-            mCommunicationListener.showInfoMessage("Connecting...");
+            Log.d("TCP Client", "C: Conectando...");
+            mCommunicationListener.showInfoMessage("Conectando...");
 
-            //create a socket to make the connection with the server
+            //Se crea un socket para establecer la conexión con el servidor
             Socket socket = new Socket(serverAddr, server_port);
 
             try {
-
-                //sends the message to the server
+                //Envía los mensajes al servidor
                 mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
 
-                //receives the message which the server sends back
+                //Recibe los mensajes del servidor
                 mBufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-                Log.d("TCP Client", "C: Succesfully connected to " + server_ip + ':' + server_port + "!");
-                mCommunicationListener.showInfoMessage("Succesfully connected to " + server_ip + ':' + server_port + "!");
+                Log.d("TCP Client", "C: ¡Se ha conectado con éxito a " + server_ip + ':' + server_port + "!");
+                mCommunicationListener.showInfoMessage("¡Se ha conectado con éxito a " + server_ip + ':' + server_port + "!");
                 connected = true;
 
-                //in this while the client listens for the messages sent by the server
-                while (mRun) {
+                //Se mandan los comandos necesarios para configurar el servidor adecuadamente
+                mSetupListener.sendSetupCommands();
 
+                //En este bucle el cliente recibe los mensajes del servidor
+                while (mRun) {
+                    //Se guarda el mensaje recibido en el buffer
                     mServerMessage = mBufferIn.readLine();
 
                     if (mServerMessage != null && mMessageListener != null) {
-                        //call the method messageReceived from MyActivity class
+                        //Se llama al método messageReceived de la clase MainActivity
                         mMessageListener.messageReceived(mServerMessage);
-                        Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + mServerMessage + "'");
-                        mCommunicationListener.showInfoMessage("Received Message: '" + mServerMessage + "'");
+                        Log.e("RESPUESTA DEL SERVIDOR", "S: Mensaje recibido: '" + mServerMessage + "'");
+                        if (debug) // Ralentiza mucho la pantalla
+                            mCommunicationListener.showInfoMessage("Mensaje recibido: '" + mServerMessage + "'");
                         connected = true;
                     }
 
                 }
 
-                Log.d("RESPONSE FROM SERVER", "S: Received Message: '" + mServerMessage + "'");
-                mCommunicationListener.showInfoMessage("Received Message: '" + mServerMessage + "'");
+                Log.d("RESPUESTA DEL SERVIDOR", "S: Mensaje recibido: '" + mServerMessage + "'");
+                if (debug) // Ralentiza mucho la pantalla
+                    mCommunicationListener.showInfoMessage("Mensaje recibido: '" + mServerMessage + "'");
 
             } catch (Exception e) {
                 Log.e("TCP", "S: Error", e);
-                mCommunicationListener.showInfoMessage("Error! Closing connection!");
+                mErrorListener.errorInConnection();
                 connected = false;
             } finally {
                 //the socket must be closed. It is not possible to reconnect to this socket
@@ -133,6 +143,7 @@ public class TCPClient {
 
         } catch (Exception e) {
             Log.e("TCP", "C: Error", e);
+            mErrorListener.errorInConnection();
             connected = false;
         }
 
@@ -145,5 +156,13 @@ public class TCPClient {
 
     public interface OnExternalCommunication {
         public void showInfoMessage(String message);
+    }
+
+    public interface OnInitialSetup {
+        public void sendSetupCommands();
+    }
+
+    public interface OnError {
+        public void errorInConnection();
     }
 }

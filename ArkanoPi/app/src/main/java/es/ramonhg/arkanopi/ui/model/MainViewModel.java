@@ -78,14 +78,6 @@ public class MainViewModel extends ViewModel {
 
     public void setTcpClient(TCPClient tcpClient) {
         this.tcpClient = tcpClient;
-        // Al conectarnos debemos informar al servidor qué partida queremos
-        if (partidaActual.equals("Host")) {
-            this.getTcpClient().sendMessage("$Cambiar_a_partida_0");
-        } else if (partidaActual.equals("Partida 1")) {
-            this.getTcpClient().sendMessage("$Cambiar_a_partida_1");
-        } else if (partidaActual.equals("Partida 2")) {
-            this.getTcpClient().sendMessage("$Cambiar_a_partida_2");
-        }
     }
 
     public TCPClient getTcpClient() {
@@ -217,14 +209,18 @@ public class MainViewModel extends ViewModel {
 
     public void setPartidaActual(String partidaActual) {
         this.partidaActual = partidaActual;
+        sendPartidaActual();
+    }
+
+    public void sendPartidaActual() {
         if (this.getTcpClient() != null) {
-            // Al cambiar de partida debemos informar al servidor de qué partida queremos
+            // Debemos informar al servidor de qué partida queremos controlar
             if (partidaActual.equals("Host")) {
-                this.getTcpClient().sendMessage("$Cambiar_a_partida_0");
+                this.getTcpClient().sendMessage("$Cambiar_a_partida_0\n");
             } else if (partidaActual.equals("Partida 1")) {
-                this.getTcpClient().sendMessage("$Cambiar_a_partida_1");
+                this.getTcpClient().sendMessage("$Cambiar_a_partida_1\n");
             } else if (partidaActual.equals("Partida 2")) {
-                this.getTcpClient().sendMessage("$Cambiar_a_partida_2");
+                this.getTcpClient().sendMessage("$Cambiar_a_partida_2\n");
             }
         }
     }
