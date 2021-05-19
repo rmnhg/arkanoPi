@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +28,7 @@ public class MixedFragment extends Fragment {
     TextView consoleTextView;
     Button settings;
     Button led[][] = new Button[7][8];
-    Button tecla[][] = new Button[4][4];
+    ImageButton tecla[][] = new ImageButton[4][4];
     private MainViewModel mViewModel;
     private boolean primeraPantallaEscrita = true;
 

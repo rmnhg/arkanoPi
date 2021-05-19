@@ -209,34 +209,36 @@ void ResetArkanoPi(tipo_arkanoPi *p_arkanoPi) {
 	}
 
 	// Comprobamos que ninguna pelota está en el mismo sitio que las demás
-	while (!pelotas_unicas || paridad_igual) {	// Si las pelotas no son unicas o la paridad es igual
-		pelotas_unicas = TRUE; // Caso ideal
-		paridad_igual = TRUE; // Caso peor
-		for (int i = 0; i < p_arkanoPi->numeroPelotas; i++) {
-			for (int j = 0; j < p_arkanoPi->numeroPelotas - 1; j++) {
-				// Si una pelota tiene distinta paridad a otra, se guarda y no se vuelve a comprobar
-				if ((i != j) && paridad_igual && (posiciones_pelotas[i][2] != posiciones_pelotas[j][2])) {
-					paridad_igual = FALSE;
-				}
-				// Si llegamos a la última pelota y todas tienen la misma paridad, se cambia
-				if ((i == p_arkanoPi->numeroPelotas-1) && (j == p_arkanoPi->numeroPelotas-2) && paridad_igual) {
-					paridad_igual = FALSE;
-					if (posiciones_pelotas[j][0] < NUM_COLUMNAS_DISPLAY - 1) {
-						posiciones_pelotas[j][0]++;
-					} else {
-						posiciones_pelotas[j][0]--;
+	if (p_arkanoPi->numeroPelotas > 1) {
+		while (!pelotas_unicas || paridad_igual) {	// Si las pelotas no son unicas o la paridad es igual
+			pelotas_unicas = TRUE; // Caso ideal
+			paridad_igual = TRUE; // Caso peor
+			for (int i = 0; i < p_arkanoPi->numeroPelotas; i++) {
+				for (int j = 0; j < p_arkanoPi->numeroPelotas - 1; j++) {
+					// Si una pelota tiene distinta paridad a otra, se guarda y no se vuelve a comprobar
+					if ((i != j) && paridad_igual && (posiciones_pelotas[i][2] != posiciones_pelotas[j][2])) {
+						paridad_igual = FALSE;
 					}
-				}
-				// Si una pelota tiene la misma posición que otra, se cambia su posición
-				if ((i != j) && (posiciones_pelotas[i][0] == posiciones_pelotas[j][0]) && (posiciones_pelotas[i][1] == posiciones_pelotas[j][1])) {
-					InicializaPelota((tipo_pelota*)(&(p_arkanoPi->pelota[i])));
-					//Actualizamos su posición en el array de posiciones
-					posiciones_pelotas[i][0] = p_arkanoPi->pelota[i].x;
-					posiciones_pelotas[i][1] = p_arkanoPi->pelota[i].y;
-					posiciones_pelotas[i][2] = p_arkanoPi->pelota[i].x % 2;
-					// Como hemos cambiado la posición de la pelota, habrá que comprobar e nuevo las condiciones que queremos
-					pelotas_unicas = FALSE;
-					paridad_igual = TRUE;
+					// Si llegamos a la última pelota y todas tienen la misma paridad, se cambia
+					if ((i == p_arkanoPi->numeroPelotas-1) && (j == p_arkanoPi->numeroPelotas-2) && paridad_igual) {
+						paridad_igual = FALSE;
+						if (posiciones_pelotas[j][0] < NUM_COLUMNAS_DISPLAY - 1) {
+							posiciones_pelotas[j][0]++;
+						} else {
+							posiciones_pelotas[j][0]--;
+						}
+					}
+					// Si una pelota tiene la misma posición que otra, se cambia su posición
+					if ((i != j) && (posiciones_pelotas[i][0] == posiciones_pelotas[j][0]) && (posiciones_pelotas[i][1] == posiciones_pelotas[j][1])) {
+						InicializaPelota((tipo_pelota*)(&(p_arkanoPi->pelota[i])));
+						//Actualizamos su posición en el array de posiciones
+						posiciones_pelotas[i][0] = p_arkanoPi->pelota[i].x;
+						posiciones_pelotas[i][1] = p_arkanoPi->pelota[i].y;
+						posiciones_pelotas[i][2] = p_arkanoPi->pelota[i].x % 2;
+						// Como hemos cambiado la posición de la pelota, habrá que comprobar e nuevo las condiciones que queremos
+						pelotas_unicas = FALSE;
+						paridad_igual = TRUE;
+					}
 				}
 			}
 		}
@@ -829,7 +831,7 @@ void ReseteaJuego (fsm_t* this) {
 
 	// Imprimimos el saludo y las instrucciones del juego
 	piLock(STD_IO_BUFFER_KEY);
-	mostrarInstruccionesJuego(p_arkanoPi->partida);
+	mostrarInstruccionesJuego(p_arkanoPi->partida, 0);
 	piUnlock(STD_IO_BUFFER_KEY);
 
 	// Pintamos la pantalla inicial
@@ -1012,7 +1014,7 @@ void MostrarSubmenuAyuda (fsm_t* this) {
 		pseudoWiringPiEnableDisplay(0);
 	}
 	piLock(STD_IO_BUFFER_KEY);
-	mostrarInstruccionesJuego(p_arkanoPi->partida);
+	mostrarInstruccionesJuego(p_arkanoPi->partida, 1);
 	fflush(stdout);
 	piUnlock(STD_IO_BUFFER_KEY);
 }

@@ -1,1388 +1,786 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/screenFragment"
-    android:layout_width="match_parent"
+    android:id="@+id/blank_fragment"
+    android:layout_width="fill_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
-    tools:context=".ui.main.SettingsFragment">
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:background="#ff000000"
+    android:weightSum="17">
 
 
     <Button
         android:id="@+id/settingsButton"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ajustes"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.00999999" />
+        android:layout_height="0dp"
+        android:layout_weight="1.5"
+        android:gravity="center"
+        android:text="Ajustes" />
 
-    <Button
-        android:id="@+id/led23"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="156dp"
-        android:layout_marginLeft="156dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginEnd="205dp"
-        android:layout_marginRight="205dp"
-        android:layout_marginBottom="160dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
 
-    <Button
-        android:id="@+id/led46"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="246dp"
-        android:layout_marginLeft="246dp"
-        android:layout_marginTop="120dp"
-        android:layout_marginEnd="115dp"
-        android:layout_marginRight="115dp"
-        android:layout_marginBottom="100dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="50dp"
+        android:orientation="horizontal"
+        android:weightSum="8" >
 
-    <Button
-        android:id="@+id/led10"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="66dp"
-        android:layout_marginLeft="66dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="295dp"
-        android:layout_marginRight="295dp"
-        android:layout_marginBottom="190dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led00"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led20"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="66dp"
-        android:layout_marginLeft="66dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginEnd="295dp"
-        android:layout_marginRight="295dp"
-        android:layout_marginBottom="160dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led01"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led54"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="186dp"
-        android:layout_marginLeft="186dp"
-        android:layout_marginTop="150dp"
-        android:layout_marginEnd="175dp"
-        android:layout_marginRight="175dp"
-        android:layout_marginBottom="70dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led02"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led34"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="186dp"
-        android:layout_marginLeft="186dp"
-        android:layout_marginTop="90dp"
-        android:layout_marginEnd="175dp"
-        android:layout_marginRight="175dp"
-        android:layout_marginBottom="130dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led03"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led43"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="156dp"
-        android:layout_marginLeft="156dp"
-        android:layout_marginTop="120dp"
-        android:layout_marginEnd="205dp"
-        android:layout_marginRight="205dp"
-        android:layout_marginBottom="100dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led04"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led61"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="96dp"
-        android:layout_marginLeft="96dp"
-        android:layout_marginTop="180dp"
-        android:layout_marginEnd="265dp"
-        android:layout_marginRight="265dp"
-        android:layout_marginBottom="40dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led05"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led42"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="126dp"
-        android:layout_marginLeft="126dp"
-        android:layout_marginTop="120dp"
-        android:layout_marginEnd="235dp"
-        android:layout_marginRight="235dp"
-        android:layout_marginBottom="100dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led06"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led24"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="186dp"
-        android:layout_marginLeft="186dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginEnd="175dp"
-        android:layout_marginRight="175dp"
-        android:layout_marginBottom="160dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led07"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led60"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="66dp"
-        android:layout_marginLeft="66dp"
-        android:layout_marginTop="180dp"
-        android:layout_marginEnd="295dp"
-        android:layout_marginRight="295dp"
-        android:layout_marginBottom="40dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/led33"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="156dp"
-        android:layout_marginLeft="156dp"
-        android:layout_marginTop="90dp"
-        android:layout_marginEnd="205dp"
-        android:layout_marginRight="205dp"
-        android:layout_marginBottom="130dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="50dp"
+        android:orientation="horizontal"
+        android:weightSum="8" >
 
-    <Button
-        android:id="@+id/led05"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="216dp"
-        android:layout_marginLeft="216dp"
-        android:layout_marginEnd="145dp"
-        android:layout_marginRight="145dp"
-        android:layout_marginBottom="220dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led10"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led17"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="276dp"
-        android:layout_marginLeft="276dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="85dp"
-        android:layout_marginRight="85dp"
-        android:layout_marginBottom="190dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led11"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led67"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="276dp"
-        android:layout_marginLeft="276dp"
-        android:layout_marginTop="180dp"
-        android:layout_marginEnd="85dp"
-        android:layout_marginRight="85dp"
-        android:layout_marginBottom="40dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led12"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led44"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="186dp"
-        android:layout_marginLeft="186dp"
-        android:layout_marginTop="120dp"
-        android:layout_marginEnd="175dp"
-        android:layout_marginRight="175dp"
-        android:layout_marginBottom="100dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led13"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led01"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="96dp"
-        android:layout_marginLeft="96dp"
-        android:layout_marginEnd="265dp"
-        android:layout_marginRight="265dp"
-        android:layout_marginBottom="220dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led14"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led32"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="126dp"
-        android:layout_marginLeft="126dp"
-        android:layout_marginTop="90dp"
-        android:layout_marginEnd="235dp"
-        android:layout_marginRight="235dp"
-        android:layout_marginBottom="130dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led15"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led26"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="246dp"
-        android:layout_marginLeft="246dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginEnd="115dp"
-        android:layout_marginRight="115dp"
-        android:layout_marginBottom="160dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led16"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led14"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="186dp"
-        android:layout_marginLeft="186dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="175dp"
-        android:layout_marginRight="175dp"
-        android:layout_marginBottom="190dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led17"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led45"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="216dp"
-        android:layout_marginLeft="216dp"
-        android:layout_marginTop="120dp"
-        android:layout_marginEnd="145dp"
-        android:layout_marginRight="145dp"
-        android:layout_marginBottom="100dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/led03"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="156dp"
-        android:layout_marginLeft="156dp"
-        android:layout_marginEnd="205dp"
-        android:layout_marginRight="205dp"
-        android:layout_marginBottom="220dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="50dp"
+        android:orientation="horizontal"
+        android:weightSum="8" >
 
-    <Button
-        android:id="@+id/led56"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="246dp"
-        android:layout_marginLeft="246dp"
-        android:layout_marginTop="150dp"
-        android:layout_marginEnd="115dp"
-        android:layout_marginRight="115dp"
-        android:layout_marginBottom="70dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led20"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led12"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="126dp"
-        android:layout_marginLeft="126dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="235dp"
-        android:layout_marginRight="235dp"
-        android:layout_marginBottom="190dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led21"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led66"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="246dp"
-        android:layout_marginLeft="246dp"
-        android:layout_marginTop="180dp"
-        android:layout_marginEnd="115dp"
-        android:layout_marginRight="115dp"
-        android:layout_marginBottom="40dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led22"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led07"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="276dp"
-        android:layout_marginLeft="276dp"
-        android:layout_marginEnd="85dp"
-        android:layout_marginRight="85dp"
-        android:layout_marginBottom="220dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led23"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led50"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="66dp"
-        android:layout_marginLeft="66dp"
-        android:layout_marginTop="150dp"
-        android:layout_marginEnd="295dp"
-        android:layout_marginRight="295dp"
-        android:layout_marginBottom="70dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led24"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led00"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="66dp"
-        android:layout_marginLeft="66dp"
-        android:layout_marginEnd="295dp"
-        android:layout_marginRight="295dp"
-        android:layout_marginBottom="220dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led25"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led57"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="276dp"
-        android:layout_marginLeft="276dp"
-        android:layout_marginTop="150dp"
-        android:layout_marginEnd="85dp"
-        android:layout_marginRight="85dp"
-        android:layout_marginBottom="70dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led26"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led37"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="276dp"
-        android:layout_marginLeft="276dp"
-        android:layout_marginTop="90dp"
-        android:layout_marginEnd="85dp"
-        android:layout_marginRight="85dp"
-        android:layout_marginBottom="130dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led27"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led11"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="96dp"
-        android:layout_marginLeft="96dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="265dp"
-        android:layout_marginRight="265dp"
-        android:layout_marginBottom="190dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/led02"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="126dp"
-        android:layout_marginLeft="126dp"
-        android:layout_marginEnd="235dp"
-        android:layout_marginRight="235dp"
-        android:layout_marginBottom="220dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="50dp"
+        android:orientation="horizontal"
+        android:weightSum="8" >
 
-    <Button
-        android:id="@+id/led04"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="186dp"
-        android:layout_marginLeft="186dp"
-        android:layout_marginEnd="175dp"
-        android:layout_marginRight="175dp"
-        android:layout_marginBottom="220dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led30"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led31"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="96dp"
-        android:layout_marginLeft="96dp"
-        android:layout_marginTop="90dp"
-        android:layout_marginEnd="265dp"
-        android:layout_marginRight="265dp"
-        android:layout_marginBottom="130dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led31"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led21"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="96dp"
-        android:layout_marginLeft="96dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginEnd="265dp"
-        android:layout_marginRight="265dp"
-        android:layout_marginBottom="160dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led32"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led52"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="126dp"
-        android:layout_marginLeft="126dp"
-        android:layout_marginTop="150dp"
-        android:layout_marginEnd="235dp"
-        android:layout_marginRight="235dp"
-        android:layout_marginBottom="70dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led33"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led22"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="126dp"
-        android:layout_marginLeft="126dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginEnd="235dp"
-        android:layout_marginRight="235dp"
-        android:layout_marginBottom="160dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led34"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led64"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="186dp"
-        android:layout_marginLeft="186dp"
-        android:layout_marginTop="180dp"
-        android:layout_marginEnd="175dp"
-        android:layout_marginRight="175dp"
-        android:layout_marginBottom="40dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led35"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led35"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="216dp"
-        android:layout_marginLeft="216dp"
-        android:layout_marginTop="90dp"
-        android:layout_marginEnd="145dp"
-        android:layout_marginRight="145dp"
-        android:layout_marginBottom="130dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led36"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led62"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="126dp"
-        android:layout_marginLeft="126dp"
-        android:layout_marginTop="180dp"
-        android:layout_marginEnd="235dp"
-        android:layout_marginRight="235dp"
-        android:layout_marginBottom="40dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led37"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led16"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="246dp"
-        android:layout_marginLeft="246dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="115dp"
-        android:layout_marginRight="115dp"
-        android:layout_marginBottom="190dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/led06"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="246dp"
-        android:layout_marginLeft="246dp"
-        android:layout_marginEnd="115dp"
-        android:layout_marginRight="115dp"
-        android:layout_marginBottom="220dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="50dp"
+        android:orientation="horizontal"
+        android:weightSum="8" >
 
-    <Button
-        android:id="@+id/led30"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="66dp"
-        android:layout_marginLeft="66dp"
-        android:layout_marginTop="90dp"
-        android:layout_marginEnd="295dp"
-        android:layout_marginRight="295dp"
-        android:layout_marginBottom="130dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led40"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led47"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="276dp"
-        android:layout_marginLeft="76dp"
-        android:layout_marginTop="120dp"
-        android:layout_marginEnd="85dp"
-        android:layout_marginRight="85dp"
-        android:layout_marginBottom="100dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led41"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led27"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="276dp"
-        android:layout_marginLeft="276dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginEnd="85dp"
-        android:layout_marginRight="85dp"
-        android:layout_marginBottom="160dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led42"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led13"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="156dp"
-        android:layout_marginLeft="156dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="205dp"
-        android:layout_marginRight="205dp"
-        android:layout_marginBottom="190dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led43"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led15"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="216dp"
-        android:layout_marginLeft="216dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="145dp"
-        android:layout_marginRight="145dp"
-        android:layout_marginBottom="190dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led44"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led63"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="156dp"
-        android:layout_marginLeft="156dp"
-        android:layout_marginTop="180dp"
-        android:layout_marginEnd="205dp"
-        android:layout_marginRight="205dp"
-        android:layout_marginBottom="40dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led45"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led51"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="96dp"
-        android:layout_marginLeft="96dp"
-        android:layout_marginTop="150dp"
-        android:layout_marginEnd="265dp"
-        android:layout_marginRight="265dp"
-        android:layout_marginBottom="70dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led46"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led40"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="66dp"
-        android:layout_marginLeft="66dp"
-        android:layout_marginTop="120dp"
-        android:layout_marginEnd="295dp"
-        android:layout_marginRight="295dp"
-        android:layout_marginBottom="100dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led47"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led55"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="216dp"
-        android:layout_marginLeft="216dp"
-        android:layout_marginTop="150dp"
-        android:layout_marginEnd="145dp"
-        android:layout_marginRight="145dp"
-        android:layout_marginBottom="70dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/led53"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="156dp"
-        android:layout_marginLeft="156dp"
-        android:layout_marginTop="150dp"
-        android:layout_marginEnd="205dp"
-        android:layout_marginRight="205dp"
-        android:layout_marginBottom="70dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="50dp"
+        android:orientation="horizontal"
+        android:weightSum="8" >
 
-    <Button
-        android:id="@+id/led41"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="96dp"
-        android:layout_marginLeft="96dp"
-        android:layout_marginTop="120dp"
-        android:layout_marginEnd="265dp"
-        android:layout_marginRight="265dp"
-        android:layout_marginBottom="100dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led50"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led36"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="246dp"
-        android:layout_marginLeft="246dp"
-        android:layout_marginTop="90dp"
-        android:layout_marginEnd="115dp"
-        android:layout_marginRight="115dp"
-        android:layout_marginBottom="130dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led51"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led65"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="216dp"
-        android:layout_marginLeft="216dp"
-        android:layout_marginTop="180dp"
-        android:layout_marginEnd="145dp"
-        android:layout_marginRight="145dp"
-        android:layout_marginBottom="40dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led52"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
 
-    <Button
-        android:id="@+id/led25"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="216dp"
-        android:layout_marginLeft="216dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginEnd="145dp"
-        android:layout_marginRight="145dp"
-        android:layout_marginBottom="160dp"
-        android:background="@color/black"
-        android:text=""
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        <Button
+            android:id="@+id/led53"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
+
+        <Button
+            android:id="@+id/led54"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
+
+        <Button
+            android:id="@+id/led55"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
+
+        <Button
+            android:id="@+id/led56"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
+
+        <Button
+            android:id="@+id/led57"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="50dp"
+        android:orientation="horizontal"
+        android:weightSum="8" >
+
+        <Button
+            android:id="@+id/led60"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
+
+        <Button
+            android:id="@+id/led61"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
+
+        <Button
+            android:id="@+id/led62"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
+
+        <Button
+            android:id="@+id/led63"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
+
+        <Button
+            android:id="@+id/led64"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
+
+        <Button
+            android:id="@+id/led65"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
+
+        <Button
+            android:id="@+id/led66"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
+
+        <Button
+            android:id="@+id/led67"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/black"
+            android:text=""
+            app:backgroundTint="@color/black"/>
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/consoleTextView"
-        android:layout_width="350dp"
-        android:layout_height="162dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4"
+        android:layout_marginHorizontal="20dp"
+        android:text="\nInstrucciones de uso:\n\tCualquier tecla inicia el juego.\n\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n\tLa tecla C actualiza la posición de la pelota en la pantalla manualmente.\n\tLa tecla B pausa el juego.\n\tLa tecla 5 abre el menú del juego.\n\tLa tecla F cierra el juego.\n"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.491"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.541" />
+        android:textSize="8sp" />
 
-    <Button
-        android:id="@+id/tecla01"
-        android:layout_width="40dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="100dp"
-        android:text="2"
-        android:textSize="13sp"
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.401"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.684" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="100dp"
+        android:orientation="horizontal"
+        android:weightSum="4" >
 
-    <Button
-        android:id="@+id/tecla10"
-        android:layout_width="40dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="215dp"
-        android:text="4"
-        android:textSize="13sp"
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.223"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.719" />
+        <ImageButton
+            android:id="@+id/tecla00"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="5dp"
+            android:src="@mipmap/tecla00"
+            app:backgroundTint="@color/black" />
 
-    <Button
-        android:id="@+id/tecla22"
-        android:layout_width="40dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="330dp"
-        android:text="9"
-        android:textSize="13sp"
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.576"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.793" />
+        <ImageButton
+            android:id="@+id/tecla01"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="5dp"
+            android:src="@mipmap/tecla01"
+            app:backgroundTint="@color/black" />
 
-    <Button
-        android:id="@+id/tecla21"
-        android:layout_width="40dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="330dp"
-        android:text="8"
-        android:textSize="13sp"
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.401"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.793" />
+        <ImageButton
+            android:id="@+id/tecla02"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="5dp"
+            android:src="@mipmap/tecla02"
+            app:backgroundTint="@color/black" />
 
-    <Button
-        android:id="@+id/tecla23"
-        android:layout_width="40dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="330dp"
-        android:text="E"
-        android:textSize="13sp"
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.752"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.793" />
+        <ImageButton
+            android:id="@+id/tecla03"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="5dp"
+            android:src="@mipmap/tecla03"
+            app:backgroundTint="@color/black" />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/tecla11"
-        android:layout_width="40dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="215dp"
-        android:text="5"
-        android:textSize="13sp"
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.401"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.719" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="100dp"
+        android:orientation="horizontal"
+        android:weightSum="4" >
 
-    <Button
-        android:id="@+id/tecla33"
-        android:layout_width="40dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="445dp"
-        android:text="F"
-        android:textSize="13sp"
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.752"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.921" />
+        <ImageButton
+            android:id="@+id/tecla10"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="5dp"
+            android:src="@mipmap/tecla10"
+            app:backgroundTint="@color/black" />
 
-    <Button
-        android:id="@+id/tecla03"
-        android:layout_width="40dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="100dp"
-        android:text="C"
-        android:textSize="13sp"
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.752"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.684" />
+        <ImageButton
+            android:id="@+id/tecla11"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="5dp"
+            android:src="@mipmap/tecla11"
+            app:backgroundTint="@color/black" />
 
-    <Button
-        android:id="@+id/tecla12"
-        android:layout_width="40dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="215dp"
-        android:text="6"
-        android:textSize="13sp"
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.576"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.719" />
+        <ImageButton
+            android:id="@+id/tecla12"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="5dp"
+            android:src="@mipmap/tecla12"
+            app:backgroundTint="@color/black" />
 
-    <Button
-        android:id="@+id/tecla30"
-        android:layout_width="40dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="445dp"
-        android:text="A"
-        android:textSize="13sp"
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.223"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.921" />
+        <ImageButton
+            android:id="@+id/tecla13"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="5dp"
+            android:src="@mipmap/tecla13"
+            app:backgroundTint="@color/black" />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/tecla13"
-        android:layout_width="40dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="215dp"
-        android:text="D"
-        android:textSize="13sp"
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.752"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.719" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="100dp"
+        android:orientation="horizontal"
+        android:weightSum="4" >
 
-    <Button
-        android:id="@+id/tecla00"
-        android:layout_width="40dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="100dp"
-        android:text="1"
-        android:textSize="13sp"
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.223"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.684" />
+        <ImageButton
+            android:id="@+id/tecla20"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="5dp"
+            android:src="@mipmap/tecla20"
+            app:backgroundTint="@color/black" />
 
-    <Button
-        android:id="@+id/tecla31"
-        android:layout_width="40dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="445dp"
-        android:text="0"
-        android:textSize="13sp"
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.401"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.921" />
+        <ImageButton
+            android:id="@+id/tecla21"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="5dp"
+            android:src="@mipmap/tecla21"
+            app:backgroundTint="@color/black" />
 
-    <Button
-        android:id="@+id/tecla20"
-        android:layout_width="40dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="330dp"
-        android:text="7"
-        android:textSize="13sp"
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.223"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.793" />
+        <ImageButton
+            android:id="@+id/tecla22"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="5dp"
+            android:src="@mipmap/tecla22"
+            app:backgroundTint="@color/black" />
 
-    <Button
-        android:id="@+id/tecla32"
-        android:layout_width="40dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="445dp"
-        android:text="B"
-        android:textSize="13sp"
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.576"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.921" />
+        <ImageButton
+            android:id="@+id/tecla23"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="5dp"
+            android:src="@mipmap/tecla22"
+            app:backgroundTint="@color/black" />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/tecla02"
-        android:layout_width="40dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="100dp"
-        android:text="3"
-        android:textSize="13sp"
-        app:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.576"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.684" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="100dp"
+        android:orientation="horizontal"
+        android:weightSum="4" >
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <ImageButton
+            android:id="@+id/tecla30"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="5dp"
+            android:src="@mipmap/tecla30"
+            app:backgroundTint="@color/black" />
+
+        <ImageButton
+            android:id="@+id/tecla31"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="5dp"
+            android:src="@mipmap/tecla31"
+            app:backgroundTint="@color/black" />
+
+        <ImageButton
+            android:id="@+id/tecla32"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="5dp"
+            android:src="@mipmap/tecla32"
+            app:backgroundTint="@color/black" />
+
+        <ImageButton
+            android:id="@+id/tecla33"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="5dp"
+            android:src="@mipmap/tecla33"
+            app:backgroundTint="@color/black" />
+    </LinearLayout>
+
+</LinearLayout>

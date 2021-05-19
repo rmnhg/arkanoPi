@@ -194,10 +194,10 @@ void explora_teclado(int teclaPulsada, int partida) {
 			// Activamos el flaG para ir o volver al menú
 			piLock(SYSTEM_FLAGS_KEY);
 			switch (arkanoPi_fsm[partida]->current_state) {
-				case WAIT_START:
 				case WAIT_END:
 					flags[partida] |= FLAG_BOTON;
 					break;
+				case WAIT_START:
 				case WAIT_PELOTAS:
 				case WAIT_PAREDES:
 				case WAIT_TCP:

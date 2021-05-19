@@ -181,7 +181,7 @@
             android:text=""
             app:backgroundTint="@color/black"/>
 
-    </LinearLayout>
+        </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -598,8 +598,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="4"
-        android:layout_marginHorizontal="20dp"
-        android:text="\nInstrucciones de uso:\n\tCualquier tecla inicia el juego.\n\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n\tLa tecla C actualiza la posición de la pelota en la pantalla manualmente.\n\tLa tecla B pausa el juego.\n\tLa tecla 5 abre el menú del juego.\n\tLa tecla F cierra el juego.\n"
         android:textColor="@color/white"
         android:textSize="11sp" />
 
@@ -611,40 +609,44 @@
         android:orientation="horizontal"
         android:weightSum="4" >
 
-        <ImageButton
+        <Button
             android:id="@+id/tecla00"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginHorizontal="5dp"
-            android:src="@mipmap/tecla00"
+            android:text="1"
+            android:textSize="13sp"
             app:backgroundTint="@color/black" />
 
-        <ImageButton
+        <Button
             android:id="@+id/tecla01"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginHorizontal="5dp"
-            android:src="@mipmap/tecla01"
+            android:text="2"
+            android:textSize="13sp"
             app:backgroundTint="@color/black" />
 
-        <ImageButton
+        <Button
             android:id="@+id/tecla02"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginHorizontal="5dp"
-            android:src="@mipmap/tecla02"
+            android:text="3"
+            android:textSize="13sp"
             app:backgroundTint="@color/black" />
 
-        <ImageButton
+        <Button
             android:id="@+id/tecla03"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginHorizontal="5dp"
-            android:src="@mipmap/tecla03"
+            android:text="C"
+            android:textSize="13sp"
             app:backgroundTint="@color/black" />
     </LinearLayout>
 
@@ -656,40 +658,44 @@
         android:orientation="horizontal"
         android:weightSum="4" >
 
-        <ImageButton
+        <Button
             android:id="@+id/tecla10"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginHorizontal="5dp"
-            android:src="@mipmap/tecla10"
+            android:text="4"
+            android:textSize="13sp"
             app:backgroundTint="@color/black" />
 
-        <ImageButton
+        <Button
             android:id="@+id/tecla11"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginHorizontal="5dp"
-            android:src="@mipmap/tecla11"
+            android:text="5"
+            android:textSize="13sp"
             app:backgroundTint="@color/black" />
 
-        <ImageButton
+        <Button
             android:id="@+id/tecla12"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginHorizontal="5dp"
-            android:src="@mipmap/tecla12"
+            android:text="6"
+            android:textSize="13sp"
             app:backgroundTint="@color/black" />
 
-        <ImageButton
+        <Button
             android:id="@+id/tecla13"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginHorizontal="5dp"
-            android:src="@mipmap/tecla13"
+            android:text="D"
+            android:textSize="13sp"
             app:backgroundTint="@color/black" />
     </LinearLayout>
 
@@ -701,40 +707,44 @@
         android:orientation="horizontal"
         android:weightSum="4" >
 
-        <ImageButton
+        <Button
             android:id="@+id/tecla20"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginHorizontal="5dp"
-            android:src="@mipmap/tecla20"
+            android:text="7"
+            android:textSize="13sp"
             app:backgroundTint="@color/black" />
 
-        <ImageButton
+        <Button
             android:id="@+id/tecla21"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginHorizontal="5dp"
-            android:src="@mipmap/tecla21"
+            android:text="8"
+            android:textSize="13sp"
             app:backgroundTint="@color/black" />
 
-        <ImageButton
+        <Button
             android:id="@+id/tecla22"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginHorizontal="5dp"
-            android:src="@mipmap/tecla22"
+            android:text="9"
+            android:textSize="13sp"
             app:backgroundTint="@color/black" />
 
-        <ImageButton
+        <Button
             android:id="@+id/tecla23"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginHorizontal="5dp"
-            android:src="@mipmap/tecla22"
+            android:text="E"
+            android:textSize="13sp"
             app:backgroundTint="@color/black" />
     </LinearLayout>
 
@@ -746,40 +756,44 @@
         android:orientation="horizontal"
         android:weightSum="4" >
 
-        <ImageButton
+        <Button
             android:id="@+id/tecla30"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginHorizontal="5dp"
-            android:src="@mipmap/tecla30"
+            android:text="A"
+            android:textSize="13sp"
             app:backgroundTint="@color/black" />
 
-        <ImageButton
+        <Button
             android:id="@+id/tecla31"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginHorizontal="5dp"
-            android:src="@mipmap/tecla31"
+            android:text="0"
+            android:textSize="13sp"
             app:backgroundTint="@color/black" />
 
-        <ImageButton
+        <Button
             android:id="@+id/tecla32"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginHorizontal="5dp"
-            android:src="@mipmap/tecla32"
+            android:text="B"
+            android:textSize="13sp"
             app:backgroundTint="@color/black" />
 
-        <ImageButton
+        <Button
             android:id="@+id/tecla33"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginHorizontal="5dp"
-            android:src="@mipmap/tecla33"
+            android:text="F"
+            android:textSize="13sp"
             app:backgroundTint="@color/black" />
     </LinearLayout>
 

@@ -121,7 +121,14 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         }, server_address, server_port);
-        new ConnectTask(mTCPClient).start();
+        if (mViewModel.getConnectTask() != null && mViewModel.getConnectTask().isAlive()) {
+            try {
+                mViewModel.getConnectTask().interrupt();
+            } catch (Exception e) {}
+            mViewModel.setConnectTask(null);
+        }
+        mViewModel.setConnectTask(new ConnectTask(mTCPClient));
+        mViewModel.getConnectTask().start();
         mViewModel.setTcpClient(mTCPClient);
         mViewModel.setServerAddress(server_address);
         mViewModel.setServerPort(server_port);

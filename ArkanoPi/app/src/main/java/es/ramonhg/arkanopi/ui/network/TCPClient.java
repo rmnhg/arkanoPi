@@ -8,6 +8,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class TCPClient {
 
@@ -32,6 +34,8 @@ public class TCPClient {
     private PrintWriter mBufferOut;
     //Buffer que recibe mensajes del servidor
     private BufferedReader mBufferIn;
+    private TimerTask timerTask;
+    private Timer timerEnvioPeriodico = new Timer();
 
     /**
      * Constructor de la clase. OnMessagedReceived escucha los mensajes recibidos del servidor
@@ -43,6 +47,14 @@ public class TCPClient {
         this.mErrorListener = mErrorListener;
         this.mSetupListener = mSetupListener;
         this.mCommunicationListener = mCommunicationListener;
+        this.timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                sendMessage("$Sigo_conectado");
+            }
+        };
+        this.timerEnvioPeriodico = new Timer();
+        this.timerEnvioPeriodico.scheduleAtFixedRate(timerTask, 0, 5000);
     }
 
     /**

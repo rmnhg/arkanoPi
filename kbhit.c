@@ -2,6 +2,7 @@
 #include <sys/select.h>
 #include <stdlib.h> // para poder usar NULL
 #include <stdio.h> // para poder usar getc, printf...
+#include <unistd.h> // para poder usar access
 //#define DEBUG
 #include "dprintf.h" // para poder usar DPRINTF
 
@@ -25,7 +26,11 @@ int kbhit(void)
 	  return ch2;
 	  }
 
-  system ("/bin/stty raw");
+  if(access("/bin/stty", F_OK ) == 0) {
+    system ("/bin/stty raw"); // PC con Linux
+  } else {
+    system ("/system/xbin/stty raw"); // Smartphone con Android
+  }
 
   /* Do not wait at all, not even a microsecond */
   tv.tv_sec=0;
@@ -42,7 +47,11 @@ int kbhit(void)
    * largest file descriptor to check + 1. */
   if(select(1, &read_fd,NULL, /*No writes*/NULL, /*No exceptions*/&tv) == -1)
     { 
-    system ("/bin/stty cooked");
+    if(access("/bin/stty", F_OK ) == 0) {
+      system ("/bin/stty cooked"); // PC con Linux
+    } else {
+      system ("/system/xbin/stty cooked"); // Smartphone con Android
+    }
     return 0;  /* An error occured */ 
     }
 
@@ -54,13 +63,21 @@ if(FD_ISSET(0,&read_fd))
     /* Character pending on stdin */
   {
   ch2=getc(stdin);
-  system ("/bin/stty cooked");
+  if(access("/bin/stty", F_OK ) == 0) {
+    system ("/bin/stty cooked"); // PC con Linux
+  } else {
+    system ("/system/xbin/stty cooked"); // Smartphone con Android
+  }
   DPRINTF("kbhit '%c'\n",ch2);
 //  ungetc(ch2,stdin);
   return ch2;
   }
   /* no characters were pending */
-  system ("/bin/stty cooked");
+  if(access("/bin/stty", F_OK ) == 0) {
+    system ("/bin/stty cooked"); // PC con Linux
+  } else {
+    system ("/system/xbin/stty cooked"); // Smartphone con Android
+  }
   return 0;
   }
 

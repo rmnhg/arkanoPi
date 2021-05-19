@@ -13,6 +13,7 @@ import es.ramonhg.arkanopi.ui.main.KeyboardFragment;
 import es.ramonhg.arkanopi.ui.main.MainActivity;
 import es.ramonhg.arkanopi.ui.main.ScreenFragment;
 import es.ramonhg.arkanopi.ui.main.MixedFragment;
+import es.ramonhg.arkanopi.ui.network.ConnectTask;
 import es.ramonhg.arkanopi.ui.network.TCPClient;
 
 public class MainViewModel extends ViewModel {
@@ -22,7 +23,8 @@ public class MainViewModel extends ViewModel {
     public MixedFragment mixedFragment;
     private String screenContent, tipoPeriferico, server_address, consoleContent, partidaActual;
     private int server_port = -1;
-    TCPClient tcpClient;
+    private TCPClient tcpClient;
+    private ConnectTask connectTask;
 
     public MainActivity getMainActivity() {
         return mainActivity;
@@ -130,7 +132,8 @@ public class MainViewModel extends ViewModel {
                     String realMessage = receivedMessage.replace('#', '\n');
                     setConsoleContent(realMessage);
                     // Se muestra el mensaje de la consola recibido
-                    consoleTextView.setText(getConsoleContent());
+                    if (consoleTextView != null)
+                        consoleTextView.setText(getConsoleContent());
                 } else if (forzarDibujadoPantalla || !receivedMessage.equals(getScreenContent())) {
                     // Si se ha cambiado de fragment o ha llegado una pantalla distinta a la
                     // almacenada, se pinta la pantalla de LEDs.
@@ -148,7 +151,8 @@ public class MainViewModel extends ViewModel {
                         if (screenDigits[i] != '0') {
                             jugando = true;
                             setConsoleContent(null);
-                            consoleTextView.setText("");
+                            if (consoleTextView != null)
+                                consoleTextView.setText("");
                             break;
                         }
                     }
@@ -223,5 +227,13 @@ public class MainViewModel extends ViewModel {
                 this.getTcpClient().sendMessage("$Cambiar_a_partida_2\n");
             }
         }
+    }
+
+    public ConnectTask getConnectTask() {
+        return connectTask;
+    }
+
+    public void setConnectTask(ConnectTask connectTask) {
+        this.connectTask = connectTask;
     }
 }

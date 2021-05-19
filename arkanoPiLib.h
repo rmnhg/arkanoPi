@@ -76,24 +76,33 @@ void InicializaArkanoPi(tipo_arkanoPi *p_arkanoPi);
 void ResetArkanoPi(tipo_arkanoPi *p_arkanoPi);
 void ReseteaMatriz(tipo_pantalla *p_pantalla);
 
-inline static void mostrarInstruccionesJuego(int partida) {
-	enviarConsola(partida, "\nInstrucciones de uso:\n"
-				  "\tCualquier tecla inicia el juego.\n"
-				  "\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n"
-				  "\tLa tecla C actualiza la posición de la pelota en la pantalla.\n"
-				  "\tLa tecla B pausa el juego.\n"
-				  "\tLa tecla 5 abre el menú del juego.\n"
-				  "\tLa tecla F cierra el juego.\n");
+inline static void mostrarInstruccionesJuego(int partida, int desdeMenu) {
+	if (desdeMenu) {
+		enviarConsola(partida, "\nInstrucciones de uso:\n"
+							   "\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n"
+							   "\tLa tecla C actualiza la posición de la pelota en la pantalla manualmente.\n"
+							   "\tLa tecla B pausa el juego.\n"
+							   "\tLa tecla 5 vuelve al menú del juego.\n"
+							   "\tLa tecla F cierra el juego.\n");
+	} else {
+		enviarConsola(partida, "\nInstrucciones de uso:\n"
+							   "\tCualquier tecla inicia el juego.\n"
+							   "\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n"
+							   "\tLa tecla C actualiza la posición de la pelota en la pantalla manualmente.\n"
+							   "\tLa tecla B pausa el juego.\n"
+							   "\tLa tecla 5 abre el menú del juego.\n"
+							   "\tLa tecla F cierra el juego.\n");
+	}
 	fflush(stdout);
 }
 
 inline static void MostrarMenu(int partida) {
 	enviarConsola(partida, "\n¡Bienvenido a arkanoPi!\n"
-			"\tPulsa 1 para cambiar el números de pelotas en juego (1 - 9).\n"
-			"\tPulsa 2 para alternar las paredes del juego.\n"
-			"\tPulsa 3 para alternar el soporte de periféricos externos.\n"
-			"\tPulsa 4 para ver la ayuda.\n"
-			"\tPulsa A o D para comenzar la partida.\n");
+						   "\tPulsa 1 para cambiar el números de pelotas en juego (1 - 9).\n"
+						   "\tPulsa 2 para alternar las paredes del juego.\n"
+						   "\tPulsa 3 para alternar el soporte de periféricos externos.\n"
+						   "\tPulsa 4 para ver la ayuda.\n"
+						   "\tPulsa A o D para comenzar la partida.\n");
 	fflush(stdout);
 }
 
