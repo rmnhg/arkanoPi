@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 } else {  // Es un mensaje de control
-                    if (message != null && processTCPMessage(message).length() > 0 && processTCPMessage(message).contains("$Servidor_cerrado")) {
+                    if (message != null && processTCPMessage(message).length() > 0 && (processTCPMessage(message).contains("$Servidor_cerrado") || processTCPMessage(message).contains("$Desconectado_por_inactividad"))) {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -123,9 +123,14 @@ public class MainActivity extends AppCompatActivity {
         }, server_address, server_port);
         if (mViewModel.getConnectTask() != null && mViewModel.getConnectTask().isAlive()) {
             try {
+                if (mViewModel.getTcpClient() != null) {
+                    mViewModel.getTcpClient().stopClient();
+                }
                 mViewModel.getConnectTask().interrupt();
             } catch (Exception e) {}
             mViewModel.setConnectTask(null);
+        } else if (mViewModel.getTcpClient() != null) {
+            mViewModel.getTcpClient().stopClient();
         }
         mViewModel.setConnectTask(new ConnectTask(mTCPClient));
         mViewModel.getConnectTask().start();

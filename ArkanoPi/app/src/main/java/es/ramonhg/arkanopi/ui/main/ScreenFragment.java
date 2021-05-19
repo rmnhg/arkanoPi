@@ -119,6 +119,9 @@ public class ScreenFragment extends Fragment {
         led[6][5] = mView.findViewById(R.id.led65);
         led[6][6] = mView.findViewById(R.id.led66);
         led[6][7] = mView.findViewById(R.id.led67);
+
+        // Se dibuja la pantalla guardada
+        mViewModel.updateScreen(mViewModel.getScreenContent(), consoleTextView, led, true, TAG);
     }
 
     @Override

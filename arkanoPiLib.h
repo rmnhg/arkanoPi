@@ -9,6 +9,7 @@
 #include "ledDisplay.h"
 #include "tmr.h"
 
+void enviar_pantalla(int partida);
 void enviarConsola(int partida, const char *format, ...);
 PI_THREAD (thread_conexion);
 void cerrarConexion();

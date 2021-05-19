@@ -123,6 +123,9 @@ public class MixedFragment extends Fragment {
         led[6][6] = mView.findViewById(R.id.led66);
         led[6][7] = mView.findViewById(R.id.led67);
 
+        // Se dibuja la pantalla guardada
+        mViewModel.updateScreen(mViewModel.getScreenContent(), consoleTextView, led, true, TAG);
+
         // Preparación matriz de teclas
         tecla[0][0] = mView.findViewById(R.id.tecla00);
         tecla[0][1] = mView.findViewById(R.id.tecla01);

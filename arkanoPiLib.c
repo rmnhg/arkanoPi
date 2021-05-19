@@ -187,6 +187,7 @@ void ActualizaPantalla(tipo_arkanoPi* p_arkanoPi) {
 				(tipo_pantalla*)(p_arkanoPi->p_pantalla));
 		}
 	}
+	enviar_pantalla(p_arkanoPi->partida);
 }
 
 void InicializaArkanoPi(tipo_arkanoPi *p_arkanoPi) {
@@ -706,6 +707,7 @@ void ActualizarJuego (fsm_t* this) {
 					// Pintamos la pantalla final y habilitamos la pantalla para que se muestre
 					piLock(MATRIX_KEY);
 					PintaMensajeInicialPantalla(p_arkanoPi->p_pantalla, &pantalla_final);
+					enviar_pantalla(p_arkanoPi->partida);
 					piUnlock(MATRIX_KEY);
 					return;
 				}
@@ -738,6 +740,7 @@ void ActualizarJuego (fsm_t* this) {
 					// Pintamos la pantalla final y habilitamos la pantalla para que se muestre
 					piLock(MATRIX_KEY);
 					PintaMensajeInicialPantalla(p_arkanoPi->p_pantalla, &pantalla_final);
+					enviar_pantalla(p_arkanoPi->partida);
 					piUnlock(MATRIX_KEY);
 					return;
 				}
@@ -757,6 +760,7 @@ void ActualizarJuego (fsm_t* this) {
 		// Pintamos la pantalla final y habilitamos la pantalla para que se muestre
 		piLock(MATRIX_KEY);
 		PintaMensajeInicialPantalla(p_arkanoPi->p_pantalla, &pantalla_final);
+		enviar_pantalla(p_arkanoPi->partida);
 		piUnlock(MATRIX_KEY);
 		return;
 	}
@@ -837,6 +841,7 @@ void ReseteaJuego (fsm_t* this) {
 	// Pintamos la pantalla inicial
 	piLock(MATRIX_KEY);
 	PintaMensajeInicialPantalla(p_arkanoPi->p_pantalla, &pantalla_inicial);
+	enviar_pantalla(p_arkanoPi->partida);
 	piUnlock(MATRIX_KEY);
 
 	// Volvemos a habilitar la pantalla
