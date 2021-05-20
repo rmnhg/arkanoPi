@@ -47,7 +47,9 @@ public class MixedFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        // Obtenemos el view model para comunicarnos con otras clases y obtener los datos
         mViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
+        // Guardamos este fragment en el view model
         mViewModel.setMixedFragment(this);
 
         settings = mView.findViewById(R.id.settingsButton);
@@ -144,7 +146,7 @@ public class MixedFragment extends Fragment {
         tecla[3][2] = mView.findViewById(R.id.tecla32);
         tecla[3][3] = mView.findViewById(R.id.tecla33);
 
-        // Envío de pulsado de teclas
+        // Preparamos las teclas para el envío de su posición
         for (int fila = 0; fila < 4; fila++) {
             for (int columna = 0; columna < 4; columna++) {
                 if (!(fila == 3 && columna == 3)) {
@@ -192,7 +194,7 @@ public class MixedFragment extends Fragment {
                                 public void onClick(View v) {
                                     mViewModel.getTcpClient().sendMessage("33");
                                     mViewModel.setTcpClient(null);
-                                    Toast.makeText(getContext(), "Se ha desconectado del servidor", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(), "El servidor se ha cerrado. Se ha detenido la conexión", Toast.LENGTH_SHORT).show();
                                 }
                             })
                             .show();
@@ -208,18 +210,34 @@ public class MixedFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    /**
+     * Función que establece si es la primera vez que se pinta una pantalla o no
+     * @param primeraPantallaEscrita valor del boolean que controla este parámetro
+     */
     public void setPrimeraPantallaEscrita(boolean primeraPantallaEscrita) {
         this.primeraPantallaEscrita = primeraPantallaEscrita;
     }
 
+    /**
+     * Método que devuelve si es la primera vez que se pinta la pantalla
+     * @return boolean que indica si es la primera vez que se pinta la pantalla
+     */
     public boolean getPrimeraPantallaEscrita() {
         return primeraPantallaEscrita;
     }
 
+    /**
+     * Método que devuelve la matriz de LEDs (Buttons) del fragment
+     * @return matriz de LEDs (Buttons) del fragment
+     */
     public Button[][] getMatrizDeLeds() {
         return led;
     }
 
+    /**
+     * Método que devuelve el TextView donde se muestran los mensajes de consola
+     * @return TextView donde se muestran los mensajes de consola
+     */
     public TextView getConsoleTextView() {
         return consoleTextView;
     }

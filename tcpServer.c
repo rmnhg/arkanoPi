@@ -2,6 +2,7 @@
 //#define DEBUG // Da más información sobre los resultados de algunas funciones de TCP
 //#define MOSTRAR_MENSAJES
 
+// Creamos el objeto servidor e inicializamos algunos de sus parámetros
 TipoServidor servidor = {
 	.puerto = PUERTO,
     .socket_fd = 0,
@@ -14,15 +15,16 @@ TipoServidor servidor = {
  * Establece un mensaje de error y cierra las conexiones por completo.
  */
 void error(char * mensajeError) {
-	printf("%s", mensajeError);
+	// Almacenamos el mensaje de error en servidor.mensaje_error
 	bzero(servidor.mensaje_error, MAX_CARACTERES);
 	strncpy(servidor.mensaje_error, mensajeError, strlen(mensajeError));
+	// Activamos el flag de error
 	servidor.flags |= FLAG_TCP_ERROR;
-	// Se detiene sel servidor
+	// Se detiene el servidor por completo
 	cerrarConexion();
-	// Se reanuda el servidor
+	// Se intenta volver a abrir el servidor
 	servidor.servidorHabilitado = 1;
-	// Lanzamos un thread para gestionar las conexiones TCP de los periféricos externos
+	// Lanzamos el thread para gestionar las conexiones TCP de los periféricos externos
 	if (piThreadCreate(thread_conexion) != 0) {
 		printf("No se pudo crear el thread thread_conexion.\n");
 		return;
@@ -48,9 +50,9 @@ int escucha() {
 }
 
 /**
- * Thread que está pendiente de aceptar y almacenar hasta MAX_PERIFERICOS_CONECTADOS perifericos.
- * Si hay más perifericos, los acepta y los almacena donde estaban los anteriores perifericos
- * (se supone que esos perifericos se han desconectado).
+ * Thread que está pendiente de aceptar y almacenar hasta MAX_PERIFERICOS_CONECTADOS periféricos.
+ * Si hay más perifericos, los acepta y los almacena donde estaban los anteriores periféricos
+ * (se supone que los primeros perifericos se han desconectado).
  */
 PI_THREAD(thread_aceptar_periferico) {
 	int err = 0;
@@ -62,48 +64,63 @@ PI_THREAD(thread_aceptar_periferico) {
 	sl.l_onoff = 1;
 	sl.l_linger = 0;
 
+	// El thread se ejecuta mientras el servidor siga habilitado
 	while (servidor.servidorHabilitado) {
-		if (servidor.socket_fd == -1 && servidor.perifericos_conectados < MAX_PERIFERICOS_CONECTADOS) {
+		if (servidor.servidorHabilitado && servidor.socket_fd == -1 && servidor.perifericos_conectados < MAX_PERIFERICOS_CONECTADOS) {
+			// Si hay menos periféricos del máximo y el socket no está escuchando nuevas conexiones, se pone en escucha
 			inicializaSocketTCP();
 			servidor.aceptandoPerifericos = 1;
-		}
-		for (int idPeriferico = 0; idPeriferico < MAX_PERIFERICOS_CONECTADOS; idPeriferico++) {
-			if (servidor.socket_fd != -1 && servidor.periferico[idPeriferico].conexion_fd == -1) {
-				p_periferico = &(servidor.periferico[idPeriferico]);
+		} else if (servidor.servidorHabilitado && servidor.perifericos_conectados < MAX_PERIFERICOS_CONECTADOS) {
+			for (int idPeriferico = 0; idPeriferico < MAX_PERIFERICOS_CONECTADOS; idPeriferico++) {
+				if (servidor.socket_fd != -1 && servidor.periferico[idPeriferico].conexion_fd == -1) {
+					// Solo se acepta y almacena un periférico nuevo si hay algún socket libre (con -1)
+					p_periferico = &(servidor.periferico[idPeriferico]);
 
-				p_periferico->long_periferico = sizeof(p_periferico->direccion_periferico);
+					// Se establece la longitud de la dirección del periférico
+					p_periferico->long_periferico = sizeof(p_periferico->direccion_periferico);
 
-				err = (p_periferico->conexion_fd = accept(servidor.socket_fd, (struct sockaddr*)&(p_periferico->direccion_periferico), &(p_periferico->long_periferico)));
-				if (err == -1) {
-					#ifdef DEBUG
-					perror("accept");
-					#endif
-					perror("accept");
-					sprintf(buffer_error, "Hubo un fallo al aceptar al periferico con id %d.\n", idPeriferico);
-					//error(buffer_error);
-				} else {
-					#ifdef MOSTRAR_MENSAJES
-					piLock(STD_IO_BUFFER_KEY);
-					printf("El periferico con id %d se ha conectado.\n", i);
-					piUnlock(STD_IO_BUFFER_KEY);
-					#endif
-					// Definimos que no se espere a que se transmitan datos al cerrar el socket
-					setsockopt(servidor.periferico[idPeriferico].conexion_fd, SOL_SOCKET, SO_LINGER, &sl, sizeof(sl));
-					servidor.perifericos_conectados++;
-					p_periferico->activo = 1;
-					// A cada periférico se le asigna su propia partida en un principio
-					p_periferico->partida = idPeriferico + 1;
-					// Se comienza a obtener sus mensajes
-					if (pthread_create(&(servidor.thread_supervisa_perifericos[idPeriferico]), NULL, thread_obtener_mensajes, NULL) != 0) {
-						error("No se pudo crear el thread de thread_obtener_mensajes.\n");
-						return NULL;
+					// Se espera a que haya un periférico intentando establecer conexión para aceptarlo
+					err = (p_periferico->conexion_fd = accept(servidor.socket_fd, (struct sockaddr*)&(p_periferico->direccion_periferico), &(p_periferico->long_periferico)));
+					if (err == -1) {
+						#ifdef DEBUG
+						perror("accept");
+						#endif
+						sprintf(buffer_error, "Hubo un fallo al aceptar al periferico con id %d.\n", idPeriferico);
+						error(buffer_error);
+					} else {
+						#ifdef MOSTRAR_MENSAJES
+						piLock(STD_IO_BUFFER_KEY);
+						printf("El periferico con id %d se ha conectado.\n", i);
+						piUnlock(STD_IO_BUFFER_KEY);
+						#endif
+						// Definimos que no se espere a que se transmitan datos al cerrar el socket
+						setsockopt(servidor.periferico[idPeriferico].conexion_fd, SOL_SOCKET, SO_LINGER, &sl, sizeof(sl));
+						// Se actualiza el número de periféricos conectados
+						servidor.perifericos_conectados++;
+						// Se marca el periférico como activo
+						p_periferico->activo = 1;
+						// A cada periférico se le asigna su propia partida en un principio
+						p_periferico->partida = idPeriferico + 1;
+						// Se comienza a obtener sus mensajes
+						if (pthread_create(&(servidor.thread_supervisa_perifericos[idPeriferico]), NULL, thread_obtener_mensajes, &idPeriferico) != 0) {
+							error("No se pudo crear el thread de thread_obtener_mensajes.\n");
+							return NULL;
+						}
+						// Se envía la pantalla para que la renderice por primera vez
+						enviarPantalla(p_periferico->partida);
+						// Se envía la consola almacenada por si no la recibió anteriormente
+						enviarTexto(servidor.str_consola[p_periferico->partida], idPeriferico);
+						// Se inicia la cuenta del timer que comprueba la disponibilidad de periféricos
+						tmr_startms((tmr_t*) (servidor.timer_comprueba_conexiones), TIMEOUT_COMPRUEBA_PERIFERICO);
 					}
-					// Se envía la pantalla
-					enviar_pantalla(p_periferico->partida);
-					// Se envía la consola almacenada por si no la recibió anteriormente
-					enviarTexto(servidor.str_consola[p_periferico->partida], idPeriferico);
-					tmr_startms((tmr_t*) (servidor.timer_comprueba_conexiones), TIMEOUT_COMPRUEBA_PERIFERICO);
 				}
+			}
+			if (servidor.servidorHabilitado && servidor.perifericos_conectados == MAX_PERIFERICOS_CONECTADOS) {
+				// Se deja de aceptar periféricos porque hemos llegado al máximo
+				close(servidor.socket_fd);
+				servidor.socket_fd = -1;
+				servidor.aceptandoPerifericos = 0;
+
 			}
 		}
 	}
@@ -130,6 +147,7 @@ void enviarTexto(char * str, int idPeriferico) {
 	}
 	if (servidor.perifericos_conectados && (servidor.servidorHabilitado || (strstr(str, "$Servidor_cerrado") != NULL))) {
 		if (servidor.periferico[idPeriferico].conexion_fd != -1) {
+			// Se envía el mensaje al periférico si su socket está activo. Si hay algún error, se desconecta a dicho periférico
 			if (send(servidor.periferico[idPeriferico].conexion_fd, str, strlen(str), MSG_NOSIGNAL) < 0) {
 				#ifdef MOSTRAR_MENSAJES
 				piLock(STD_IO_BUFFER_KEY);
@@ -171,16 +189,16 @@ void enviarConsola(int partida, const char *format, ...) {
 }
 
 /**
- * Función de interrupción del timer que recorre todas las pantallas y
- * las transforma en una string de dígitos consecutivos para su envío.
+ * Función que recorre todas las pantallas y las transforma
+ * en una string de dígitos consecutivos para su envío.
  */
-void enviar_pantalla(int partida) {
+void enviarPantalla(int partida) {
 	char str_pantalla[NUM_FILAS_DISPLAY * NUM_COLUMNAS_DISPLAY + 2];
 
 	if (servidor.servidorHabilitado) {
 		for (int idPeriferico = 0; idPeriferico < MAX_PERIFERICOS_CONECTADOS; idPeriferico++) {
 			if (partida == servidor.periferico[idPeriferico].partida) {
-				// Se transmite la pantalla
+				// Se transmite la pantalla correspondiente a la partida que controle el periférico
 				for (int i = 0; i < NUM_FILAS_DISPLAY; i++) {
 					for (int j = 0; j < NUM_COLUMNAS_DISPLAY; j++) {
 						if (partida == 0) { // Pantalla del host con led_display
@@ -208,6 +226,7 @@ void enviar_pantalla(int partida) {
 						}
 					}
 				}
+				// Se establece el final de la string y se manda al periférico idPeriferico
 				str_pantalla[56] = '\n';
 				str_pantalla[57] = '\0';
 				enviarTexto(str_pantalla, idPeriferico);
@@ -246,12 +265,15 @@ void desconectarPeriferico(int idPeriferico) {
 void timer_comprueba_perifericos_isr(union sigval value) {
 	for (int idPeriferico = 0; idPeriferico < MAX_PERIFERICOS_CONECTADOS; idPeriferico++) {
 		if (servidor.periferico[idPeriferico].activo) {
+			// Por ahora el periférico ha respondido. Si no responde en la siguiente vuelta se desconecta
 			servidor.periferico[idPeriferico].activo = 0;
 		} else {
+			// El periférico no ha respondido, así que se le informa de la desconexión y se desconecta
 			enviarTexto("$Desconectado_por_inactividad", idPeriferico);
 			desconectarPeriferico(idPeriferico);
 		}
 	}
+	// Se reinicia la cuenta del timer
 	tmr_startms((tmr_t*) (servidor.timer_comprueba_conexiones), TIMEOUT_COMPRUEBA_PERIFERICO);
 }
 
@@ -260,31 +282,34 @@ void timer_comprueba_perifericos_isr(union sigval value) {
  * Solo los lee si hay periféricos conectados y el socket que va a leer está inicializado.
  */
 PI_THREAD(thread_obtener_mensajes) {
-	int idPeriferico = 0;
+	int *p_periferico;
+	p_periferico = (int*)(dummy);
+	// Obtenemos el periférico que debemos controlar del parámetro dummy pasado al crear el thread
+	int idPeriferico = *p_periferico;
 	char partidaRecibida[2];
-	for (int i = 0; i < MAX_PERIFERICOS_CONECTADOS; i++) {
-		if (servidor.periferico[i].supervisado == 'n') {
-			servidor.periferico[i].supervisado = 's';
-			idPeriferico = i;
-			break;
-		}
+	if (servidor.periferico[idPeriferico].supervisado == 'n') {
+		servidor.periferico[idPeriferico].supervisado = 's';
 	}
+	// Se buscan mensajes nuevos del periférico siempre que el servidor siga habilitado y no haya ningún error
 	while (servidor.servidorHabilitado) {
 		if (servidor.flags & FLAG_TCP_ERROR)
 			break;
 		if (servidor.perifericos_conectados && !(servidor.flags & FLAG_TCP_MENSAJE)) {
 			if (servidor.periferico[idPeriferico].conexion_fd != -1) {
+				// Se espera un nuevo mensaje del periférico si su socket es válido y se almacena en su variable mensaje
 				bzero(servidor.periferico[idPeriferico].mensaje, sizeof(servidor.periferico[idPeriferico].mensaje));
-				if(read(servidor.periferico[idPeriferico].conexion_fd, servidor.periferico[idPeriferico].mensaje, sizeof(servidor.periferico[idPeriferico].mensaje)) <= 0) {
+				if(recv(servidor.periferico[idPeriferico].conexion_fd, servidor.periferico[idPeriferico].mensaje, sizeof(servidor.periferico[idPeriferico].mensaje), 0) <= 0) {
 					#ifdef MOSTRAR_MENSAJES
 					piLock(STD_IO_BUFFER_KEY);
 					#ifdef DEBUG
-					perror("read");
+					perror("recv");
 					#endif
 					printf("El periférico con id %d se ha desconectado.\nEscuchando de nuevo conexión con periférico en el puerto %d.\n", idPeriferico, servidor.puerto);
 					piUnlock(STD_IO_BUFFER_KEY);
 					#endif
+					// Si ha habido algún error, se desconecta el periférico
 					desconectarPeriferico(idPeriferico);
+					// Si el servidor no está aceptando nuevos periféricos, se lanza el thread para comenzar a aceptarlos
 					if (!servidor.aceptandoPerifericos) {
 						// Se comienza a escuchar a perifericos externos
 						if (pthread_create(&(servidor.thread_acepta_perifericos), NULL, thread_aceptar_periferico, NULL) != 0) {
@@ -292,20 +317,23 @@ PI_THREAD(thread_obtener_mensajes) {
 						}
 					}
 				} else {
+					// Si se ha recibido un mensaje se marca el periférico como activo
 					servidor.periferico[idPeriferico].activo = 1;
 					if (strstr(servidor.periferico[idPeriferico].mensaje, "$Desconectar_cliente") != NULL) {
+						// Se desconecta al periférico si lo pide
 						desconectarPeriferico(idPeriferico);
 					} else if (strstr(servidor.periferico[idPeriferico].mensaje, "$Cambiar_a_partida_") != NULL) {
-						// Se coge el última carácter como partida
+						// Se coge el último carácter como partida
 						sprintf(partidaRecibida, "%c", *(servidor.periferico[idPeriferico].mensaje + 19));
 						if (atoi(partidaRecibida) >= 0 && atoi(partidaRecibida) <= MAX_PERIFERICOS_CONECTADOS) {
 							servidor.periferico[idPeriferico].partida = atoi(partidaRecibida);
 							// Se envía la pantalla
-							enviar_pantalla(servidor.periferico[idPeriferico].partida);
+							enviarPantalla(servidor.periferico[idPeriferico].partida);
 							// Se envía la consola almacenada en la nueva partida
 							enviarTexto(servidor.str_consola[servidor.periferico[idPeriferico].partida], idPeriferico);
 						}
 					} else if (strstr(servidor.periferico[idPeriferico].mensaje, "$Sigo_conectado") == NULL) {
+						// Si el mensaje no es ningún mensaje de control conocido, será una pulsación de tecla. Se activa el flag correspondiente
 						servidor.flags |= FLAG_TCP_MENSAJE;
 						servidor.periferico[idPeriferico].mensajeSinProcesar = 1;
 					}
@@ -409,9 +437,11 @@ void inicializaSocketTCP() {
  */
 PI_THREAD (thread_conexion) {
 	int partidaActual = 0, posicionTecla = 0, fila = 0, columna = 0;
+	// Se inicia el servidor TCP
 	servidor.servidorHabilitado = 1;
 	iniciarServidor();
 
+	// Se procesan los mensajes que lleguen mientras el servidor esté habilitado y si no hay ningún error
 	while(servidor.servidorHabilitado) {
 		if (servidor.perifericos_conectados) {
 			if (servidor.flags & FLAG_TCP_ERROR) {
@@ -424,16 +454,19 @@ PI_THREAD (thread_conexion) {
 				break;
 			} else if (servidor.flags & FLAG_TCP_MENSAJE)  {
 				for (int idPeriferico = 0; idPeriferico < MAX_PERIFERICOS_CONECTADOS; idPeriferico++) {
+					// Por cada periférico se comprueba si tiene un mensaje sin procesar, para trabajar con él
 					if (servidor.periferico[idPeriferico].mensajeSinProcesar) {
 						partidaActual = servidor.periferico[idPeriferico].partida;
+						// Se transforma la string "FC" en la fila F y la columna C
 						posicionTecla = atoi((const char *) servidor.periferico[idPeriferico].mensaje);
 						fila = posicionTecla / 10;
 						columna = posicionTecla % 10;
-						// Llegará XY siendo X la fila e Y la columna de la tecla pulsada
 						if (partidaActual >= 0 && partidaActual <= MAX_PERIFERICOS_CONECTADOS) {
 							if (partidaActual != 0) {
+								// Si estamos en una partida remota, llamamos directamente a explora_teclado()
 								explora_teclado(tecladoTL04[fila][columna], partidaActual);
 							} else {
+								// Si estamos en la partida host, procesamos la tecla como si se hubiese pulsado físicamente
 								teclado.teclaPulsada.row = fila;
 								teclado.teclaPulsada.col = columna;
 								piLock(SYSTEM_FLAGS_KEY);
@@ -441,10 +474,11 @@ PI_THREAD (thread_conexion) {
 								piUnlock(SYSTEM_FLAGS_KEY);
 							}
 						}	
-						// Se establece que no tiene ningún mensaje pendiente de procesar
+						// Se establece que el periférico ya no tiene ningún mensaje pendiente de procesar
 						servidor.periferico[idPeriferico].mensajeSinProcesar = 0;
 					}
 				}
+				// Ya hemos atendido el flag. Se desactiva.
 				servidor.flags &= ~FLAG_TCP_MENSAJE;
 			}
 		}
@@ -457,23 +491,25 @@ PI_THREAD (thread_conexion) {
  */
 void cerrarConexion() {
 	// Se deja de aceptar perifericos
-	close(servidor.socket_fd);
-	servidor.socket_fd = -1;
+	if (servidor.socket_fd != -1) {
+		close(servidor.socket_fd);
+		servidor.socket_fd = -1;
+	}
 	// Para desconectar a todos los periféricos del servidor.
 	// Se notifica a los periféricos y se cierran las conexiones
 	for (int idPeriferico = 0; idPeriferico < MAX_PERIFERICOS_CONECTADOS; idPeriferico++) {
 		enviarTexto("$Servidor_cerrado", idPeriferico);
 	}
+	// Se establece que el servidor está deshabilitado y se detiene el thread que acepta periféricos
 	servidor.servidorHabilitado = 0;
-	delay(TIMEOUT_ENVIO_PANTALLA);
 	pthread_cancel(servidor.thread_acepta_perifericos);
-	//tmr_destroy((tmr_t*) (servidor.timer_pantalla));
-	// Se eliminan las referencias a los clientes
+	// Se desconectan y se eliminan las referencias a los periféricos
 	for (int idPeriferico = 0; idPeriferico < MAX_PERIFERICOS_CONECTADOS; idPeriferico++) {
 		if (servidor.periferico[idPeriferico].conexion_fd != -1) {
 			desconectarPeriferico(idPeriferico);
 		}
 	}
+	// Establecemos que ya no hay periféricos conectados
 	servidor.perifericos_conectados = 0;
 }
 

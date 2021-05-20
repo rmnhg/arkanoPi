@@ -9,13 +9,6 @@
 #include "ledDisplay.h"
 #include "tmr.h"
 
-void enviar_pantalla(int partida);
-void enviarConsola(int partida, const char *format, ...);
-PI_THREAD (thread_conexion);
-void cerrarConexion();
-int compruebaServidorHabilitado();
-void habilitarServidor();
-
 enum t_direccion {
 	ARRIBA_IZQUIERDA,
 	ARRIBA,
@@ -31,7 +24,7 @@ enum t_direccion {
 #define NUM_COLUMNAS_PALA 	3
 #define NUM_FILAS_PALA 		1
 #define MAX_NUM_TRAYECTORIAS 8
-#define MAX_PELOTAS			9
+#define MAX_PELOTAS			9 // Máximo número de pelotas que puede haber en el juego
 
 typedef struct {
   int ancho;
@@ -58,9 +51,9 @@ typedef struct {
 	tipo_pantalla ladrillos;
 	tipo_pala pala;
 	tipo_pelota pelota[MAX_PELOTAS];
-	int numeroPelotas;
-	int paredesHabilitadas;
-	int primerAccesoSubmenu;
+	int numeroPelotas; // Entero que almacena el número de pelotas que se muestran en esta partida
+	int paredesHabilitadas; // Entero que almacena si hay rebotes en las paredes verticales o no en esta partida
+	int primerAccesoSubmenu; // Entero que almacena si algún submenú se muestra por primera vez o no en en esta partida
 	int partida; // Número de la partida que se juega con esta estructura arkanoPi
 	tmr_t* tmr_actualizacion_juego;
 } tipo_arkanoPi;
@@ -68,7 +61,6 @@ typedef struct {
 //------------------------------------------------------------------------
 // FUNCIONES DE INICIALIZACION / RESET  DE LOS OBJETOS ESPECIFICOS
 //------------------------------------------------------------------------
-
 void InicializaLadrillos(tipo_pantalla *p_ladrillos);
 void InicializaPelota(tipo_pelota *p_pelota);
 void InicializaPala(tipo_pala *p_pala);
@@ -76,36 +68,6 @@ void InicializaPosiblesTrayectorias(tipo_pelota *p_pelota);
 void InicializaArkanoPi(tipo_arkanoPi *p_arkanoPi);
 void ResetArkanoPi(tipo_arkanoPi *p_arkanoPi);
 void ReseteaMatriz(tipo_pantalla *p_pantalla);
-
-inline static void mostrarInstruccionesJuego(int partida, int desdeMenu) {
-	if (desdeMenu) {
-		enviarConsola(partida, "\nInstrucciones de uso:\n"
-							   "\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n"
-							   "\tLa tecla C actualiza la posición de la pelota en la pantalla manualmente.\n"
-							   "\tLa tecla B pausa el juego.\n"
-							   "\tLa tecla 5 vuelve al menú del juego.\n"
-							   "\tLa tecla F cierra el juego.\n");
-	} else {
-		enviarConsola(partida, "\nInstrucciones de uso:\n"
-							   "\tCualquier tecla inicia el juego.\n"
-							   "\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n"
-							   "\tLa tecla C actualiza la posición de la pelota en la pantalla manualmente.\n"
-							   "\tLa tecla B pausa el juego.\n"
-							   "\tLa tecla 5 abre el menú del juego.\n"
-							   "\tLa tecla F cierra el juego.\n");
-	}
-	fflush(stdout);
-}
-
-inline static void MostrarMenu(int partida) {
-	enviarConsola(partida, "\n¡Bienvenido a arkanoPi!\n"
-						   "\tPulsa 1 para cambiar el números de pelotas en juego (1 - 9).\n"
-						   "\tPulsa 2 para alternar las paredes del juego.\n"
-						   "\tPulsa 3 para alternar el soporte de periféricos externos.\n"
-						   "\tPulsa 4 para ver la ayuda.\n"
-						   "\tPulsa A o D para comenzar la partida.\n");
-	fflush(stdout);
-}
 
 //------------------------------------------------------
 // PROCEDIMIENTOS PARA LA GESTION DEL JUEGO
@@ -148,7 +110,7 @@ int CompruebaAyuda(fsm_t* this);
 int CompruebaNumerosPulsados(fsm_t* this);
 int CompruebaMenosPulsado(fsm_t* this);
 int CompruebaMasPulsado(fsm_t* this);
-int CompruebaSalirMenuPulsado(fsm_t* this);
+int CompruebaMenuPulsado(fsm_t* this);
 
 //------------------------------------------------------
 // FUNCIONES DE ACCION DE LA MAQUINA DE ESTADOS
@@ -170,5 +132,48 @@ void MostrarSubmenuAyuda (fsm_t* this);
 // SUBRUTINAS DE ATENCION A LAS INTERRUPCIONES
 //------------------------------------------------------
 void tmr_actualizacion_juego_isr(union sigval value);
+
+//------------------------------------------------------
+// SUBRUTINAS DE CONTROL Y COMUNICACIÓN DEL SERVIDOR TCP
+//------------------------------------------------------
+void enviarPantalla(int partida);
+void enviarConsola(int partida, const char *format, ...);
+PI_THREAD (thread_conexion);
+int compruebaServidorHabilitado();
+void habilitarServidor();
+void cerrarConexion();
+
+//-------------------------------------------------------------------
+// SUBRUTINAS COMUNES PARA MOSTRAR EL MENÚ Y LOS CONTROLES DEL JUEGO
+//-------------------------------------------------------------------
+inline static void mostrarInstruccionesJuego(int partida, int desdeMenu) {
+	if (desdeMenu) {
+		enviarConsola(partida, "\nInstrucciones de uso:\n"
+							   "\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n"
+							   "\tLa tecla C actualiza la posición de la pelota en la pantalla manualmente.\n"
+							   "\tLa tecla B pausa el juego.\n"
+							   "\tLa tecla 5 vuelve al menú del juego.\n"
+							   "\tLa tecla F cierra el juego.\n");
+	} else {
+		enviarConsola(partida, "\nInstrucciones de uso:\n"
+							   "\tCualquier tecla inicia el juego.\n"
+							   "\tLas teclas A o 4 y D o 6 mueven la pala hacia la izquierda y hacia la derecha respectivamente.\n"
+							   "\tLa tecla C actualiza la posición de la pelota en la pantalla manualmente.\n"
+							   "\tLa tecla B pausa el juego.\n"
+							   "\tLa tecla 5 abre el menú del juego.\n"
+							   "\tLa tecla F cierra el juego.\n");
+	}
+	fflush(stdout);
+}
+
+inline static void MostrarMenu(int partida) {
+	enviarConsola(partida, "\n¡Bienvenido a arkanoPi!\n"
+						   "\tPulsa 1 para cambiar el números de pelotas en juego (1 - %d).\n"
+						   "\tPulsa 2 para alternar las paredes del juego.\n"
+						   "\tPulsa 3 para alternar el soporte de periféricos externos.\n"
+						   "\tPulsa 4 para ver la ayuda.\n"
+						   "\tPulsa A o D para comenzar la partida.\n", MAX_PELOTAS);
+	fflush(stdout);
+}
 
 #endif /* _ARKANOPILIB_H_ */

@@ -16,7 +16,6 @@
 #define MAX_CARACTERES 500
 #define PUERTO 1607
 #define MAX_PERIFERICOS_CONECTADOS 2
-#define TIMEOUT_ENVIO_PANTALLA DEBOUNCE_TIME
 #define TIMEOUT_COMPRUEBA_PERIFERICO 10000
 
 typedef struct {
@@ -67,7 +66,7 @@ void timer_comprueba_perifericos_isr(union sigval value);
 void iniciarServidor();
 
 /* Funciones usadas externamente TCP */
-void enviar_pantalla(int partida);
+void enviarPantalla(int partida);
 void enviarConsola(int partida, const char *format, ...);
 void cerrarConexion();
 int compruebaServidorHabilitado();

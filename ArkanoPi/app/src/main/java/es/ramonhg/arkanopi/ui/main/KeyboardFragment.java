@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,7 +26,7 @@ public class KeyboardFragment extends Fragment {
     private View mView;
 
     Button settings;
-    Button tecla[][] = new Button[4][4];
+    ImageButton tecla[][] = new ImageButton[4][4];
     private MainViewModel mViewModel;
 
     public static KeyboardFragment newInstance() {
@@ -43,9 +44,12 @@ public class KeyboardFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        // Obtenemos el view model para comunicarnos con otras clases y obtener los datos
         mViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
+        // Guardamos este fragment en el view model
         mViewModel.setKeyboardFragment(this);
 
+        // Inicializamos el botón de ajustes con su función
         settings = mView.findViewById(R.id.settingsButton);
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,7 +76,7 @@ public class KeyboardFragment extends Fragment {
         tecla[3][2] = mView.findViewById(R.id.tecla32);
         tecla[3][3] = mView.findViewById(R.id.tecla33);
 
-        // Envío de pulsado de teclas
+        // Preparamos las teclas para el envío de su posición
         for (int fila = 0; fila < 4; fila++) {
             for (int columna = 0; columna < 4; columna++) {
                 if (!(fila == 3 && columna == 3)) {

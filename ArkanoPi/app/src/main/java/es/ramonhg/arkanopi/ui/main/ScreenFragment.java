@@ -44,7 +44,9 @@ public class ScreenFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        // Obtenemos el view model para comunicarnos con otras clases y obtener los datos
         mViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
+        // Guardamos este fragment en el view model
         mViewModel.setScreenFragment(this);
 
         settings = mView.findViewById(R.id.settingsButton);
@@ -129,18 +131,34 @@ public class ScreenFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    /**
+     * Función que establece si es la primera vez que se pinta una pantalla o no
+     * @param primeraPantallaEscrita valor del boolean que controla este parámetro
+     */
     public void setPrimeraPantallaEscrita(boolean primeraPantallaEscrita) {
         this.primeraPantallaEscrita = primeraPantallaEscrita;
     }
 
+    /**
+     * Método que devuelve si es la primera vez que se pinta la pantalla
+     * @return boolean que indica si es la primera vez que se pinta la pantalla
+     */
     public boolean getPrimeraPantallaEscrita() {
         return primeraPantallaEscrita;
     }
 
+    /**
+     * Método que devuelve la matriz de LEDs (Buttons) del fragment
+     * @return matriz de LEDs (Buttons) del fragment
+     */
     public Button[][] getMatrizDeLeds() {
         return led;
     }
 
+    /**
+     * Método que devuelve el TextView donde se muestran los mensajes de consola
+     * @return TextView donde se muestran los mensajes de consola
+     */
     public TextView getConsoleTextView() {
         return consoleTextView;
     }

@@ -46,28 +46,34 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        // Obtenemos el view model para comunicarnos con otras clases y obtener los datos
         mViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
-        // TODO: Use the ViewModel
+        // Inicializamos el spinner que define el tipo de conexión
         tipoConexion = mView.findViewById(R.id.tipo_conexion_spinner);
         tipoConexion.setOnItemSelectedListener(this);
 
-        //Creating the ArrayAdapter instance having the country list
+        // Se crea el ArrayAdapter del tipo de conexión o periférico y se establece el layout de los elementos internos
         ArrayAdapter aa = new ArrayAdapter(this.getContext(), android.R.layout.simple_spinner_item, periferico);
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //Setting the ArrayAdapter data on the Spinner
+        // Se asigna este ArrayAdapter al spinner
         tipoConexion.setAdapter(aa);
+        // Establecemos el periférico anteriormente elegido si había alguno
         for (int i = 0; i < periferico.length; i++) {
             if (periferico[i].equals(mViewModel.getTipoPeriferico())) {
                 tipoConexion.setSelection(i);
             }
         }
+
+        // Inicializamos el spinner que define la partida que se jugará
         selectorPartida = mView.findViewById(R.id.partida_spinner);
+        // Definimos el comportamiento del spinner al cambiar de partida
         selectorPartida.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (!partida[position].equals(mViewModel.getPartidaActual())) {
+                    // Se establece la nueva partida en el view model
                     mViewModel.setPartidaActual(partida[position]);
-                    //Si cambiamos de partida, se deben borrar los datos anteriores porque no son válidos
+                    // Si cambiamos de partida, se deben borrar los datos anteriores porque no son válidos
                     mViewModel.setConsoleContent(null);
                     mViewModel.setScreenContent("00000000000000000000000000000000000000000000000000000000");
                 }
@@ -78,13 +84,15 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
 
             }
         });
-
-        //Creating the ArrayAdapter instance having the country list
+        // Establecemos la partida por defecto en la partida 1
         selectorPartida.setSelection(1);
+
+        // Se crea el ArrayAdapter de las partidas y se establece el layout de los elementos internos
         ArrayAdapter aa2 = new ArrayAdapter(this.getContext(), android.R.layout.simple_spinner_item, partida);
         aa2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Se asigna este ArrayAdapter al spinner
         selectorPartida.setAdapter(aa2);
-        // Ponemos la partida guardada anteriormente
+        // Ponemos la partida guardada anteriormente si había alguna
         for (int i = 0; i < partida.length; i++) {
             if (partida[i].equals(mViewModel.getPartidaActual())) {
                 selectorPartida.setSelection(i);
@@ -105,14 +113,18 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
                 }
             }
         });
+        // Inicializamos el botón de conectar
         connect = mView.findViewById(R.id.connectButton);
         connect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Bloqueamos el editor de texto IP al crear una conexión
                 mView.findViewById(R.id.editTextIP).setFocusable(false);
+                // Obtenemos los parámetros del servidor al que nos conectaremos
                 String server_address = ((EditText) mView.findViewById(R.id.editTextIP)).getText().toString();
                 String server_port_str = ((EditText) mView.findViewById(R.id.editTextPuerto)).getText().toString();
                 int server_port = Integer.parseInt(server_port_str);
+                // Finalmente creamos una nueva conexión con los datos recogidos
                 MainActivity main = ((MainActivity)getActivity());
                 main.createConnection(server_address, server_port);
                 try {
@@ -122,6 +134,7 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
                 }
             }
         });
+        // Si anteriormente nos conectamos a un servidor, establecemos los parámetros de dicho servidor en el fragment
         ((EditText) mView.findViewById(R.id.editTextIP)).setText(mViewModel.getServerAddress());
         if (mViewModel.getServerPort() != -1)
             ((EditText) mView.findViewById(R.id.editTextPuerto)).setText(""+mViewModel.getServerPort());
@@ -132,8 +145,10 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
         super.onViewCreated(view, savedInstanceState);
     }
 
+    /**
+     * Método que restaura la disponibilidad de los elementos relacionados con la conexión.
+     */
     public void enableNewConnection() {
-        //EditText.setFocusable(false)
         mView.findViewById(R.id.editTextIP).setFocusableInTouchMode(true);
         mView.findViewById(R.id.editTextPuerto).setFocusableInTouchMode(true);
         mView.findViewById(R.id.tipo_conexion_spinner).setFocusableInTouchMode(true);
@@ -145,6 +160,10 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
         super.onCreate(savedInstanceState);
     }
 
+
+    /**
+     * Método que establece el tipo de periférico seleccionado en el view model
+     */
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         mViewModel.setTipoPeriferico(periferico[position]);

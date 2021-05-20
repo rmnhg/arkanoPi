@@ -2,7 +2,7 @@
 #define _TECLADO_TL04_H_
 
 #include "systemLib.h"
-#include "arkanoPi.h"
+#include "arkanoPi.h" // Para poder acceder a la función explora_teclado()
 
 // REFRESCO TECLADO
 #define TIMEOUT_COLUMNA_TECLADO	25
@@ -11,7 +11,6 @@
 #define NUM_FILAS_TECLADO 		4
 
 // FLAGS FSM CONTROL DE EXCITACION TECLADO Y FSM GESTION TECLAS PULSADAS
-// ATENCION: Valores a modificar por el alumno
 #define FLAG_TIMEOUT_COLUMNA_TECLADO  	0x01 //00000001
 #define FLAG_TECLA_PULSADA 				0x02 //00000010
 
@@ -51,13 +50,12 @@ typedef struct {
 	TipoTecla teclaPulsada; // Variable que almacena la ultima tecla pulsada
 	tmr_t* tmr_duracion_columna; // Temporizador responsable de medir el tiempo de activacion de cada columna
 	int flags; // Variable para gestion de flags especificamente ligados a la gestion del teclado
-	int partida; // Partida actual de la que se han cogido las teclas
 } TipoTeclado;
 
 extern TipoTeclado teclado;
 extern fsm_trans_t fsm_trans_excitacion_columnas[];
 extern fsm_trans_t fsm_trans_deteccion_pulsaciones[];
-extern char tecladoTL04[4][4];
+extern char tecladoTL04[4][4]; // Compartimos el teclado TL04 para usarlo desde tcpServer.c cuando se recibe la posición de una tecla
 
 //------------------------------------------------------
 // PROCEDIMIENTOS DE INICIALIZACION DE LOS OBJETOS ESPECIFICOS
