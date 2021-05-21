@@ -11,6 +11,9 @@ tipo_pantalla pantallas_remotas[MAX_PERIFERICOS_CONECTADOS];
 // Definimos la máquina de estados de arkanoPi como variable global para acceder a él desde explora_teclado()
 fsm_t* arkanoPi_fsm[MAX_PERIFERICOS_CONECTADOS + 1];
 
+// Creamos el timer único de actualizacion del juego
+tmr_t* timer_juego;
+
 // Declaracion del objeto teclado usado en la partida principal
 TipoTeclado teclado = {
 	.columnas = {
@@ -389,8 +392,8 @@ int main () {
 	led_display.tmr_refresco_display = tmr_new(timer_refresco_display_isr);
 	tmr_startms((tmr_t*) (led_display.tmr_refresco_display), TIMEOUT_COLUMNA_DISPLAY);
 
-	// Creamos el timer único de actualizacion del juego
-	tmr_t* timer_juego = tmr_new(tmr_actualizacion_juego_isr);
+	// Inicializamos el timer de actualización de las partidas
+	timer_juego = tmr_new(tmr_actualizacion_juego_isr);
 
 	// Configuracion e incializacion del sistema
 	// Inicializamos los puntero a las pantallas de cada partida

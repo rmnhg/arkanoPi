@@ -136,7 +136,7 @@ PI_THREAD(thread_aceptar_periferico) {
  * Envía el texto de la string str al periférico pasado como parámetro.
  */
 void enviarTexto(char * str, int idPeriferico) {
-	if (strlen(str) < 2)
+	if (!str || strlen(str) < 2)
 		return;
 
 	// Sustituimos los saltos de línea por '#' para evitar mandar más de un mensaje por string.
@@ -168,6 +168,8 @@ void enviarTexto(char * str, int idPeriferico) {
  */
 void enviarConsola(int partida, const char *format, ...) {
 	char * str_consola = (char *) malloc(MAX_CARACTERES * sizeof(char));
+	if (!servidor.str_consola[partida])
+		return;
 	// Componemos la string final y la mostramos en la consola (stdout) y la enviamos a los periféricos conectados.
 	va_list arg;
 	va_start(arg, format);
@@ -286,6 +288,7 @@ PI_THREAD(thread_obtener_mensajes) {
 	p_periferico = (int*)(dummy);
 	// Obtenemos el periférico que debemos controlar del parámetro dummy pasado al crear el thread
 	int idPeriferico = *p_periferico;
+	int nuevaPartida = 0;
 	char partidaRecibida[2];
 	if (servidor.periferico[idPeriferico].supervisado == 'n') {
 		servidor.periferico[idPeriferico].supervisado = 's';
@@ -298,11 +301,11 @@ PI_THREAD(thread_obtener_mensajes) {
 			if (servidor.periferico[idPeriferico].conexion_fd != -1) {
 				// Se espera un nuevo mensaje del periférico si su socket es válido y se almacena en su variable mensaje
 				bzero(servidor.periferico[idPeriferico].mensaje, sizeof(servidor.periferico[idPeriferico].mensaje));
-				if(recv(servidor.periferico[idPeriferico].conexion_fd, servidor.periferico[idPeriferico].mensaje, sizeof(servidor.periferico[idPeriferico].mensaje), 0) <= 0) {
+				if(read(servidor.periferico[idPeriferico].conexion_fd, servidor.periferico[idPeriferico].mensaje, sizeof(servidor.periferico[idPeriferico].mensaje)) <= 0) {
 					#ifdef MOSTRAR_MENSAJES
 					piLock(STD_IO_BUFFER_KEY);
 					#ifdef DEBUG
-					perror("recv");
+					perror("read");
 					#endif
 					printf("El periférico con id %d se ha desconectado.\nEscuchando de nuevo conexión con periférico en el puerto %d.\n", idPeriferico, servidor.puerto);
 					piUnlock(STD_IO_BUFFER_KEY);
@@ -325,12 +328,13 @@ PI_THREAD(thread_obtener_mensajes) {
 					} else if (strstr(servidor.periferico[idPeriferico].mensaje, "$Cambiar_a_partida_") != NULL) {
 						// Se coge el último carácter como partida
 						sprintf(partidaRecibida, "%c", *(servidor.periferico[idPeriferico].mensaje + 19));
-						if (atoi(partidaRecibida) >= 0 && atoi(partidaRecibida) <= MAX_PERIFERICOS_CONECTADOS) {
-							servidor.periferico[idPeriferico].partida = atoi(partidaRecibida);
+						nuevaPartida = atoi(partidaRecibida);
+						if (nuevaPartida >= 0 && nuevaPartida <= MAX_PERIFERICOS_CONECTADOS) {
+							servidor.periferico[idPeriferico].partida = nuevaPartida;
 							// Se envía la pantalla
-							enviarPantalla(servidor.periferico[idPeriferico].partida);
+							enviarPantalla(nuevaPartida);
 							// Se envía la consola almacenada en la nueva partida
-							enviarTexto(servidor.str_consola[servidor.periferico[idPeriferico].partida], idPeriferico);
+							enviarTexto(servidor.str_consola[nuevaPartida], idPeriferico);
 						}
 					} else if (strstr(servidor.periferico[idPeriferico].mensaje, "$Sigo_conectado") == NULL) {
 						// Si el mensaje no es ningún mensaje de control conocido, será una pulsación de tecla. Se activa el flag correspondiente

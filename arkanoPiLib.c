@@ -767,8 +767,7 @@ void ActualizarJuego (fsm_t* this) {
 	PintaPantallaPorTerminal(p_arkanoPi->p_pantalla);
 	piUnlock(STD_IO_BUFFER_KEY);
 
-	// Inicializamos el timer iniciando su cuenta y poniendo en activarTimer que esta partida debe actualizarse
-	tmr_startms((tmr_t*)p_arkanoPi->tmr_actualizacion_juego, TIMEOUT_ACTUALIZA_JUEGO);
+	// Activamos el timer cambiando activarTimer en esta partida
 	activarTimer[p_arkanoPi->partida] = 1;
 }
 
@@ -1060,5 +1059,6 @@ void tmr_actualizacion_juego_isr(union sigval value) {
 		}
 	}
 	piUnlock(SYSTEM_FLAGS_KEY);
+	tmr_startms((tmr_t*) timer_juego, TIMEOUT_ACTUALIZA_JUEGO);
 }
 

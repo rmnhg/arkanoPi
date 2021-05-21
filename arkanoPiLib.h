@@ -176,4 +176,7 @@ inline static void MostrarMenu(int partida) {
 	fflush(stdout);
 }
 
+// Externalizamos el timer de actualización de partidas para reiniciarlo desde su interrupción
+tmr_t* timer_juego;
+
 #endif /* _ARKANOPILIB_H_ */
